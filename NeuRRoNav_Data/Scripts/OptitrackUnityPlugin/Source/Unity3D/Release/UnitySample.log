@@ -1,0 +1,19 @@
+﻿Build started 8/13/2015 3:47:41 PM.
+     1>Project "C:\Users\PM&R\Documents\NueRRoNav\Assets\Scripts\OptitrackUnityPlugin\Source\Unity3D\UnitySample.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Touching "Release\UnityPlugin.unsuccessfulbuild".
+       ClCompile:
+         All outputs are up-to-date.
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\PM&R\Documents\NueRRoNav\Assets\Scripts\OptitrackUnityPlugin\Source\Unity3D\\bin\UnityPlugin.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"\v100-x86-Release\\" NatNetLibStatic.lib ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\UnityPlugin.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /PDB:"C:\Users\PM&R\Documents\NueRRoNav\Assets\Scripts\OptitrackUnityPlugin\Source\Unity3D\bin\UnityPlugin.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\PM&R\Documents\NueRRoNav\Assets\Scripts\OptitrackUnityPlugin\Source\Unity3D\\bin\UnityPlugin.lib" /MACHINE:X86 Release\UnityPlugin.obj
+         Release\tinystr.obj
+         Release\tinyxml.obj
+         Release\tinyxmlerror.obj
+         Release\tinyxmlparser.obj 
+          
+     1>LINK : fatal error LNK1181: cannot open input file 'NatNetLibStatic.lib'
+     1>Done Building Project "C:\Users\PM&R\Documents\NueRRoNav\Assets\Scripts\OptitrackUnityPlugin\Source\Unity3D\UnitySample.vcxproj" (build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:00.40
