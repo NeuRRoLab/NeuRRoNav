@@ -1,19 +1,21 @@
-﻿Build started 8/13/2015 3:47:41 PM.
-     1>Project "C:\Users\PM&R\Documents\NueRRoNav\Assets\Scripts\OptitrackUnityPlugin\Source\Unity3D\UnitySample.vcxproj" on node 2 (build target(s)).
-     1>InitializeBuildStatus:
-         Touching "Release\UnityPlugin.unsuccessfulbuild".
-       ClCompile:
-         All outputs are up-to-date.
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\PM&R\Documents\NueRRoNav\Assets\Scripts\OptitrackUnityPlugin\Source\Unity3D\\bin\UnityPlugin.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"\v100-x86-Release\\" NatNetLibStatic.lib ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\UnityPlugin.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /PDB:"C:\Users\PM&R\Documents\NueRRoNav\Assets\Scripts\OptitrackUnityPlugin\Source\Unity3D\bin\UnityPlugin.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\PM&R\Documents\NueRRoNav\Assets\Scripts\OptitrackUnityPlugin\Source\Unity3D\\bin\UnityPlugin.lib" /MACHINE:X86 Release\UnityPlugin.obj
+﻿Build started 11/25/2015 2:19:32 PM.
+     1>Project "C:\Users\User\Documents\Rodseth\Gait Tracking\Assets\OptitrackUnityPlugin\Source\Unity3D\UnitySample.vcxproj" on node 2 (Build target(s)).
+     1>Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\User\Documents\Rodseth\Gait Tracking\Assets\OptitrackUnityPlugin\Source\Unity3D\\bin\UnityPlugin.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"\v140-x86-Release\\" NatNetLibStatic.lib ws2_32.lib msvcrt.lib msvcmrt.lib legacy_stdio_definitions.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\User\Documents\Rodseth\Gait Tracking\Assets\OptitrackUnityPlugin\Source\Unity3D\\bin\UnityPlugin.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\User\Documents\Rodseth\Gait Tracking\Assets\OptitrackUnityPlugin\Source\Unity3D\\bin\UnityPlugin.lib" /MACHINE:X86 /SAFESEH 
+          Release\UnityPlugin.obj
          Release\tinystr.obj
          Release\tinyxml.obj
          Release\tinyxmlerror.obj
-         Release\tinyxmlparser.obj 
-          
-     1>LINK : fatal error LNK1181: cannot open input file 'NatNetLibStatic.lib'
-     1>Done Building Project "C:\Users\PM&R\Documents\NueRRoNav\Assets\Scripts\OptitrackUnityPlugin\Source\Unity3D\UnitySample.vcxproj" (build target(s)) -- FAILED.
+         Release\tinyxmlparser.obj
+     1>NatNetLibStatic.lib(ClientCore.obj) : warning LNK4099: PDB 'vc100.pdb' was not found with 'NatNetLibStatic.lib(ClientCore.obj)' or at 'C:\Users\User\Documents\Rodseth\Gait Tracking\Assets\OptitrackUnityPlugin\Source\Unity3D\bin\vc100.pdb'; linking object as if no debug info
+     1>NatNetLibStatic.lib(NatNetClient.obj) : warning LNK4099: PDB 'vc100.pdb' was not found with 'NatNetLibStatic.lib(NatNetClient.obj)' or at 'C:\Users\User\Documents\Rodseth\Gait Tracking\Assets\OptitrackUnityPlugin\Source\Unity3D\bin\vc100.pdb'; linking object as if no debug info
+     1>NatNetLibStatic.lib(NatNetHelper.obj) : warning LNK4099: PDB 'vc100.pdb' was not found with 'NatNetLibStatic.lib(NatNetHelper.obj)' or at 'C:\Users\User\Documents\Rodseth\Gait Tracking\Assets\OptitrackUnityPlugin\Source\Unity3D\bin\vc100.pdb'; linking object as if no debug info
+     1>NatNetLibStatic.lib(NatNetRepeater.obj) : warning LNK4099: PDB 'vc100.pdb' was not found with 'NatNetLibStatic.lib(NatNetRepeater.obj)' or at 'C:\Users\User\Documents\Rodseth\Gait Tracking\Assets\OptitrackUnityPlugin\Source\Unity3D\bin\vc100.pdb'; linking object as if no debug info
+     1>NatNetLibStatic.lib(quattoeuler.obj) : warning LNK4099: PDB 'vc100.pdb' was not found with 'NatNetLibStatic.lib(quattoeuler.obj)' or at 'C:\Users\User\Documents\Rodseth\Gait Tracking\Assets\OptitrackUnityPlugin\Source\Unity3D\bin\vc100.pdb'; linking object as if no debug info
+     1>NatNetLibStatic.lib(UnicastClientCore.obj) : warning LNK4099: PDB 'vc100.pdb' was not found with 'NatNetLibStatic.lib(UnicastClientCore.obj)' or at 'C:\Users\User\Documents\Rodseth\Gait Tracking\Assets\OptitrackUnityPlugin\Source\Unity3D\bin\vc100.pdb'; linking object as if no debug info
+         UnitySample.vcxproj -> C:\Users\User\Documents\Rodseth\Gait Tracking\Assets\OptitrackUnityPlugin\Source\Unity3D\\bin\UnityPlugin.exe
+     1>Done Building Project "C:\Users\User\Documents\Rodseth\Gait Tracking\Assets\OptitrackUnityPlugin\Source\Unity3D\UnitySample.vcxproj" (Build target(s)).
 
-Build FAILED.
+Build succeeded.
 
-Time Elapsed 00:00:00.40
+Time Elapsed 00:00:00.31

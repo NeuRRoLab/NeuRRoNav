@@ -196,64 +196,124 @@ public class Coil : MonoBehaviour
                 calibrateRight.name = "calibrateRight";
                 calibrateRight.transform.position = stylusPoint.transform.position;
 
-                GameObject container = coil.transform.FindChild("container").gameObject;
-
-                hotspot.transform.parent = null;
-                calibrateHotSpot.transform.parent = null;
-                calibrateForward.transform.parent = null;
-                calibrateRight.transform.parent = null;
-
-                container.transform.parent = hotspot.transform;
-                hotspot.transform.position = calibrateHotSpot.transform.position;
-                container.transform.parent = null;
-
-                //Vector3 side1 = forward.transform.position - hotspot.transform.position;
-                //Vector3 side2 = leftSide.transform.position - hotspot.transform.position;
-                //Vector3 cross = Vector3.Cross(side1, side2);
-
-                //hotspot.transform.rotation = Quaternion.LookRotation(side1, hotspot.transform.position - cross);
-
-                //side1 = calibrateForward.transform.position - calibrateHotSpot.transform.position;
-                //side2 = calibrateLeftSide.transform.position - calibrateHotSpot.transform.position;
-                //cross = Vector3.Cross(side1, side2);
-
-                //hotspot.transform.rotation = Quaternion.LookRotation(side1, hotspot.transform.position - cross);
-
-                //model.transform.parent = coil.transform;
-                //hotspot.transform.LookAt(model.transform.forward, model.transform.up);
-                //hotspot.transform.parent = coil.transform;
-
-
-                hotspot.transform.LookAt(forward.transform);
-                container.transform.parent = hotspot.transform;
-                hotspot.transform.LookAt(calibrateForward.transform);
-
-                container.transform.parent = null;
-                hotspot.transform.LookAt(right.transform, calibrateForward.transform.position - calibrateHotSpot.transform.position);
-                container.transform.parent = hotspot.transform;
-                hotspot.transform.LookAt(calibrateRight.transform, calibrateForward.transform.position - calibrateHotSpot.transform.position);
-
-                container.transform.parent = coil.transform;
-                hotspot.transform.rotation = container.transform.rotation;
-                hotspot.transform.parent = container.transform;
-                
-                calibrateForward.transform.parent = coil.transform;
-                calibrateHotSpot.transform.parent = coil.transform;
-                calibrateRight.transform.parent = coil.transform;
-
-                calibrating = false;
-                point = 0;
-                calibrationInstruct.text = "";
-
-                GameObject.Find("ScalpGenerator").GetComponent<ScalpGenerator>().waitingToDraw = true;
+                MatchRotation();
             }
-
-            
 
             //camController.putTargetCamOnStylus();
             //stylusPoint.transform.LookAt(hotspot.transform);
         }
     }
+
+    private void MatchRotation()
+    {
+        GameObject container = coil.transform.FindChild("container").gameObject;
+
+        hotspot.transform.parent = null;
+        calibrateHotSpot.transform.parent = null;
+        calibrateForward.transform.parent = null;
+        calibrateRight.transform.parent = null;
+
+        container.transform.parent = hotspot.transform;
+        hotspot.transform.position = calibrateHotSpot.transform.position;
+        container.transform.parent = null;
+
+        hotspot.transform.LookAt(forward.transform);
+        container.transform.parent = hotspot.transform;
+        hotspot.transform.LookAt(calibrateForward.transform);
+
+        container.transform.parent = null;
+        hotspot.transform.LookAt(right.transform, calibrateForward.transform.position - calibrateHotSpot.transform.position);
+        container.transform.parent = hotspot.transform;
+        hotspot.transform.LookAt(calibrateRight.transform, calibrateForward.transform.position - calibrateHotSpot.transform.position);
+
+        container.transform.parent = coil.transform;
+        hotspot.transform.rotation = container.transform.rotation;
+        hotspot.transform.parent = container.transform;
+
+        calibrateForward.transform.parent = coil.transform;
+        calibrateHotSpot.transform.parent = coil.transform;
+        calibrateRight.transform.parent = coil.transform;
+
+        calibrating = false;
+        point = 0;
+        calibrationInstruct.text = "";
+
+        ExportCoil();
+
+        GameObject.Find("ScalpGenerator").GetComponent<ScalpGenerator>().waitingToDraw = true;
+    }
+
+    public void ExportCoil()
+    {
+        string path = Application.dataPath + @"\Coils\Saved";
+
+        if (!System.IO.Directory.Exists(path))
+        {
+            System.IO.Directory.CreateDirectory(path);
+        }
+
+        string time = string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", DateTime.Now);
+
+        path += @"\" + coil.name + time + ".txt";
+
+        using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(path, true))
+        {
+            Vector3 hotspotLoc = coil.transform.InverseTransformPoint(calibrateHotSpot.transform.position);
+            Vector3 rightLoc = coil.transform.InverseTransformPoint(calibrateRight.transform.position);
+            Vector3 forwarLoc = coil.transform.InverseTransformPoint(calibrateForward.transform.position);
+
+            file.WriteLine(hotspotLoc.x + "\t" + hotspotLoc.y + "\t" + hotspotLoc.z);
+            file.WriteLine(rightLoc.x + "\t" + rightLoc.y + "\t" + rightLoc.z);
+            file.WriteLine(forwarLoc.x + "\t" + forwarLoc.y + "\t" + forwarLoc.z);
+        }
+    }
+
+    public void ImportCoil()
+    {
+        GameObject container = coil.transform.FindChild("container").gameObject;
+        forward = container.transform.FindChild("forward").gameObject;
+        hotspot = container.transform.FindChild("hotspot").gameObject;
+        right = container.transform.FindChild("right").gameObject;
+
+        string path = Application.dataPath + @"\Coils\Load";
+
+        if (!System.IO.Directory.Exists(path))
+        {
+            System.IO.Directory.CreateDirectory(path);
+        }
+
+        string[] fileNames = System.IO.Directory.GetFiles(path);
+
+
+        System.IO.FileStream filestream = new System.IO.FileStream(fileNames[0],
+                                          System.IO.FileMode.Open,
+                                          System.IO.FileAccess.Read,
+                                          System.IO.FileShare.Read);
+        System.IO.StreamReader file = new System.IO.StreamReader(filestream);
+
+        GameObject[] points = { calibrateHotSpot, calibrateRight, calibrateForward};
+        string[] names = { "calibrateHotSpot", "calibrateRight", "calibrateForward" };
+        for(int i = 0; i < 3; i++)
+        {
+            string data = file.ReadLine();
+            char[] d = new char[1];
+            d[0] = '\t';
+            string[] dims = data.Split(d);
+            points[i] = new GameObject(names[i]);
+            points[i].transform.position = coil.transform.TransformPoint(new Vector3((float)System.Convert.ToDouble(dims[0]), (float)System.Convert.ToDouble(dims[1]), (float)System.Convert.ToDouble(dims[2])));
+            points[i].transform.parent = coil.transform;
+        }
+        file.Close();
+
+        calibrateHotSpot = points[0];
+        calibrateRight = points[1];
+        calibrateForward = points[2];
+
+
+        MatchRotation();
+    }
+
     public void setStylusSensitiveTrackingState(bool state)
     {
         coilTrackingIsSensitive = state;

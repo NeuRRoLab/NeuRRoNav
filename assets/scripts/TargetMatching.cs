@@ -142,6 +142,11 @@ public class TargetMatching : MonoBehaviour
         }
     }
 
+    void fixedUpdate()
+    {
+       
+    }
+
     private void Log()
     {
         string path = Application.dataPath + @"\Logs\";
@@ -299,6 +304,24 @@ public class TargetMatching : MonoBehaviour
         }
         tPoint.pos.transform.FindChild("point").GetComponent<MeshRenderer>().material.color = new Color(distance, 1 - distance, 0, 0.2F);
     }
+    private Quaternion quaternionDifference(Quaternion fromRotation, Quaternion toRotation)
+    {
+        return fromRotation * Quaternion.Inverse(toRotation);
+    }
+    private float[] AngleDecomposition(Quaternion angle)//Returns Roll Pitch Yaw
+    {
+        float w = angle.w;
+        float y = angle.y;
+        float z = angle.z;
+        float x = angle.x;
+
+        float[] rpy = new float[3];
+        rpy[0] = Mathf.Atan2(2 * y * w - 2 * x * z, 1 - 2 * y * y - 2 * z * z) * 180 / Mathf.PI;
+        rpy[1] = Mathf.Atan2(2 * x * w - 2 * y * z, 1 - 2 * x * x - 2 * z * z) * 180 / Mathf.PI;
+        rpy[2] = Mathf.Asin(2 * x * y + 2 * z * w) * 180 / Mathf.PI;
+
+        return rpy;
+    }
 
     private void CalculateRotation()
     {
@@ -306,14 +329,13 @@ public class TargetMatching : MonoBehaviour
         //float pitch = coilHotSpot.transform.rotation.eulerAngles.x - tPoint.rot.transform.rotation.eulerAngles.x;
         //float yaw = coilHotSpot.transform.rotation.eulerAngles.y - tPoint.rot.transform.rotation.eulerAngles.y;
         //float roll = coilHotSpot.transform.rotation.eulerAngles.z - tPoint.rot.transform.rotation.eulerAngles.z;
-        Quaternion angle = Quaternion.FromToRotation(coilHotSpot.transform.forward, tPoint.rot.transform.forward);
-        float pitch = angle.x;
-        float yaw = angle.y;
-        float roll = angle.z;
+        Quaternion angle =  quaternionDifference(coilHotSpot.transform.rotation, tPoint.rot.transform.rotation);
 
-        float distRoll = Math.Abs(roll) / 180F;
-        float distYaw = Math.Abs(yaw) / 180F;
-        float distPitch = Math.Abs(pitch) / 180F;
+        float[] rpy = AngleDecomposition(angle);
+
+        float distRoll = Math.Abs(rpy[0]) / 180F;
+        float distPitch = Math.Abs(rpy[1]) / 180F;
+        float distYaw = Math.Abs(rpy[2]) / 180F;
 
         pitchStatus[0].color = pitchStatus[1].color = new Color(distPitch, 1 - distPitch, 0, 1);
         yawStatus[0].color = yawStatus[1].color = new Color(distYaw, 1 - distYaw, 0, 1);
@@ -338,17 +360,17 @@ public class TargetMatching : MonoBehaviour
 
         float rThresh = 1F;
 
-        string r = setRotateInstruction("Cntr Clockwise ", "Clockwise ", roll, rThresh);
-        string y = setRotateInstruction("Yaw Right ", "Yaw Left ", yaw, rThresh);
-        string p = setRotateInstruction("Pitch Up ", "Pitch Down ", pitch, rThresh);
+        string r = setRotateInstruction("Cntr Clockwise ", "Clockwise ", rpy[0], rThresh);
+        string p = setRotateInstruction("Pitch Up ", "Pitch Down ", rpy[1], rThresh);
+        string y = setRotateInstruction("Yaw Right ", "Yaw Left ", rpy[2], rThresh);
 
-        pitchStatus[0].text = pitchStatus[1].text = "Pitch: " + p + pitch.ToString("0.00");
-        yawStatus[0].text = yawStatus[1].text = "Yaw: " + y + yaw.ToString("0.00");
-        rollStatus[0].text = rollStatus[1].text = "Roll: " + r + roll.ToString("0.00");
+        pitchStatus[0].text = pitchStatus[1].text = "Pitch: " + p + rpy[1].ToString("0.00");
+        yawStatus[0].text = yawStatus[1].text = "Yaw: " + y + rpy[2].ToString("0.00");
+        rollStatus[0].text = rollStatus[1].text = "Roll: " + r + rpy[0].ToString("0.00");
 
-        loggingString[3] = "Pitch: " + pitch.ToString("0.00");
-        loggingString[4] = "Yaw: " + yaw.ToString("0.00");
-        loggingString[5] = "Roll: " + roll.ToString("0.00");
+        loggingString[3] = "Pitch: " + rpy[1].ToString("0.00");
+        loggingString[4] = "Yaw: " + rpy[2].ToString("0.00");
+        loggingString[5] = "Roll: " + rpy[0].ToString("0.00");
     }
 
     public struct TargetPoint
@@ -563,12 +585,12 @@ public class TargetMatching : MonoBehaviour
 
     public void LogErrorToggle(Text toggleText)
     {
-        errorToggleText = toggleText;
-        if (logging && matching)
+        if (logging)
         {
+            logging = false;
             watch.Stop();
             watch.Reset();
-            errorToggleText.text = "Toggle Error Logging";
+            toggleText.text = "Toggle Error Logging";
         }
         else if (!logging)
         {
@@ -578,8 +600,9 @@ public class TargetMatching : MonoBehaviour
                new System.IO.StreamWriter(path + currentGrid.name + "_" + tPoint.ID.ToString() + ".txt", true))
             {
                 file.WriteLine(tPoint.ID.ToString());
+                file.WriteLine(System.DateTime.Now.ToString() + " " + System.DateTime.Now.Millisecond.ToString());
             }
-            errorToggleText.text = "Stop Logging";
+            toggleText.text = "Stop Logging";
             watch.Start();
         }
     }
@@ -711,21 +734,7 @@ public class TargetMatching : MonoBehaviour
             System.IO.Directory.CreateDirectory(path);
         }
 
-        //path =EditorUtility.SaveFilePanel("Select Destination", path, currentGrid.name, "txt");
         path += @"\" + currentGrid.name + ".txt";
-        //bool check = true;
-        //int safety = 1;
-        //while(check)
-        //{
-        //if (System.IO.File.Exists(path))
-        //{
-        //    path.Insert(path.Length-5,"("+safety.ToString()+")");
-        //    safety++;
-        //    //System.IO.File.Delete(path);
-        //}
-        //else
-        //    check = false;
-        //}
 
         using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(path, true))

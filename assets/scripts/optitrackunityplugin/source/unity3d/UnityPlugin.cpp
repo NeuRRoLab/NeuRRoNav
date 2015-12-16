@@ -2,7 +2,7 @@
 // Copyright © NaturalPoint, Inc. All Rights Reserved.
 // 
 // This software is provided by the copyright holders and contributors "as is" and
-// any express or implied warranties, including, but not limited to, the implied
+// any express or implied warranties	, including, but not limited to, the implied
 // warranties of merchantability and fitness for a particular purpose are disclaimed.
 // In no event shall NaturalPoint, Inc. or contributors be liable for any direct,
 // indirect, incidental, special, exemplary, or consequential damages
