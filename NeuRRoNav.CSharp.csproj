@@ -114,7 +114,7 @@
     <Compile Include="assets\scripts\camList.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\Coils\Load\figureeightsession-2015-12-13_06-10-42-PM.txt" />
+    <None Include="assets\Coils\Load\figureeightsession-2015-12-20_11-41-40-AM.txt" />
     <None Include="assets\Coils\Saved\figureeightsession-2015-12-13_04-53-59-PM.txt" />
     <None Include="assets\Coils\Saved\figureeightsession-2015-12-13_06-10-42-PM.txt" />
     <None Include="assets\Coils\Saved\figureeightsession-2015-12-13_06-25-49-PM.txt" />
@@ -122,10 +122,21 @@
     <None Include="assets\Coils\Saved\figureeightsession-2015-12-14_01-18-56-PM.txt" />
     <None Include="assets\Coils\Saved\figureeightsession-2015-12-14_10-20-44-AM.txt" />
     <None Include="assets\Coils\Saved\figureeightsession-2015-12-14_12-54-36-PM.txt" />
+    <None Include="assets\Coils\Saved\figureeightsession-2015-12-20_01-05-07-PM.txt" />
+    <None Include="assets\Coils\Saved\figureeightsession-2015-12-20_01-05-39-PM.txt" />
+    <None Include="assets\Coils\Saved\figureeightsession-2015-12-20_12-55-48-PM.txt" />
+    <None Include="assets\Coils\Saved\figureeightsession-2015-12-21_11-38-39-AM.txt" />
+    <None Include="assets\Coils\Saved\figureeightsession-2015-12-21_11-40-03-AM.txt" />
+    <None Include="assets\Coils\Saved\figureeightsession-2015-12-21_11-50-37-AM.txt" />
+    <None Include="assets\Coils\Saved\figureeightsession-2015-12-21_11-50-43-AM.txt" />
+    <None Include="assets\Coils\Saved\figureeightsession-2015-12-21_11-52-48-AM.txt" />
+    <None Include="assets\Coils\Saved\figureeightsession-2015-12-21_12-01-00-PM.txt" />
     <None Include="assets\Logs\Grid1Scalp Hot Spot.txt" />
     <None Include="assets\Logs\Grid1_Scalp Hot Spot.txt" />
+    <None Include="assets\Logs\Grid2_Scalp Hot Spot.txt" />
+    <None Include="assets\Logs\Validation 12-21-2015 data.txt" />
     <None Include="assets\Scalps\Scalp.txt" />
-    <None Include="assets\grids\Load\OvernightGrid.txt" />
+    <None Include="assets\grids\Load\Grid1.txt" />
     <None Include="assets\grids\Saved\Grid1 (2).txt" />
     <None Include="assets\grids\Saved\Grid1.txt" />
     <None Include="assets\grids\Saved\null.txt" />
