@@ -1,115 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-	<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-	<ProductVersion>10.0.20506</ProductVersion>
-	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{E1060FF9-AA7B-CCA9-9BA5-A419C9DA2724}</ProjectGuid>
-	<OutputType>Library</OutputType>
-	<AppDesignerFolder>Properties</AppDesignerFolder>
-	<RootNamespace></RootNamespace>
-	<AssemblyName>Assembly-CSharp</AssemblyName>
-	<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-	<FileAlignment>512</FileAlignment>
-	<BaseDirectory>Assets</BaseDirectory>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <RootNamespace></RootNamespace>
+    <ProjectGuid>{7B41564C-5404-A8F1-D4A5-98E6298027EC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <BaseDirectory>Assets</BaseDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-	<DebugSymbols>true</DebugSymbols>
-	<DebugType>full</DebugType>
-	<Optimize>false</Optimize>
-	<OutputPath>Temp\bin\Debug\</OutputPath>
-	<DefineConstants>DEBUG;TRACE;UNITY_5_1_1;UNITY_5_1;UNITY_5;ENABLE_NEW_BUGREPORTER;ENABLE_2D_PHYSICS;ENABLE_4_6_FEATURES;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_DUCK_TYPING;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PHYSICS_PHYSX3;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_LICENSE;ENABLE_AUDIOMIXER_SUSPEND;ENABLE_EDITOR_METRICS;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_LOCALIZATION;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_SUBSTANCE;ENABLE_TEXTUREID_MAP;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;DEVELOPMENT_BUILD;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN</DefineConstants>
-	<ErrorReport>prompt</ErrorReport>
-	<WarningLevel>4</WarningLevel>
-	<NoWarn>0169</NoWarn>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Temp\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;UNITY_5_3_1;UNITY_5_3;UNITY_5;ENABLE_NEW_BUGREPORTER;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_DUCK_TYPING;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_SPRITERENDERER_FLIPPING;ENABLE_SPRITES;ENABLE_SPRITE_POLYGON;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_METRICS;ENABLE_EDITOR_METRICS_CACHING;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_LOCALIZATION;ENABLE_ANDROID_ATLAS_ETC1_COMPRESSION;ENABLE_EDITOR_TESTS_RUNNER;UNITY_WEBPLAYER;ENABLE_SUBSTANCE;WEBPLUG;ENABLE_TEXTUREID_MAP;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_MONO;DEVELOPMENT_BUILD;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0169</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-	<DebugType>pdbonly</DebugType>
-	<Optimize>true</Optimize>
-	<OutputPath>Temp\bin\Release\</OutputPath>
-	<DefineConstants>TRACE</DefineConstants>
-	<ErrorReport>prompt</ErrorReport>
-	<WarningLevel>4</WarningLevel>
-	<NoWarn>0169</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Temp\bin\Release\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0169</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-	<Reference Include="System" />
+    <Reference Include="System" />
     <Reference Include="System.XML" />
-	<Reference Include="System.Core" />
-	<Reference Include="System.Xml.Linq" />
-	<Reference Include="UnityEngine">
-	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
-	</Reference>
-	<Reference Include="UnityEditor">
-	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
-	</Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="UnityEngine">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\ProceduralToolkit\ColorE.cs" />
-     <Compile Include="Assets\ProceduralToolkit\Datasets\Datasets.cs" />
-     <Compile Include="Assets\ProceduralToolkit\Directions.cs" />
-     <Compile Include="Assets\ProceduralToolkit\Examples\Primitives\Cylinder.cs" />
-     <Compile Include="Assets\ProceduralToolkit\Examples\Primitives\Dodecahedron.cs" />
-     <Compile Include="Assets\ProceduralToolkit\Examples\Primitives\FlatSphere.cs" />
-     <Compile Include="Assets\ProceduralToolkit\Examples\Primitives\Hexahedron.cs" />
-     <Compile Include="Assets\ProceduralToolkit\Examples\Primitives\Icosahedron.cs" />
-     <Compile Include="Assets\ProceduralToolkit\Examples\Primitives\Octahedron.cs" />
-     <Compile Include="Assets\ProceduralToolkit\Examples\Primitives\Plane.cs" />
-     <Compile Include="Assets\ProceduralToolkit\Examples\Primitives\Prism.cs" />
-     <Compile Include="Assets\ProceduralToolkit\Examples\Primitives\Pyramid.cs" />
-     <Compile Include="Assets\ProceduralToolkit\Examples\Primitives\Sphere.cs" />
-     <Compile Include="Assets\ProceduralToolkit\Examples\Primitives\Tetrahedron.cs" />
-     <Compile Include="Assets\ProceduralToolkit\Examples\TerrainMesh\TerrainMesh.cs" />
-     <Compile Include="Assets\ProceduralToolkit\MeshDraft.cs" />
-     <Compile Include="Assets\ProceduralToolkit\MeshE.cs" />
-     <Compile Include="Assets\ProceduralToolkit\PTUtils.cs" />
-     <Compile Include="Assets\ProceduralToolkit\RandomE.cs" />
-     <Compile Include="Assets\ProceduralToolkit\TextureE.cs" />
-     <Compile Include="Assets\Scripts\BSplineMath.cs" />
-     <Compile Include="Assets\Scripts\BSplineSurface.cs" />
-     <Compile Include="Assets\Scripts\Body.cs" />
-     <Compile Include="Assets\Scripts\CalibrationTool.cs" />
-     <Compile Include="Assets\Scripts\CamPosDropDown.cs" />
-     <Compile Include="Assets\Scripts\CameraController.cs" />
-     <Compile Include="Assets\Scripts\Coil.cs" />
-     <Compile Include="Assets\Scripts\ConvexHull.cs" />
-     <Compile Include="Assets\Scripts\GridOverlay.cs" />
-     <Compile Include="Assets\Scripts\Head.cs" />
-     <Compile Include="Assets\Scripts\RigidBody.cs" />
-     <Compile Include="Assets\Scripts\ScalpGenerator.cs" />
-     <Compile Include="Assets\Scripts\SlipStream.cs" />
-     <Compile Include="Assets\Scripts\Stylus.cs" />
-     <Compile Include="Assets\Scripts\SurfaceGen.cs" />
-     <Compile Include="Assets\Scripts\TargetMatching.cs" />
-     <Compile Include="Assets\Scripts\XMLSerialization.cs" />
-     <Compile Include="Assets\Scripts\camList.cs" />
-     <None Include="Assets\Scalps\Scalp.txt" />
-     <None Include="Assets\ProceduralToolkit\Shaders\Standard Vertex Color.shader" />
-     <None Include="Assets\Grids\Saved\Grid1.txt" />
-     <None Include="Assets\Grids\Saved\null.txt" />
-     <None Include="Assets\ProceduralToolkit\Shaders\Unlit Color.shader" />
-     <None Include="Assets\ProceduralToolkit\Shaders\Unlit Vertex Color.shader" />
-     <None Include="Assets\ProceduralToolkit\Shaders\Diffuse Vertex Color.shader" />
-     <None Include="Assets\ProceduralToolkit\Shaders\Specular Vertex Color.shader" />
-     <None Include="Assets\Scripts\OptitrackUnityPlugin\Source\Unity3D\ClassDiagram1.cd" />
-     <None Include="Assets\Grids\Load\Grid1.txt" />
+     <Compile Include="assets\proceduraltoolkit\ColorE.cs" />
+     <Compile Include="assets\proceduraltoolkit\Datasets\Datasets.cs" />
+     <Compile Include="assets\proceduraltoolkit\Directions.cs" />
+     <Compile Include="assets\proceduraltoolkit\MeshDraft.cs" />
+     <Compile Include="assets\proceduraltoolkit\MeshE.cs" />
+     <Compile Include="assets\proceduraltoolkit\PTUtils.cs" />
+     <Compile Include="assets\proceduraltoolkit\RandomE.cs" />
+     <Compile Include="assets\proceduraltoolkit\TextureE.cs" />
+     <Compile Include="assets\proceduraltoolkit\examples\Primitives\Cylinder.cs" />
+     <Compile Include="assets\proceduraltoolkit\examples\Primitives\Dodecahedron.cs" />
+     <Compile Include="assets\proceduraltoolkit\examples\Primitives\FlatSphere.cs" />
+     <Compile Include="assets\proceduraltoolkit\examples\Primitives\Hexahedron.cs" />
+     <Compile Include="assets\proceduraltoolkit\examples\Primitives\Icosahedron.cs" />
+     <Compile Include="assets\proceduraltoolkit\examples\Primitives\Octahedron.cs" />
+     <Compile Include="assets\proceduraltoolkit\examples\Primitives\Plane.cs" />
+     <Compile Include="assets\proceduraltoolkit\examples\Primitives\Prism.cs" />
+     <Compile Include="assets\proceduraltoolkit\examples\Primitives\Pyramid.cs" />
+     <Compile Include="assets\proceduraltoolkit\examples\Primitives\Sphere.cs" />
+     <Compile Include="assets\proceduraltoolkit\examples\Primitives\Tetrahedron.cs" />
+     <Compile Include="assets\proceduraltoolkit\examples\TerrainMesh\TerrainMesh.cs" />
+     <Compile Include="assets\scripts\BSplineMath.cs" />
+     <Compile Include="assets\scripts\BSplineSurface.cs" />
+     <Compile Include="assets\scripts\Body.cs" />
+     <Compile Include="assets\scripts\CalibrationTool.cs" />
+     <Compile Include="assets\scripts\CamPosDropDown.cs" />
+     <Compile Include="assets\scripts\CameraController.cs" />
+     <Compile Include="assets\scripts\Coil.cs" />
+     <Compile Include="assets\scripts\ConvexHull.cs" />
+     <Compile Include="assets\scripts\GridOverlay.cs" />
+     <Compile Include="assets\scripts\Head.cs" />
+     <Compile Include="assets\scripts\RigidBody.cs" />
+     <Compile Include="assets\scripts\ScalpGenerator.cs" />
+     <Compile Include="assets\scripts\SlipStream.cs" />
+     <Compile Include="assets\scripts\Stylus.cs" />
+     <Compile Include="assets\scripts\SurfaceGen.cs" />
+     <Compile Include="assets\scripts\TargetMatching.cs" />
+     <Compile Include="assets\scripts\XMLSerialization.cs" />
+     <Compile Include="assets\scripts\camList.cs" />
+     <None Include="assets\Scalps\Scalp.txt" />
+     <None Include="assets\Coils\Load\figureeightsession-2015-12-20_11-41-40-AM.txt" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-20_12-55-48-PM.txt" />
+     <None Include="assets\grids\Load\Grid1.txt" />
+     <None Include="assets\proceduraltoolkit\Shaders\Standard Vertex Color.shader" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-21_11-38-39-AM.txt" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-20_01-05-07-PM.txt" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-21_11-50-37-AM.txt" />
+     <None Include="assets\grids\Saved\Grid1.txt" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-21_12-01-00-PM.txt" />
+     <None Include="assets\grids\Saved\null.txt" />
+     <None Include="assets\Logs\Validation 12-21-2015 data.txt" />
+     <None Include="assets\proceduraltoolkit\Shaders\Unlit Color.shader" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-20_01-05-39-PM.txt" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-14_10-20-44-AM.txt" />
+     <None Include="assets\proceduraltoolkit\Shaders\Unlit Vertex Color.shader" />
+     <None Include="assets\Logs\Grid1_Scalp Hot Spot.txt" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-14_12-54-36-PM.txt" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-13_06-30-27-PM.txt" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-13_06-25-49-PM.txt" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-21_11-52-48-AM.txt" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-13_06-10-42-PM.txt" />
+     <None Include="assets\proceduraltoolkit\Shaders\Diffuse Vertex Color.shader" />
+     <None Include="assets\Logs\Grid2_Scalp Hot Spot.txt" />
+     <None Include="assets\grids\Saved\Grid1 (2).txt" />
+     <None Include="assets\Logs\Grid1Scalp Hot Spot.txt" />
+     <None Include="assets\proceduraltoolkit\Shaders\Specular Vertex Color.shader" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-21_11-50-43-AM.txt" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-14_01-18-56-PM.txt" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-21_11-40-03-AM.txt" />
+     <None Include="assets\Coils\Saved\figureeightsession-2015-12-13_04-53-59-PM.txt" />
+     <None Include="assets\scripts\OptitrackUnityPlugin\Source\Unity3D\ClassDiagram1.cd" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
- <Reference Include="UnityEngine.Analytics">
- <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.iOS.Extensions.Xcode">
- <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
- </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-	   Other similar extension points exist, see Microsoft.Common.targets.
+       Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
