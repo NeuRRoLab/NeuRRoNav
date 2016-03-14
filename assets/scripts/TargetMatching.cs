@@ -107,14 +107,7 @@ public class TargetMatching : MonoBehaviour
     void Update()
     {
         coilTracker.setStylusSensitiveTrackingState(matching);
-        if (matching)
-        {
-            CalculateOffsets();
-            if (logging)
-            {
-                Log();
-            }
-        }
+        
         if (settingGrid && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse1)))
         {
             currentGrid.points.Add(CreateGridPoint());
@@ -144,7 +137,14 @@ public class TargetMatching : MonoBehaviour
 
     void fixedUpdate()
     {
-       
+		if (matching)
+		{
+			CalculateOffsets();
+			if (logging)
+			{
+				Log();
+			}
+		}
     }
 
     private void Log()
