@@ -33,7 +33,7 @@ public class RigidBody : MonoBehaviour {
 	void Start () 
 	{
 		Debug.Log (Application.dataPath);
-		System.Diagnostics.Process.Start(Application.dataPath + @"\Scripts\OptitrackUnityPlugin\Source\Unity3D\bin\UnitySample.exe");
+		//System.Diagnostics.Process.Start(Application.dataPath + @"\Scripts\OptitrackUnityPlugin\Source\Unity3D\bin\UnitySample.exe");
 		SlipStreamObject = GameObject.Find("Optitrack");
 		SlipStreamObject.GetComponent<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
 	}

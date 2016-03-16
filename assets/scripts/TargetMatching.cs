@@ -107,14 +107,7 @@ public class TargetMatching : MonoBehaviour
     void Update()
     {
         coilTracker.setStylusSensitiveTrackingState(matching);
-        if (matching)
-        {
-            CalculateOffsets();
-            if (logging)
-            {
-                Log();
-            }
-        }
+        
         if (settingGrid && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse1)))
         {
             currentGrid.points.Add(CreateGridPoint());
@@ -144,7 +137,14 @@ public class TargetMatching : MonoBehaviour
 
     void fixedUpdate()
     {
-       
+		if (matching)
+		{
+			CalculateOffsets();
+			if (logging)
+			{
+				Log();
+			}
+		}
     }
 
     private void Log()
@@ -256,15 +256,20 @@ public class TargetMatching : MonoBehaviour
         float deltY = p.y - t.y;
         float deltZ = p.z - t.z;
 
+
+
         if (distance > 0.05)
         {
             distance = 1;
+            deltX *= 100;
+            deltY *= 100;
+            deltZ *= 100;
             xStatus[0].text = xStatus[1].text = "X: Get Closer";
             yStatus[0].text = yStatus[1].text = "Y: Get Closer";
             zStatus[0].text = zStatus[1].text = "Z: Get Closer";
-            loggingString[0] = "X: Get Closer";
-            loggingString[1] = "Y: Get Closer";
-            loggingString[2] = "Z: Get Closer";
+            loggingString[0] = deltX.ToString("0.00");
+            loggingString[1] = deltY.ToString("0.00");
+            loggingString[2] = deltZ.ToString("0.00");
         }
 
         else
@@ -297,9 +302,9 @@ public class TargetMatching : MonoBehaviour
 
             distance = distance / 0.05F;
 
-            loggingString[0] = "X: " + deltX.ToString("0.00");
-            loggingString[1] = "Y: " + deltY.ToString("0.00");
-            loggingString[2] = "Z: " + deltZ.ToString("0.00");
+            loggingString[0] = deltX.ToString("0.00");
+            loggingString[1] = deltY.ToString("0.00");
+            loggingString[2] = deltZ.ToString("0.00");
 
         }
         tPoint.pos.transform.FindChild("point").GetComponent<MeshRenderer>().material.color = new Color(distance, 1 - distance, 0, 0.2F);

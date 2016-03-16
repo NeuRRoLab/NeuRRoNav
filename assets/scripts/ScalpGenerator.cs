@@ -280,7 +280,9 @@ public class ScalpGenerator : MonoBehaviour
             center.name = "Center";
             center.transform.position = lerpCenter;
             center.transform.rotation = head.transform.rotation;
-            center.transform.LookAt(landmarks[(int)landmarkNames.nasion].transform.position, head.transform.up);
+			center.transform.rotation = Quaternion.LookRotation (Vector3.Normalize (landmarks [(int)landmarkNames.nasion].transform.position - landmarks [(int)landmarkNames.inion].transform.position), Vector3.Normalize (Vector3.Cross (Vector3.Normalize (landmarks [(int)landmarkNames.leftTragus].transform.position - landmarks [(int)landmarkNames.rightTragus].transform.position),
+				Vector3.Normalize (landmarks [(int)landmarkNames.nasion].transform.position - landmarks [(int)landmarkNames.inion].transform.position))));
+			//center.transform.LookAt(landmarks[(int)landmarkNames.nasion].transform.position, head.transform.up);
             center.transform.parent = head.transform;
 
         }

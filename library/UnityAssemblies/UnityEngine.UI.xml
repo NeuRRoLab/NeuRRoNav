@@ -4,6 +4,26 @@
     <assembly>
       <name>UnityEngine.UI</name>
     </assembly>
+    <member name="T:UnityEngine.EventSystems.AbstractEventData">
+      <summary>
+        <para>A class that can be used for sending simple events via the event system.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.EventSystems.AbstractEventData.used">
+      <summary>
+        <para>Is the event used?</para>
+      </summary>
+    </member>
+    <member name="M:UnityEngine.EventSystems.AbstractEventData.Reset">
+      <summary>
+        <para>Reset the event.</para>
+      </summary>
+    </member>
+    <member name="M:UnityEngine.EventSystems.AbstractEventData.Use">
+      <summary>
+        <para>Use the event.</para>
+      </summary>
+    </member>
     <member name="T:UnityEngine.EventSystems.AxisEventData">
       <summary>
         <para>Event Data associated with Axis Events (Controller / Keyboard).</para>
@@ -34,26 +54,11 @@
         <para>The object currently considered selected by the EventSystem.</para>
       </summary>
     </member>
-    <member name="P:UnityEngine.EventSystems.BaseEventData.used">
-      <summary>
-        <para>Has the event been marked as used?</para>
-      </summary>
-    </member>
     <member name="M:UnityEngine.EventSystems.BaseEventData.#ctor(UnityEngine.EventSystems.EventSystem)">
       <summary>
         <para>Construct a BaseEventData tied to the passed EventSystem.</para>
       </summary>
       <param name="eventSystem"></param>
-    </member>
-    <member name="M:UnityEngine.EventSystems.BaseEventData.Reset">
-      <summary>
-        <para>Reset the Event to the default state.</para>
-      </summary>
-    </member>
-    <member name="M:UnityEngine.EventSystems.BaseEventData.Use">
-      <summary>
-        <para>Use the event.</para>
-      </summary>
     </member>
     <member name="T:UnityEngine.EventSystems.BaseInputModule">
       <summary>
@@ -129,9 +134,9 @@
     </member>
     <member name="M:UnityEngine.EventSystems.BaseInputModule.IsPointerOverGameObject(System.Int32)">
       <summary>
-        <para>Is the pointer over a GameObject that is controlled by the EventSystem.</para>
+        <para>Is the pointer with the given ID over an EventSystem object?</para>
       </summary>
-      <param name="pointerId">Pointer id.</param>
+      <param name="pointerId">Pointer ID.</param>
     </member>
     <member name="M:UnityEngine.EventSystems.BaseInputModule.OnDisable">
       <summary>
@@ -250,15 +255,15 @@
     </member>
     <member name="M:UnityEngine.EventSystems.EventSystem.IsPointerOverGameObject">
       <summary>
-        <para>Is the pointer with the given id over an EventSystem object?</para>
+        <para>Is the pointer with the given ID over an EventSystem object?</para>
       </summary>
-      <param name="pointerId">Pointer (touch / mouse) id.</param>
+      <param name="pointerId">Pointer (touch / mouse) ID.</param>
     </member>
     <member name="M:UnityEngine.EventSystems.EventSystem.IsPointerOverGameObject(System.Int32)">
       <summary>
-        <para>Is the pointer with the given id over an EventSystem object?</para>
+        <para>Is the pointer with the given ID over an EventSystem object?</para>
       </summary>
-      <param name="pointerId">Pointer (touch / mouse) id.</param>
+      <param name="pointerId">Pointer (touch / mouse) ID.</param>
     </member>
     <member name="M:UnityEngine.EventSystems.EventSystem.OnDisable">
       <summary>
@@ -1366,7 +1371,7 @@
     </member>
     <member name="M:UnityEngine.EventSystems.StandaloneInputModule.ProcessMousePress(UnityEngine.EventSystems.PointerInputModule/MouseButtonEventData)">
       <summary>
-        <para>Calulate and process any mouse button state changes.</para>
+        <para>Calculate and process any mouse button state changes.</para>
       </summary>
       <param name="data">The data pertaining to the current mouse state.</param>
     </member>
@@ -2283,6 +2288,29 @@ One point is 112 of a pica, and 172 of an inch.</para>
         <para>The index of the currently selected option. 0 is the first option, 1 is the second, and so on.</para>
       </summary>
     </member>
+    <member name="M:UnityEngine.UI.Dropdown.AddOptions(System.Collections.Generic.List`1&lt;UnityEngine.UI.Dropdown/OptionData&gt;)">
+      <summary>
+        <para>Add multiple options to the options of the Dropdown based on a list of OptionData objects.</para>
+      </summary>
+      <param name="options">The list of OptionData to add.</param>
+    </member>
+    <member name="M:UnityEngine.UI.Dropdown.AddOptions(System.Collections.Generic.List`1&lt;System.String&gt;)">
+      <summary>
+        <para>Add multiple text-only options to the options of the Dropdown based on a list of strings.</para>
+      </summary>
+      <param name="options">The list of text strings to add.</param>
+    </member>
+    <member name="M:UnityEngine.UI.Dropdown.AddOptions(System.Collections.Generic.List`1&lt;UnityEngine.Sprite&gt;)">
+      <summary>
+        <para>Add multiple image-only options to the options of the Dropdown based on a list of Sprites.</para>
+      </summary>
+      <param name="options">The list of Sprites to add.</param>
+    </member>
+    <member name="M:UnityEngine.UI.Dropdown.ClearOptions">
+      <summary>
+        <para>Clear the list of options in the Dropdown.</para>
+      </summary>
+    </member>
     <member name="M:UnityEngine.UI.Dropdown.CreateBlocker(UnityEngine.Canvas)">
       <summary>
         <para>Override this method to implement a different way to obtain a blocker GameObject.</para>
@@ -2409,6 +2437,13 @@ One point is 112 of a pica, and 172 of an inch.</para>
         <para>The list of options for the dropdown list.</para>
       </summary>
     </member>
+    <member name="M:UnityEngine.UI.Dropdown.RefreshShownValue">
+      <summary>
+        <para>Refreshes the text and image (if available) of the currently selected option.
+
+If you have modified the list of options, you should call this method afterwards to ensure that the visual state of the dropdown corresponds to the updated options.</para>
+      </summary>
+    </member>
     <member name="M:UnityEngine.UI.Dropdown.Show">
       <summary>
         <para>Show the dropdown list.</para>
@@ -2417,6 +2452,11 @@ One point is 112 of a pica, and 172 of an inch.</para>
     <member name="T:UnityEngine.UI.FontData">
       <summary>
         <para>Struct for storing Text generation settings.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.UI.FontData.alignByGeometry">
+      <summary>
+        <para>Use the extents of glyph geometry to perform horizontal alignment rather than glyph metrics.</para>
       </summary>
     </member>
     <member name="P:UnityEngine.UI.FontData.alignment">
@@ -3218,11 +3258,6 @@ Used if the native representation has been destroyed.</para>
         <para>Set an override sprite to be used for rendering.</para>
       </summary>
     </member>
-    <member name="P:UnityEngine.UI.Image.pixelsPerUnit">
-      <summary>
-        <para>The number of pixels in the Image that correspond to one unit in world space.</para>
-      </summary>
-    </member>
     <member name="P:UnityEngine.UI.Image.preferredHeight">
       <summary>
         <para>See ILayoutElement.preferredHeight.</para>
@@ -3505,6 +3540,11 @@ Used if the native representation has been destroyed.</para>
         <para>The blinking rate of the input caret, defined as the number of times the blink cycle occurs per second.</para>
       </summary>
     </member>
+    <member name="P:UnityEngine.UI.InputField.caretColor">
+      <summary>
+        <para>The custom caret color used if customCaretColor is set.</para>
+      </summary>
+    </member>
     <member name="P:UnityEngine.UI.InputField.caretPosition">
       <summary>
         <para>Current InputField caret position (also selection tail).</para>
@@ -3513,6 +3553,11 @@ Used if the native representation has been destroyed.</para>
     <member name="P:UnityEngine.UI.InputField.caretSelectPosition">
       <summary>
         <para>Current InputField selection head.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.UI.InputField.caretWidth">
+      <summary>
+        <para>The width of the caret in pixels.</para>
       </summary>
     </member>
     <member name="P:UnityEngine.UI.InputField.characterLimit">
@@ -3528,6 +3573,11 @@ Used if the native representation has been destroyed.</para>
     <member name="P:UnityEngine.UI.InputField.contentType">
       <summary>
         <para>Specifies the type of the input text content.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.UI.InputField.customCaretColor">
+      <summary>
+        <para>Should a custom caret color be used or should the textComponent.color be used.</para>
       </summary>
     </member>
     <member name="P:UnityEngine.UI.InputField.inputType">
@@ -3570,10 +3620,20 @@ Used if the native representation has been destroyed.</para>
         <para>Accessor to the OnChangeEvent.</para>
       </summary>
     </member>
+    <member name="P:UnityEngine.UI.InputField.onValueChanged">
+      <summary>
+        <para>Accessor to the OnChangeEvent.</para>
+      </summary>
+    </member>
     <member name="P:UnityEngine.UI.InputField.placeholder">
       <summary>
         <para>Optional graphic to show when the InputField text is empty.
 A placeholder graphic can be used to show subtle hints or make it more obvious that the control is an InputField.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.UI.InputField.readOnly">
+      <summary>
+        <para>Set the InputField to be read only.</para>
       </summary>
     </member>
     <member name="P:UnityEngine.UI.InputField.selectionAnchorPosition">
@@ -3666,9 +3726,9 @@ Characters 0-9, . (dot), and - (dash / minus sign) are allowed. The dash is only
     </member>
     <member name="M:UnityEngine.UI.InputField.ClampPos(System.Int32&amp;)">
       <summary>
-        <para>Clamp the pos to be between 0 and the current text length.</para>
+        <para>Clamp a value (by reference) between 0 and the current text length.</para>
       </summary>
-      <param name="pos">The position represenation to be clamped.</param>
+      <param name="pos">The value to be clamped.</param>
     </member>
     <member name="T:UnityEngine.UI.InputField.ContentType">
       <summary>
@@ -3730,6 +3790,11 @@ Characters 0-9, . (dot), and - (dash / minus sign) are allowed. The dash is only
         <para>Function to deactivate the InputField to stop the processing of Events and send OnSubmit if not canceled.</para>
       </summary>
     </member>
+    <member name="M:UnityEngine.UI.InputField.ForceLabelUpdate">
+      <summary>
+        <para>Force the label to update immediatly. This will recalculate the positioning of the caret and the visible text.</para>
+      </summary>
+    </member>
     <member name="M:UnityEngine.UI.InputField.GetCharacterIndexFromPosition(UnityEngine.Vector2)">
       <summary>
         <para>The character that is under the mouse.</para>
@@ -3766,7 +3831,7 @@ Characters 0-9, . (dot), and - (dash / minus sign) are allowed. The dash is only
     </member>
     <member name="M:UnityEngine.UI.InputField.KeyPressed(UnityEngine.Event)">
       <summary>
-        <para>Process the Event and perform the appropreate action for that key.</para>
+        <para>Process the Event and perform the appropriate action for that key.</para>
       </summary>
       <param name="evt">The Event that is currently being processed.</param>
       <returns>
@@ -5420,6 +5485,11 @@ Characters 0-9, . (dot), and - (dash / minus sign) are allowed. The dash is only
         <para>The default Graphic to draw font data to screen.</para>
       </summary>
     </member>
+    <member name="P:UnityEngine.UI.Text.alignByGeometry">
+      <summary>
+        <para>Use the extents of glyph geometry to perform horizontal alignment rather than glyph metrics.</para>
+      </summary>
+    </member>
     <member name="P:UnityEngine.UI.Text.alignment">
       <summary>
         <para>The positioning of the text reliative to its RectTransform.</para>
@@ -5734,7 +5804,6 @@ Characters 0-9, . (dot), and - (dash / minus sign) are allowed. The dash is only
       </summary>
       <param name="verts">The custom stream of verts to add to the helpers internal data.</param>
       <param name="indices">The custom stream of indices to add to the helpers internal data.</param>
-      <param name="indicies"></param>
     </member>
     <member name="M:UnityEngine.UI.VertexHelper.AddUIVertexTriangleStream(System.Collections.Generic.List`1&lt;UnityEngine.UIVertex&gt;)">
       <summary>
