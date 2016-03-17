@@ -66,7 +66,7 @@ public class ScalpGenerator : MonoBehaviour
         {
             if (waitingToDraw && (Input.GetKeyDown(KeyCode.Space)) && !releaseSpace)
             {
-                StartDraw();
+                //StartDraw();
             }
             if (drawing)
             {
@@ -84,7 +84,7 @@ public class ScalpGenerator : MonoBehaviour
                     }
                     else if (Vector3.Distance(lastPoint, stylusPoint.transform.position) > 0.005)
                     {
-                        splinePoints = DrawNewVert(splinePoints);
+                        //splinePoints = DrawNewVert(splinePoints);
                         lastPoint = stylusPoint.transform.position;
                     }
                 }
@@ -158,48 +158,48 @@ public class ScalpGenerator : MonoBehaviour
         landmarks[index].transform.position = stylusPoint.transform.position;
     }
 
-    void StartDraw()
-    {
-        stylusTracker.GetComponent<Stylus>().setStylusSensitiveTrackingState(true);
-        waitingToDraw = false;
-        splines++;
-        Debug.Log("Space pressed, drawing spline");
+    //void StartDraw()
+    //{
+    //    stylusTracker.GetComponent<Stylus>().setStylusSensitiveTrackingState(true);
+    //    waitingToDraw = false;
+    //    splines++;
+    //    Debug.Log("Space pressed, drawing spline");
 
-        scalpSpline = new GameObject();
-        scalpSpline.name = "spline_" + splines.ToString();
-        scalpSpline.tag = "Spline";
-        scalpSpline.transform.position = scalp.transform.position;
-        scalpSpline.transform.parent = scalp.transform;
+    //    scalpSpline = new GameObject();
+    //    scalpSpline.name = "spline_" + splines.ToString();
+    //    scalpSpline.tag = "Spline";
+    //    scalpSpline.transform.position = scalp.transform.position;
+    //    scalpSpline.transform.parent = scalp.transform;
 
-        splineRenderer = scalpSpline.AddComponent<LineRenderer>();
-        splineRenderer.useWorldSpace = false;
-        splineRenderer.material = new Material(Shader.Find("Diffuse"));
-        splineRenderer.material.color = Color.green;
-        splineRenderer.receiveShadows = false;
-        splineRenderer.SetWidth((float)0.001, (float)0.001);
+    //    splineRenderer = scalpSpline.AddComponent<LineRenderer>();
+    //    splineRenderer.useWorldSpace = false;
+    //    splineRenderer.material = new Material(Shader.Find("Diffuse"));
+    //    splineRenderer.material.color = Color.green;
+    //    splineRenderer.receiveShadows = false;
+    //    splineRenderer.SetWidth((float)0.001, (float)0.001);
 
-        splineCage.Add(new List<Vector3>());
+    //    splineCage.Add(new List<Vector3>());
 
-        splinePoints = 0;
+    //    splinePoints = 0;
 
-        drawing = true;
+    //    drawing = true;
 
-        lastPoint = stylusPoint.transform.position;
+    //    lastPoint = stylusPoint.transform.position;
 
-    }
+    //}
 
-    int DrawNewVert(int point)
-    {
-        stylusPoint = GameObject.Find("Stylus").transform.FindChild("Point").gameObject;
-        Debug.Log("Drawing");
-        int points = point + 1;
-        splineRenderer.SetVertexCount(points);
-        splineRenderer.SetPosition(points - 1, splineRenderer.transform.InverseTransformVector(stylusPoint.transform.position - splineRenderer.transform.position));
+    //int DrawNewVert(int point)
+    //{
+    //    stylusPoint = GameObject.Find("Stylus").transform.FindChild("Point").gameObject;
+    //    Debug.Log("Drawing");
+    //    int points = point + 1;
+    //    splineRenderer.SetVertexCount(points);
+    //    splineRenderer.SetPosition(points - 1, splineRenderer.transform.InverseTransformVector(stylusPoint.transform.position - splineRenderer.transform.position));
 
-        splineCage[splines - 1].Add(stylusPoint.transform.position);
+    //    splineCage[splines - 1].Add(stylusPoint.transform.position);
 
-        return points;
-    }
+    //    return points;
+    //}
 
     void CenterHead()
     {
@@ -288,6 +288,10 @@ public class ScalpGenerator : MonoBehaviour
         }
 
         camController.centerMainOnObject(head, 0.5F);
+
+        GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
+        GameObject.Find("Set Grid").GetComponent<Button>().interactable = true;
+        GameObject.Find("Load Grids").GetComponent<Button>().interactable = true;
     }
 
     public void ExportScalpSurfaceXYZ()

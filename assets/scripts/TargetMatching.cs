@@ -232,13 +232,24 @@ public class TargetMatching : MonoBehaviour
 
     private void CalculateOffsets()
     {
+        bool rotOK = false;
+        bool posOK = false;
 
         if (tPoint.rot != null)
         {
-            CalculateRotation();
+            rotOK = CalculateRotation();
         }
 
-        CalculateDistance();
+        posOK = CalculateDistance();
+
+        if(rotOK && posOK)
+        {
+            GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "FIRE";
+        }
+        else
+        {
+            GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "Match";
+        }
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -246,7 +257,7 @@ public class TargetMatching : MonoBehaviour
         }
     }
 
-    private void CalculateDistance()
+    private bool CalculateDistance()
     {
         GameObject center = GameObject.Find("Center");
         float distance = Math.Abs(Vector3.Distance(coilHotSpot.transform.position, tPoint.pos.transform.position));
@@ -306,8 +317,15 @@ public class TargetMatching : MonoBehaviour
             loggingString[1] = deltY.ToString("0.00");
             loggingString[2] = deltZ.ToString("0.00");
 
+            if(rl == ud && ud == fb && fb == "OK")
+            {
+                tPoint.pos.transform.FindChild("point").GetComponent<MeshRenderer>().material.color = new Color(distance, 1 - distance, 0, 0.2F);
+                return true;
+            }
+
         }
         tPoint.pos.transform.FindChild("point").GetComponent<MeshRenderer>().material.color = new Color(distance, 1 - distance, 0, 0.2F);
+        return false;
     }
     private Quaternion quaternionDifference(Quaternion fromRotation, Quaternion toRotation)
     {
@@ -328,7 +346,7 @@ public class TargetMatching : MonoBehaviour
         return rpy;
     }
 
-    private void CalculateRotation()
+    private bool CalculateRotation()
     {
         //float angle = Quaternion.Angle(coilHotSpot.transform.rotation, tPoint.rot.transform.rotation);
         //float pitch = coilHotSpot.transform.rotation.eulerAngles.x - tPoint.rot.transform.rotation.eulerAngles.x;
@@ -376,6 +394,13 @@ public class TargetMatching : MonoBehaviour
         loggingString[3] = "Pitch: " + rpy[1].ToString("0.00");
         loggingString[4] = "Yaw: " + rpy[2].ToString("0.00");
         loggingString[5] = "Roll: " + rpy[0].ToString("0.00");
+
+        if (r == p && p == y && y == "OK")
+        {
+            return true;
+        }
+        else
+            return false;
     }
 
     public struct TargetPoint
@@ -572,6 +597,9 @@ public class TargetMatching : MonoBehaviour
             usingGrid = true;
 
             GameObject.Find("ScalpGenerator").GetComponent<ScalpGenerator>().waitingToDraw = true;
+
+            GameObject.Find("Logging").GetComponent<Button>().interactable = true;
+
         }
     }
 
@@ -727,6 +755,9 @@ public class TargetMatching : MonoBehaviour
         //tCoil.transform.FindChild("model").transform.localScale = Vector3.Scale(tCoil.transform.FindChild("model").transform.localScale, new Vector3(1.1F,1.1F,1.1F)); position/stretch problems
 
         matching = true;
+        GameObject.Find("Delete Point").GetComponent<Button>().interactable = true;
+        GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = true;
+        GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "Match";
     }
 
     public void ExportGrid(int index)
@@ -935,6 +966,11 @@ public class TargetMatching : MonoBehaviour
         renderer.material = transMat;
 
         currentGrid.points[Int32.Parse(tPoint.ID)] = tPoint;
+
+        GameObject.Find("Reset Grid").GetComponent<Button>().interactable = true;
+        GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
+        GameObject.Find("Delete Point").GetComponent<Button>().interactable = false;
+        GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "";
     }
     public void setGridName(string name)
     {

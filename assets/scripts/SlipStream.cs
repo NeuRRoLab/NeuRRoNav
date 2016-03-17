@@ -34,7 +34,7 @@ public delegate void PacketReceivedHandler(object sender, string PacketData);
 public class SlipStream : MonoBehaviour
 {
 	public string IP = "127.0.0.1" ;
-	public int Port  = 16000;
+	public int    Port  = 16000;
 	
 	public event PacketReceivedHandler PacketNotification;
 	
@@ -44,7 +44,7 @@ public class SlipStream : MonoBehaviour
 	private string     mPacket;
 	private int        mPreviousSubPacketIndex = 0;
 	private const int  kMaxSubPacketSize       = 1400;
-	private System.Diagnostics.Process plugin;
+	private            System.Diagnostics.Process plugin;
 	
 	void Start()
 	{
@@ -122,12 +122,12 @@ public class SlipStream : MonoBehaviour
 
 	int OnApplicationQuit()
 	{
-        //plugin.CloseMainWindow();
+        plugin.CloseMainWindow();
         plugin.Dispose();
         return 0;
 	}
  
-	void Update()
+	void FixedUpdate()
 	{
 		UDPRead();
 	}

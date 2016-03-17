@@ -151,8 +151,6 @@ public class Stylus : MonoBehaviour
             DestroyImmediate(point);
         }
         GameObject calibrationTool = GameObject.Find("CalibrationTool");
-
-        
         GameObject model = stylus.transform.FindChild("model").gameObject;
         GameObject tip = model.transform.FindChild("Tip").gameObject;
 
@@ -185,6 +183,13 @@ public class Stylus : MonoBehaviour
         Debug.Log(point.transform.position.ToString());
         Debug.Log(calibrationTool.transform.position.ToString());
         pauseTracking = false;
+
+        GameObject.Find("Calibrate Coil").GetComponent<Button>().interactable = true;
+        GameObject.Find("Landmarks").GetComponent<Button>().interactable = true;
+        foreach(Button b in GameObject.Find("Landmarks").GetComponentsInChildren<Button>())
+        {
+            b.interactable = true;
+        }
     }
 
     public void setStylusSensitiveTrackingState(bool state)

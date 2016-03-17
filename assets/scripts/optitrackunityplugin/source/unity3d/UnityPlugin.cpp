@@ -348,6 +348,7 @@ void SendFrameToUnity(sFrameOfMocapData *data, void *pUserData)
 
     //    gSlipStream.Stream((unsigned char *) buffer,strlen(buffer));
     //}
+
 	if(data->RigidBodies>0)
 	{
 		TiXmlDocument doc;  
@@ -380,7 +381,7 @@ void SendFrameToUnity(sFrameOfMocapData *data, void *pUserData)
             body->SetDoubleAttribute("qy"  , rbData.qy);
             body->SetDoubleAttribute("qz"  , rbData.qz);
             body->SetDoubleAttribute("qw"  , rbData.qw);
-			body->SetAttribute("Tracked", rbData.params & 0x01);
+			body->SetAttribute      ("Tracked", rbData.params & 0x01);
    
 		}
 
