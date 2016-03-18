@@ -24,6 +24,8 @@ public class CameraController : MonoBehaviour
     bool stylusCam;
     bool coilCam;
 
+    int mouseFlip = -1;
+
     void Start()
     {
         targetCamera1 = GameObject.Find("TargetCam1");
@@ -133,6 +135,7 @@ public class CameraController : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.Mouse0) && activeCamera != 0)
         {
             activeCamera = 0;
+            mouseFlip = -1;
         }
 
         lastMousePos = Input.mousePosition;
@@ -140,35 +143,56 @@ public class CameraController : MonoBehaviour
 
     public void centerMainOnObject(GameObject target, float distance)
     {
-        targets[0] = target;
-        mainCamera.transform.position = targets[(int)targetNames.mainTarget].transform.position;
-        mainCamera.transform.parent = targets[(int)targetNames.mainTarget].transform;
-        mainCamera.transform.position = new Vector3(targets[(int)targetNames.mainTarget].transform.position.x, targets[(int)targetNames.mainTarget].transform.position.y, targets[(int)targetNames.mainTarget].transform.position.z - distance);
-        mainCamera.transform.LookAt(target.transform);
+        try
+        {
+            targets[0] = target;
+            mainCamera.transform.position = targets[(int)targetNames.mainTarget].transform.position;
+            mainCamera.transform.parent = targets[(int)targetNames.mainTarget].transform;
+            mainCamera.transform.position = new Vector3(targets[(int)targetNames.mainTarget].transform.position.x, targets[(int)targetNames.mainTarget].transform.position.y, targets[(int)targetNames.mainTarget].transform.position.z - distance);
+            mainCamera.transform.LookAt(target.transform);
+        }
+        catch(NullReferenceException e)
+        {
+
+        }
     }
 
     public void putCamOnStylus(int camera)
     {
-        GameObject cam = cameras[camera];
+        try
+        {
+            GameObject cam = cameras[camera];
 
-        stylusPoint = GameObject.Find("Stylus").transform.FindChild("Point").gameObject;
-        targets[camera] = stylusPoint;
-        cam.transform.position = Vector3.Lerp(stylusPoint.transform.position, GameObject.Find("Stylus").transform.FindChild("model").transform.position, 0.95F);
-        cam.transform.LookAt(stylusPoint.transform.position);
-        cam.transform.parent = GameObject.Find("Stylus").transform;
-        stylusCam = true;
+            stylusPoint = GameObject.Find("Stylus").transform.FindChild("Point").gameObject;
+            targets[camera] = stylusPoint;
+            cam.transform.position = Vector3.Lerp(stylusPoint.transform.position, GameObject.Find("Stylus").transform.FindChild("model").transform.position, 0.95F);
+            cam.transform.LookAt(stylusPoint.transform.position);
+            cam.transform.parent = GameObject.Find("Stylus").transform;
+            stylusCam = true;
+        }
+        catch (NullReferenceException e)
+        {
+
+        }
     }
 
     public void putCamOnCoil(int camera)
     {
-        GameObject coil = GameObject.Find(GameObject.Find("CoilTracker").GetComponent<Coil>().coilName);
-        GameObject cam = cameras[camera];
-        coilHotSpot = coil.transform.FindChild("container").FindChild("hotspot").gameObject;
-        targets[camera] = coilHotSpot;
-        cam.transform.position = Vector3.Lerp(coilHotSpot.transform.position, coil.transform.position, 0.95F);
-        cam.transform.LookAt(coilHotSpot.transform.position, coilHotSpot.transform.forward);
-        cam.transform.parent = coil.transform;
-        coilCam = true;
+        try
+        {
+            GameObject coil = GameObject.Find(GameObject.Find("CoilTracker").GetComponent<Coil>().coilName);
+            GameObject cam = cameras[camera];
+            coilHotSpot = coil.transform.FindChild("container").FindChild("hotspot").gameObject;
+            targets[camera] = coilHotSpot;
+            cam.transform.position = Vector3.Lerp(coilHotSpot.transform.position, coil.transform.position, 0.95F);
+            cam.transform.LookAt(coilHotSpot.transform.position, coilHotSpot.transform.forward);
+            cam.transform.parent = coil.transform;
+            coilCam = true;
+        }
+        catch (NullReferenceException e)
+        {
+
+        }
     }
 
     public void putTargetCam1OnTargetXY(GameObject tPoint, GameObject head)
@@ -198,35 +222,56 @@ public class CameraController : MonoBehaviour
 
     public void putMainCamOnTarget(string target)
     {
-        if (target.Equals("tPoint"))
+        try
         {
-            positionCamera(GameObject.Find("TargetMatching").GetComponent<TargetMatching>().tPoint.pos, 0);
+            if (target.Equals("tPoint"))
+            {
+                positionCamera(GameObject.Find("TargetMatching").GetComponent<TargetMatching>().tPoint.pos, 0);
+            }
+            else
+            {
+                positionCamera(GameObject.Find(target), 0);
+            }
         }
-        else
+        catch (NullReferenceException e)
         {
-            positionCamera(GameObject.Find(target), 0);
+
         }
     }
     public void putT1CamOnTarget(string target)
     {
-        if (target.Equals("tPoint"))
+        try
         {
-            positionCamera(GameObject.Find("TargetMatching").GetComponent<TargetMatching>().tPoint.pos, 1);
+            if (target.Equals("tPoint"))
+            {
+                positionCamera(GameObject.Find("TargetMatching").GetComponent<TargetMatching>().tPoint.pos, 1);
+            }
+            else
+            {
+                positionCamera(GameObject.Find(target), 1);
+            }
         }
-        else
+        catch (NullReferenceException e)
         {
-            positionCamera(GameObject.Find(target), 1);
+
         }
     }
     public void putT2CamOnTarget(string target)
     {
-        if (target.Equals("tPoint"))
+        try
         {
-            positionCamera(GameObject.Find("TargetMatching").GetComponent<TargetMatching>().tPoint.pos, 2);
+            if (target.Equals("tPoint"))
+            {
+                positionCamera(GameObject.Find("TargetMatching").GetComponent<TargetMatching>().tPoint.pos, 2);
+            }
+            else
+            {
+                positionCamera(GameObject.Find(target), 2);
+            }
         }
-        else
+        catch (NullReferenceException e)
         {
-            positionCamera(GameObject.Find(target), 2);
+
         }
     }
     private void positionCamera(GameObject target, int cam)
@@ -245,9 +290,17 @@ public class CameraController : MonoBehaviour
 
     private void rotateCamera(GameObject target, GameObject cam)
     {
+        if (Vector3.Dot(cam.transform.forward, Vector3.up) > 0f && Vector3.Dot(-Vector3.up, cam.transform.up) > 0f && mouseFlip == -1)
+        {
+            mouseFlip = 1;
+        }
+        else
+        {
+            mouseFlip = -1;
+        }
         cam.transform.LookAt(target.transform.position);
         cam.transform.RotateAround(target.transform.position, Vector3.up, (Input.mousePosition.x - lastMousePos.x));
-        cam.transform.RotateAround(target.transform.position, cam.transform.right, -(Input.mousePosition.y - lastMousePos.y));
+        cam.transform.RotateAround(target.transform.position, cam.transform.right, mouseFlip * (Input.mousePosition.y - lastMousePos.y));
     }
 
     private void zoomCamera(GameObject target, GameObject cam, float mouseDelta)

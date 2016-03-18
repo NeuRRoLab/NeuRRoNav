@@ -186,7 +186,7 @@ public class Stylus : MonoBehaviour
 
         GameObject.Find("Calibrate Coil").GetComponent<Button>().interactable = true;
         GameObject.Find("Landmarks").GetComponent<Button>().interactable = true;
-        foreach(Button b in GameObject.Find("Landmarks").GetComponentsInChildren<Button>())
+        foreach(Button b in GameObject.Find("LandmarksList").GetComponentsInChildren<Button>())
         {
             b.interactable = true;
         }

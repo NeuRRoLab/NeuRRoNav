@@ -20,7 +20,7 @@ public class TargetMatching : MonoBehaviour
 
     public Grid currentGrid;
 
-    TargetPoint scalpHotSpot;
+    public IList<TargetPoint> scalpHotSpots;
 
     IList<Text> xStatus = new List<Text>();
     IList<Text> yStatus = new List<Text>();
@@ -36,6 +36,8 @@ public class TargetMatching : MonoBehaviour
 
     int numPoints;
     int numGrids;
+
+    int numHotSpots;
 
     bool matching;
     bool settingGrid;
@@ -53,15 +55,17 @@ public class TargetMatching : MonoBehaviour
         usingGrid = false;
         settingHotSpot = false;
         numGrids = 0;
-        scalpHotSpot.pos = null;
-        scalpHotSpot.rot = null;
+        //scalpHotSpots.pos = null;
+        //scalpHotSpots.rot = null;
         watch = new Stopwatch();
         logging = false;
         loggingString = new string[6];
+        numHotSpots = 0;
 
         CreateTextArray();
 
         currentGrid = new Grid("null", new List<TargetPoint>());
+        scalpHotSpots = new List<TargetPoint>();
 
 
         string path = Application.dataPath + @"\Grids\Load";
@@ -119,20 +123,25 @@ public class TargetMatching : MonoBehaviour
 
         if (settingHotSpot && (Input.GetKeyDown(KeyCode.Space)))
         {
-            TargetPoint newHotSpot = new TargetPoint(false);
-            GameObject hs = new GameObject();
-            hs.transform.position = GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.position;
-            hs.transform.rotation = GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.rotation;
-            CreateScalpHotSpot(GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.position, GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.rotation);
-
-            setHotSpot.text = "Set Hot Spot";
-            settingHotSpot = false;
+            prepareHotSpot();
         }
 
         if (!matching && logging)
         {
             LogErrorToggle(errorToggleText);
         }
+    }
+
+    private void prepareHotSpot()
+    {
+        TargetPoint newHotSpot = new TargetPoint(false, scalpHotSpots);
+        GameObject hs = new GameObject();
+        hs.transform.position = GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.position;
+        hs.transform.rotation = GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.rotation;
+        CreateScalpHotSpot(GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.position, GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.rotation);
+
+        setHotSpot.text = "Set Hot Spot";
+        settingHotSpot = false;
     }
 
     void fixedUpdate()
@@ -185,12 +194,17 @@ public class TargetMatching : MonoBehaviour
                     target();
                 }
             }
-            else if (hit.collider.gameObject.transform.parent.gameObject.name.Equals("Scalp Hot Spot"))
+            //else if(hit.collider.gameObject.transform.parent.gameObject.name.Equals("Scalp Hot Spot"))
+            else
             {
-                tPoint = scalpHotSpot;
-                if (tPoint.fired == false)
+                String name = hit.collider.gameObject.transform.parent.gameObject.name;
+                if (name.Contains("ScalpHotSpot"))
                 {
-                    target();
+                    tPoint = scalpHotSpots[name.ToCharArray()[name.Length-1]];
+                    if (tPoint.fired == false)
+                    {
+                        target();
+                    }
                 }
             }
         }
@@ -198,7 +212,7 @@ public class TargetMatching : MonoBehaviour
 
     private TargetPoint CreateGridPoint()
     {
-        TargetPoint point = new TargetPoint(false);
+        TargetPoint point = new TargetPoint(false, currentGrid.points);
         GameObject pos = new GameObject();
         pos.transform.position = GameObject.Find("Stylus").transform.FindChild("Point").position;
         pos.transform.parent = GameObject.Find("Head").transform;
@@ -403,23 +417,25 @@ public class TargetMatching : MonoBehaviour
             return false;
     }
 
-    public struct TargetPoint
+    public class TargetPoint
     {
         public GameObject pos;
         public GameObject rot;
         public string ID;
         public bool fired;
+        public IList<TargetPoint> containedIn;
 
-        public TargetPoint(bool fired)
+        public TargetPoint(bool fired, IList<TargetPoint> containedIn)
         {
             this.fired = fired;
             pos = null;
             rot = null;
             ID = null;
+            this.containedIn = containedIn;
         }
     }
 
-    public struct Grid
+    public class Grid
     {
         public IList<TargetPoint> points;
         public string name;
@@ -471,9 +487,9 @@ public class TargetMatching : MonoBehaviour
 
             foreach (TargetPoint point in currentGrid.points)
             {
-                TargetPoint a = new TargetPoint();
-                TargetPoint b = new TargetPoint();
-                TargetPoint c = new TargetPoint();
+                TargetPoint a = new TargetPoint(false, currentGrid.points);
+                TargetPoint b = new TargetPoint(false, currentGrid.points);
+                TargetPoint c = new TargetPoint(false, currentGrid.points);
                 float distanceA = -1;
                 float distanceB = -1;
                 float distanceC = -1;
@@ -792,30 +808,26 @@ public class TargetMatching : MonoBehaviour
                     file.WriteLine("1" + "\t" + p.x + "\t" + p.y + "\t" + p.z);
                 }
             }
-            if (scalpHotSpot.pos != null)
+            //if (scalpHotSpots.pos != null)
+            foreach (TargetPoint point in scalpHotSpots)
             {
-                Vector3 p = center.transform.InverseTransformPoint(scalpHotSpot.pos.transform.position);
-                Quaternion r = scalpHotSpot.rot.transform.rotation;
+                Vector3 p = center.transform.InverseTransformPoint(point.pos.transform.position);
+                Quaternion r = point.rot.transform.rotation;
                 file.WriteLine("0" + "\t" + p.x + "\t" + p.y + "\t" + p.z + "\t" + r.x + "\t" + r.y + "\t" + r.z + "\t" + r.w);
-
-                CreateScalpHotSpot(p, r);
-            }
-            else
-            {
-                file.WriteLine("1");
+                //CreateScalpHotSpot(p, r);
             }
         }
     }
 
-    private void CreateScalpHotSpot(Vector3 p, Quaternion r)
+    public void CreateScalpHotSpot(Vector3 p, Quaternion r)
     {
-        if (scalpHotSpot.pos != null && scalpHotSpot.pos.transform.FindChild("point") != null)
-        {
-            DestroyImmediate(scalpHotSpot.pos.transform.FindChild("point").gameObject);
-            DestroyImmediate(scalpHotSpot.pos.gameObject);
-            DestroyImmediate(scalpHotSpot.rot.gameObject);
-        }
-        TargetPoint newHotSpot = new TargetPoint(false);
+        //if (scalpHotSpot.pos != null && scalpHotSpot.pos.transform.FindChild("point") != null)
+        //{
+        //    DestroyImmediate(scalpHotSpot.pos.transform.FindChild("point").gameObject);
+        //    DestroyImmediate(scalpHotSpot.pos.gameObject);
+        //    DestroyImmediate(scalpHotSpot.rot.gameObject);
+        //}
+        TargetPoint newHotSpot = new TargetPoint(false, scalpHotSpots);
         GameObject hs = new GameObject();
         hs.transform.position = p;
         hs.transform.rotation = r;
@@ -827,12 +839,12 @@ public class TargetMatching : MonoBehaviour
         psphere.transform.rotation = hs.transform.rotation;
         psphere.transform.parent = hs.transform;
         psphere.name = "point";
-        hs.name = "Scalp Hot Spot";
+        hs.name = "ScalpHotSpot " + (++numHotSpots);
 
         newHotSpot.pos = hs;
         newHotSpot.rot = hs;
         newHotSpot.ID = hs.name;
-        scalpHotSpot = newHotSpot;
+        scalpHotSpots.Add(newHotSpot);
     }
 
     public void ImportGrid()
@@ -860,10 +872,11 @@ public class TargetMatching : MonoBehaviour
 
         Grid newGrid = new Grid(file.ReadLine(), new List<TargetPoint>());
         int points = System.Convert.ToInt32(file.ReadLine());
+        int hotSpots = System.Convert.ToInt32(file.ReadLine());
 
         for (int i = 0; i < points; i++)
         {
-            TargetPoint t = new TargetPoint(false);
+            TargetPoint t = new TargetPoint(false, currentGrid.points);
             string data = file.ReadLine();
             char[] d = new char[1];
             d[0] = '\t';
@@ -882,15 +895,18 @@ public class TargetMatching : MonoBehaviour
             }
             newGrid.points.Add(t);
         }
-        string datahs = file.ReadLine();
-        char[] dhs = new char[1];
-        dhs[0] = '\t';
-        string[] dimshs = datahs.Split(dhs);
-        if (dimshs[0].Equals("0"))
+        for (int i = 0; i < hotSpots; i++)
         {
-            Vector3 p = GameObject.Find("Center").transform.TransformPoint(new Vector3((float)System.Convert.ToDouble(dimshs[1]), (float)System.Convert.ToDouble(dimshs[2]), (float)System.Convert.ToDouble(dimshs[3])));
-            Quaternion r = new Quaternion((float)System.Convert.ToDouble(dimshs[4]), (float)System.Convert.ToDouble(dimshs[5]), (float)System.Convert.ToDouble(dimshs[6]), (float)System.Convert.ToDouble(dimshs[7]));
-            CreateScalpHotSpot(p, r);
+            string datahs = file.ReadLine();
+            char[] dhs = new char[1];
+            dhs[0] = '\t';
+            string[] dimshs = datahs.Split(dhs);
+            if (dimshs[0].Equals("0"))
+            {
+                Vector3 p = GameObject.Find("Center").transform.TransformPoint(new Vector3((float)System.Convert.ToDouble(dimshs[1]), (float)System.Convert.ToDouble(dimshs[2]), (float)System.Convert.ToDouble(dimshs[3])));
+                Quaternion r = new Quaternion((float)System.Convert.ToDouble(dimshs[4]), (float)System.Convert.ToDouble(dimshs[5]), (float)System.Convert.ToDouble(dimshs[6]), (float)System.Convert.ToDouble(dimshs[7]));
+                CreateScalpHotSpot(p, r);
+            }
         }
         file.Close();
 

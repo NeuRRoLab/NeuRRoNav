@@ -241,6 +241,7 @@ public class Coil : MonoBehaviour
         ExportCoil();
 
         GameObject.Find("ScalpGenerator").GetComponent<ScalpGenerator>().waitingToDraw = true;
+        
     }
 
     public void ExportCoil()
@@ -309,7 +310,6 @@ public class Coil : MonoBehaviour
         calibrateHotSpot = points[0];
         calibrateRight = points[1];
         calibrateForward = points[2];
-
 
         MatchRotation();
     }
