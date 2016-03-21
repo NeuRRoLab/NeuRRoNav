@@ -48,7 +48,6 @@ public class TargetMatching : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
         coilTracker = GameObject.Find("CoilTracker").GetComponent<Coil>();
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
         matching = false;
@@ -66,7 +65,6 @@ public class TargetMatching : MonoBehaviour
 
         currentGrid = new Grid("null", new List<TargetPoint>());
         scalpHotSpots = new List<TargetPoint>();
-
 
         string path = Application.dataPath + @"\Grids\Load";
 
@@ -120,12 +118,10 @@ public class TargetMatching : MonoBehaviour
         {
             MouseSelectGridPoint();
         }
-
         if (settingHotSpot && (Input.GetKeyDown(KeyCode.Space)))
         {
             prepareHotSpot();
         }
-
         if (!matching && logging)
         {
             LogErrorToggle(errorToggleText);
@@ -140,11 +136,11 @@ public class TargetMatching : MonoBehaviour
         hs.transform.rotation = GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.rotation;
         CreateScalpHotSpot(GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.position, GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.rotation);
 
-        setHotSpot.text = "Set Hot Spot";
+        setHotSpot.text = "New Hot Spot";
         settingHotSpot = false;
     }
 
-    void fixedUpdate()
+    void FixedUpdate()
     {
 		if (matching)
 		{
@@ -180,32 +176,41 @@ public class TargetMatching : MonoBehaviour
 
     private void MouseSelectGridPoint()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = camController.cameras[camController.activeCamera].GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
+        //int result;
         if (Physics.Raycast(ray, out hit))
         {
-            int result;
-            if (Int32.TryParse(hit.collider.gameObject.transform.parent.gameObject.name, out result))
+            GameObject hitObj = hit.collider.gameObject.transform.parent.gameObject;
+            TargetPoint newTPoint = null;
+            UnityEngine.Debug.Log(hitObj.name.ToString());
+            foreach (TargetPoint t in currentGrid.points)
             {
-                tPoint = currentGrid.points[result];
-                if (tPoint.fired == false)
+                if(t.pos.Equals(hitObj))
                 {
-                    tPoint.ID = result.ToString();
-                    target();
+                    newTPoint = t;
+                    break;
                 }
             }
-            //else if(hit.collider.gameObject.transform.parent.gameObject.name.Equals("Scalp Hot Spot"))
-            else
+            if(newTPoint==null)
             {
-                String name = hit.collider.gameObject.transform.parent.gameObject.name;
-                if (name.Contains("ScalpHotSpot"))
+                foreach (TargetPoint t in scalpHotSpots)
                 {
-                    tPoint = scalpHotSpots[name.ToCharArray()[name.Length-1]];
-                    if (tPoint.fired == false)
+                    if (t.pos.Equals(hitObj))
                     {
-                        target();
+                        newTPoint = t;
+                        break;
                     }
                 }
+            }
+            if(newTPoint!=null && newTPoint.fired == false)
+            {
+                tPoint = newTPoint;
+                target();
+            }
+            else
+            {
+                UnityEngine.Debug.Log("Point Not Found");
             }
         }
     }
@@ -221,6 +226,9 @@ public class TargetMatching : MonoBehaviour
         pos.name = currentGrid.points.Count.ToString();
 
         VisualizePoint(pos);
+
+        GameObject.Find("Save Grids").GetComponent<Button>().interactable = true;
+
         return point;
     }
 
@@ -281,8 +289,6 @@ public class TargetMatching : MonoBehaviour
         float deltY = p.y - t.y;
         float deltZ = p.z - t.z;
 
-
-
         if (distance > 0.05)
         {
             distance = 1;
@@ -316,8 +322,8 @@ public class TargetMatching : MonoBehaviour
             //Calculate needed corrections
             float mThresh = 0.1F;
 
-            string rl = setMoveInstruction("Left ", "Right ", deltX, mThresh);
-            string ud = setMoveInstruction("Down ", "Up ", deltY, mThresh);
+            string rl = setMoveInstruction("Right ", "Left ", deltX, mThresh);
+            string ud = setMoveInstruction("Up ", "Down ", deltY, mThresh);
             string fb = setMoveInstruction("Back ", "Forward ", deltZ, mThresh);
 
             //Update the status of each dimension
@@ -336,15 +342,16 @@ public class TargetMatching : MonoBehaviour
                 tPoint.pos.transform.FindChild("point").GetComponent<MeshRenderer>().material.color = new Color(distance, 1 - distance, 0, 0.2F);
                 return true;
             }
-
         }
         tPoint.pos.transform.FindChild("point").GetComponent<MeshRenderer>().material.color = new Color(distance, 1 - distance, 0, 0.2F);
         return false;
     }
+
     private Quaternion quaternionDifference(Quaternion fromRotation, Quaternion toRotation)
     {
         return fromRotation * Quaternion.Inverse(toRotation);
     }
+
     private float[] AngleDecomposition(Quaternion angle)//Returns Roll Pitch Yaw
     {
         float w = angle.w;
@@ -399,7 +406,7 @@ public class TargetMatching : MonoBehaviour
 
         string r = setRotateInstruction("Cntr Clockwise ", "Clockwise ", rpy[0], rThresh);
         string p = setRotateInstruction("Pitch Up ", "Pitch Down ", rpy[1], rThresh);
-        string y = setRotateInstruction("Yaw Right ", "Yaw Left ", rpy[2], rThresh);
+        string y = setRotateInstruction("Yaw Left ", "Yaw Right ", rpy[2], rThresh);
 
         pitchStatus[0].text = pitchStatus[1].text = "Pitch: " + p + rpy[1].ToString("0.00");
         yawStatus[0].text = yawStatus[1].text = "Yaw: " + y + rpy[2].ToString("0.00");
@@ -414,7 +421,9 @@ public class TargetMatching : MonoBehaviour
             return true;
         }
         else
+        {
             return false;
+        }
     }
 
     public class TargetPoint
@@ -468,9 +477,10 @@ public class TargetMatching : MonoBehaviour
         else
         {
             settingHotSpot = false;
-            setHotSpot.text = "Set Hot Spot";
+            setHotSpot.text = "New Hot Spot";
         }
     }
+
     public void setGridManualButtonPress()
     {
         if (!settingGrid)
@@ -577,8 +587,6 @@ public class TargetMatching : MonoBehaviour
                     }
                 }
 
-
-
                 Vector3 side1 = a.pos.transform.position - point.pos.transform.position;
                 Vector3 side2b = b.pos.transform.position - point.pos.transform.position;
                 Vector3 side2c = c.pos.transform.position - point.pos.transform.position;
@@ -606,11 +614,14 @@ public class TargetMatching : MonoBehaviour
 
                 point.rot.transform.LookAt(point.rot.transform.up, point.rot.transform.forward);
 
+                point.rot.transform.parent = GameObject.Find("Head").transform;
+
                 point.pos.transform.FindChild("point").transform.rotation = point.rot.transform.rotation;
             }
 
             settingGrid = false;
             usingGrid = true;
+            UnityEngine.Debug.Log("ready to select");
 
             GameObject.Find("ScalpGenerator").GetComponent<ScalpGenerator>().waitingToDraw = true;
 
@@ -624,8 +635,7 @@ public class TargetMatching : MonoBehaviour
         DestroyCurrentGrid();
 
         numPoints = 0;
-        int numg = numGrids + 1;
-        numGrids++;
+        int numg = ++numGrids;
         IList<TargetPoint> g = new List<TargetPoint>();
         currentGrid = new Grid("Grid" + numg.ToString(), g);
         settingGrid = true;
@@ -675,10 +685,18 @@ public class TargetMatching : MonoBehaviour
     {
         if (matching)
         {
-            currentGrid.points.RemoveAt(currentGrid.points.IndexOf(tPoint));
+            int i = 0;
+            foreach(GameObject t in camController.targets)
+            {
+                if (t.Equals(tPoint.pos))
+                {
+                    camController.putCamOnStylus(i);
+                }
+            }
             DestroyImmediate(tPoint.pos.transform.FindChild("point").gameObject);
             DestroyImmediate(tPoint.pos.gameObject);
             DestroyImmediate(tPoint.rot.gameObject);
+            tPoint.containedIn.Remove(tPoint);
         }
     }
 
@@ -773,7 +791,7 @@ public class TargetMatching : MonoBehaviour
         matching = true;
         GameObject.Find("Delete Point").GetComponent<Button>().interactable = true;
         GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = true;
-        GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "Match";
+        //GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "Match";
     }
 
     public void ExportGrid(int index)
@@ -794,6 +812,7 @@ public class TargetMatching : MonoBehaviour
             Grid grid = currentGrid;
             file.WriteLine(grid.name);
             file.WriteLine(grid.points.Count.ToString());
+            file.WriteLine(scalpHotSpots.Count.ToString());
             foreach (TargetPoint point in grid.points)
             {
                 //Vector3 p = center.transform.InverseTransformPoint(GameObject.Find("Head").transform.TransformPoint(point.pos.transform.position));
@@ -845,6 +864,10 @@ public class TargetMatching : MonoBehaviour
         newHotSpot.rot = hs;
         newHotSpot.ID = hs.name;
         scalpHotSpots.Add(newHotSpot);
+
+        usingGrid = true;
+
+        GameObject.Find("Save Grids").GetComponent<Button>().interactable = true;
     }
 
     public void ImportGrid()
@@ -981,7 +1004,7 @@ public class TargetMatching : MonoBehaviour
         transMat.renderQueue = 3000;
         renderer.material = transMat;
 
-        currentGrid.points[Int32.Parse(tPoint.ID)] = tPoint;
+        tPoint.containedIn[Int32.Parse(tPoint.ID)] = tPoint;
 
         GameObject.Find("Reset Grid").GetComponent<Button>().interactable = true;
         GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;

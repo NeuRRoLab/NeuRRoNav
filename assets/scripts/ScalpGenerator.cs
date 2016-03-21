@@ -24,7 +24,7 @@ public class ScalpGenerator : MonoBehaviour
 
     Vector3 lastPoint;
 
-    IList<IList<Vector3>> splineCage;
+    //IList<IList<Vector3>> splineCage;
 
     LineRenderer splineRenderer;
     GameObject stylusPoint;
@@ -47,12 +47,12 @@ public class ScalpGenerator : MonoBehaviour
         headTracking = GameObject.Find("HeadTrackStatus").GetComponent<Text>();
         calibrationInstruct = GameObject.Find("CalibrationInstructions").GetComponent<Text>();
 
-        splines = 0;
-        splinePoints = 0;
-        waitingToDraw = false;
+        //splines = 0;
+        //splinePoints = 0;
+        //waitingToDraw = false;
         landmarksFound = true;
-        drawing = false;
-        splineCage = new List<IList<Vector3>>();
+        //drawing = false;
+        //splineCage = new List<IList<Vector3>>();
     }
 
     // Update is called once per frame
@@ -68,45 +68,45 @@ public class ScalpGenerator : MonoBehaviour
             {
                 //StartDraw();
             }
-            if (drawing)
-            {
-                if (Input.GetKey(KeyCode.Space))
-                {
-                    if (stylusTracking.color == Color.red)
-                    {
-                        splines--;
-                        Destroy(scalpSpline);
-                        splineCage.RemoveAt(splines);
-                        drawing = false;
-                        waitingToDraw = true;
-                        releaseSpace = true;
-                        stylusTracker.GetComponent<Stylus>().setStylusSensitiveTrackingState(false);
-                    }
-                    else if (Vector3.Distance(lastPoint, stylusPoint.transform.position) > 0.005)
-                    {
-                        //splinePoints = DrawNewVert(splinePoints);
-                        lastPoint = stylusPoint.transform.position;
-                    }
-                }
+            //if (drawing)
+            //{
+            //    if (Input.GetKey(KeyCode.Space))
+            //    {
+            //        if (stylusTracking.color == Color.red)
+            //        {
+            //            splines--;
+            //            Destroy(scalpSpline);
+            //            splineCage.RemoveAt(splines);
+            //            drawing = false;
+            //            waitingToDraw = true;
+            //            releaseSpace = true;
+            //            stylusTracker.GetComponent<Stylus>().setStylusSensitiveTrackingState(false);
+            //        }
+            //        else if (Vector3.Distance(lastPoint, stylusPoint.transform.position) > 0.005)
+            //        {
+            //            //splinePoints = DrawNewVert(splinePoints);
+            //            lastPoint = stylusPoint.transform.position;
+            //        }
+            //    }
 
-                else if (!Input.GetKey(KeyCode.Space) || !Input.GetKey(KeyCode.Mouse1))
-                {
-                    drawing = false;
-                    waitingToDraw = true;
-                    stylusTracker.GetComponent<Stylus>().setStylusSensitiveTrackingState(false);
-                }
-            }
-            else if (releaseSpace && (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.Mouse1)))
-            {
-                releaseSpace = false;
-            }
+            //    else if (!Input.GetKey(KeyCode.Space) || !Input.GetKey(KeyCode.Mouse1))
+            //    {
+            //        drawing = false;
+            //        waitingToDraw = true;
+            //        stylusTracker.GetComponent<Stylus>().setStylusSensitiveTrackingState(false);
+            //    }
+            //}
+            //else if (releaseSpace && (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.Mouse1)))
+            //{
+            //    releaseSpace = false;
+            //}
 
         }
 
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            ExportScalpSurfaceXYZ();
-        }
+        //if (Input.GetKeyDown(KeyCode.D))
+        //{
+        //    ExportScalpSurfaceXYZ();
+        //}
     }
 
 
@@ -273,16 +273,14 @@ public class ScalpGenerator : MonoBehaviour
                 Destroy(center);
             }
 
-            Vector3 lerpCenter = Vector3.Lerp(Vector3.Lerp(landmarks[(int)landmarkNames.leftTragus].transform.position, landmarks[(int)landmarkNames.rightTragus].transform.position, 0.5F), Vector3.Lerp(
-                landmarks[(int)landmarkNames.nasion].transform.position, landmarks[(int)landmarkNames.inion].transform.position, 0.5f), 0.5F);
+            Vector3 lerpCenter = Vector3.Lerp(Vector3.Lerp(landmarks[(int)landmarkNames.leftTragus].transform.position, landmarks[(int)landmarkNames.rightTragus].transform.position, 0.5F), landmarks[(int)landmarkNames.nasion].transform.position, 0.5f);
 
             center = new GameObject();
             center.name = "Center";
             center.transform.position = lerpCenter;
             center.transform.rotation = head.transform.rotation;
-			center.transform.rotation = Quaternion.LookRotation (Vector3.Normalize (landmarks [(int)landmarkNames.nasion].transform.position - landmarks [(int)landmarkNames.inion].transform.position), Vector3.Normalize (Vector3.Cross (Vector3.Normalize (landmarks [(int)landmarkNames.leftTragus].transform.position - landmarks [(int)landmarkNames.rightTragus].transform.position),
-				Vector3.Normalize (landmarks [(int)landmarkNames.nasion].transform.position - landmarks [(int)landmarkNames.inion].transform.position))));
-			//center.transform.LookAt(landmarks[(int)landmarkNames.nasion].transform.position, head.transform.up);
+			center.transform.rotation = Quaternion.LookRotation (Vector3.Normalize (landmarks [(int)landmarkNames.nasion].transform.position - lerpCenter), Vector3.Normalize (Vector3.Cross (landmarks [(int)landmarkNames.rightTragus].transform.position - Vector3.Normalize(landmarks[(int)landmarkNames.leftTragus].transform.position),
+                Vector3.Normalize(landmarks[(int)landmarkNames.nasion].transform.position - lerpCenter))));
             center.transform.parent = head.transform;
 
         }
@@ -294,64 +292,64 @@ public class ScalpGenerator : MonoBehaviour
         GameObject.Find("Load Grids").GetComponent<Button>().interactable = true;
     }
 
-    public void ExportScalpSurfaceXYZ()
-    {
-        GameObject scalp = GameObject.Find("Scalp");
-        string path = Application.dataPath + @"\Scalps";
-        if (!System.IO.File.Exists(path))
-        {
-            System.IO.Directory.CreateDirectory(path);
-        }
+    //public void ExportScalpSurfaceXYZ()
+    //{
+    //    GameObject scalp = GameObject.Find("Scalp");
+    //    string path = Application.dataPath + @"\Scalps";
+    //    if (!System.IO.File.Exists(path))
+    //    {
+    //        System.IO.Directory.CreateDirectory(path);
+    //    }
 
-        using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(path + @"\Scalp.txt", true))
-        {
-            file.WriteLine(splineCage.Count.ToString());
-            file.WriteLine(splineCage[0].Count.ToString());
-            foreach (List<Vector3> line in splineCage)
-            {
-                foreach (Vector3 point in line)
-                {
-                    Vector3 v = center.transform.InverseTransformPoint(GameObject.Find("ScalpSurface").transform.TransformPoint(point));
-                    file.WriteLine(v.x + "\t" + v.y + "\t" + v.z);
-                }
-            }
-            //file.WriteLine(
-        }
-    }
+    //    using (System.IO.StreamWriter file =
+    //        new System.IO.StreamWriter(path + @"\Scalp.txt", true))
+    //    {
+    //        file.WriteLine(splineCage.Count.ToString());
+    //        file.WriteLine(splineCage[0].Count.ToString());
+    //        foreach (List<Vector3> line in splineCage)
+    //        {
+    //            foreach (Vector3 point in line)
+    //            {
+    //                Vector3 v = center.transform.InverseTransformPoint(GameObject.Find("ScalpSurface").transform.TransformPoint(point));
+    //                file.WriteLine(v.x + "\t" + v.y + "\t" + v.z);
+    //            }
+    //        }
+    //        //file.WriteLine(
+    //    }
+    //}
 
-    public void ImportXYZ()
-    {
-        List<IList<Vector3>> newSplineCage = new List<IList<Vector3>>();
+    //public void ImportXYZ()
+    //{
+    //    List<IList<Vector3>> newSplineCage = new List<IList<Vector3>>();
 
-        System.IO.FileStream filestream = new System.IO.FileStream(Application.dataPath + @"\Scalps\Scalp.txt",
-                                          System.IO.FileMode.Open,
-                                          System.IO.FileAccess.Read,
-                                          System.IO.FileShare.Read);
-        System.IO.StreamReader file = new System.IO.StreamReader(filestream);
+    //    System.IO.FileStream filestream = new System.IO.FileStream(Application.dataPath + @"\Scalps\Scalp.txt",
+    //                                      System.IO.FileMode.Open,
+    //                                      System.IO.FileAccess.Read,
+    //                                      System.IO.FileShare.Read);
+    //    System.IO.StreamReader file = new System.IO.StreamReader(filestream);
 
 
-        int splines = System.Convert.ToInt32(file.ReadLine());
-        int points = System.Convert.ToInt32(file.ReadLine());
+    //    int splines = System.Convert.ToInt32(file.ReadLine());
+    //    int points = System.Convert.ToInt32(file.ReadLine());
 
-        for (int i = 0; i < splines; i++)
-        {
-            newSplineCage.Add(new List<Vector3>());
-            for (int j = 0; j < points; j++)
-            {
-                Vector3 v = new Vector3();
-                string vertex = file.ReadLine();
-                char[] d = new char[1];
-                d[0] = '\t';
-                string[] dims = vertex.Split(d);
-                v.Set((float)System.Convert.ToDouble(dims[0]), (float)System.Convert.ToDouble(dims[1]), (float)System.Convert.ToDouble(dims[2]));
-                newSplineCage[i].Add(center.transform.TransformPoint(v));
-            }
-        }
-        file.Close();
-        splineCage = newSplineCage;
-        createGrid();
-    }
+    //    for (int i = 0; i < splines; i++)
+    //    {
+    //        newSplineCage.Add(new List<Vector3>());
+    //        for (int j = 0; j < points; j++)
+    //        {
+    //            Vector3 v = new Vector3();
+    //            string vertex = file.ReadLine();
+    //            char[] d = new char[1];
+    //            d[0] = '\t';
+    //            string[] dims = vertex.Split(d);
+    //            v.Set((float)System.Convert.ToDouble(dims[0]), (float)System.Convert.ToDouble(dims[1]), (float)System.Convert.ToDouble(dims[2]));
+    //            newSplineCage[i].Add(center.transform.TransformPoint(v));
+    //        }
+    //    }
+    //    file.Close();
+    //    splineCage = newSplineCage;
+    //    createGrid();
+    //}
 
     public void LandmarksButtonPress()
     {
@@ -377,110 +375,110 @@ public class ScalpGenerator : MonoBehaviour
         CenterHead();
     }
 
-    public void GenScalpButtonPress()
-    {
-        createGrid();
-    }
+    //public void GenScalpButtonPress()
+    //{
+    //    createGrid();
+    //}
 
-    void createGrid()
-    {
-        int splines = 0;
-        int highestResolution = 0;
-        int j = 0;
-        foreach (List<Vector3> line in splineCage)
-        {
-            splines++;
-            foreach (Vector3 point in line)
-            {
-                j++;
-                if (j > highestResolution)
-                {
-                    highestResolution = j;
-                }
-            }
-            j = 0;
-        }
+    //void createGrid()
+    //{
+    //    int splines = 0;
+    //    int highestResolution = 0;
+    //    int j = 0;
+    //    foreach (List<Vector3> line in splineCage)
+    //    {
+    //        splines++;
+    //        foreach (Vector3 point in line)
+    //        {
+    //            j++;
+    //            if (j > highestResolution)
+    //            {
+    //                highestResolution = j;
+    //            }
+    //        }
+    //        j = 0;
+    //    }
 
-        Vector3[,] scalpGrid = new Vector3[splines, highestResolution];
-        //IList<Vector3> scalpGrid = new List<Vector3>();
+    //    Vector3[,] scalpGrid = new Vector3[splines, highestResolution];
+    //    //IList<Vector3> scalpGrid = new List<Vector3>();
 
-        foreach (List<Vector3> line in splineCage)
-        {
-            while (line.Count < highestResolution)
-            {
-                float distance = 0;
-                Vector3 v1, v2, f1, f2;
-                v1 = line[0];
-                v2 = line[1];
-                f1 = line[0];
-                f2 = line[1];
-                bool first = true;
-                int k = 0;
-                int l = 0;
-                foreach (Vector3 point in line)
-                {
-                    if (first)
-                    {
-                        first = false;
-                    }
-                    else
-                    {
-                        v2 = point;
-                        float d = Vector3.Distance(v1, v2);
-                        if (d > distance)
-                        {
-                            f1 = v1;
-                            f2 = v2;
-                            distance = d;
-                            l = k;
-                        }
-                        v1 = point;
-                    }
-                    k++;
-                }
-                line.Insert(l, Vector3.Lerp(f1, f2, 0.5F));
-            }
-        }
+    //    foreach (List<Vector3> line in splineCage)
+    //    {
+    //        while (line.Count < highestResolution)
+    //        {
+    //            float distance = 0;
+    //            Vector3 v1, v2, f1, f2;
+    //            v1 = line[0];
+    //            v2 = line[1];
+    //            f1 = line[0];
+    //            f2 = line[1];
+    //            bool first = true;
+    //            int k = 0;
+    //            int l = 0;
+    //            foreach (Vector3 point in line)
+    //            {
+    //                if (first)
+    //                {
+    //                    first = false;
+    //                }
+    //                else
+    //                {
+    //                    v2 = point;
+    //                    float d = Vector3.Distance(v1, v2);
+    //                    if (d > distance)
+    //                    {
+    //                        f1 = v1;
+    //                        f2 = v2;
+    //                        distance = d;
+    //                        l = k;
+    //                    }
+    //                    v1 = point;
+    //                }
+    //                k++;
+    //            }
+    //            line.Insert(l, Vector3.Lerp(f1, f2, 0.5F));
+    //        }
+    //    }
 
-        int i = 0;
-        for (i = 0; i < splineCage.Count; i++)
-        {
-            //float nextSpline = landmarks[(int)landmarkNames.inion].transform.position.z;
-            //int index = 0;
-            //int nextIndex = 0;
-            //foreach (IList<Vector3> list in splineCage)
-            //{
-            //    if (scalp.transform.TransformPoint(list[0]).z < nextSpline)
-            //    {
-            //        nextSpline = scalp.transform.TransformPoint(list[0]).z;
-            //        nextIndex = index;
-            //        index++;
-            //    }
-            //}
+    //    int i = 0;
+    //    for (i = 0; i < splineCage.Count; i++)
+    //    {
+    //        //float nextSpline = landmarks[(int)landmarkNames.inion].transform.position.z;
+    //        //int index = 0;
+    //        //int nextIndex = 0;
+    //        //foreach (IList<Vector3> list in splineCage)
+    //        //{
+    //        //    if (scalp.transform.TransformPoint(list[0]).z < nextSpline)
+    //        //    {
+    //        //        nextSpline = scalp.transform.TransformPoint(list[0]).z;
+    //        //        nextIndex = index;
+    //        //        index++;
+    //        //    }
+    //        //}
             
-            for (j = 0; j < highestResolution; j++)
-            {
-                if (j < splineCage[i].Count)
-                {
-                    Debug.Log("Filling at " + i.ToString() + " " + j.ToString());
-                    scalpGrid[i, j] = splineCage[i][j];
-                    //scalpGrid.Add(splineCage[i][j]);
-                }
-            }
-            //splineCage.RemoveAt(nextIndex);
-        }
+    //        for (j = 0; j < highestResolution; j++)
+    //        {
+    //            if (j < splineCage[i].Count)
+    //            {
+    //                Debug.Log("Filling at " + i.ToString() + " " + j.ToString());
+    //                scalpGrid[i, j] = splineCage[i][j];
+    //                //scalpGrid.Add(splineCage[i][j]);
+    //            }
+    //        }
+    //        //splineCage.RemoveAt(nextIndex);
+    //    }
 
-        Vector3[,] orderedScalpGrid = new Vector3[splines, highestResolution];
+    //    Vector3[,] orderedScalpGrid = new Vector3[splines, highestResolution];
 
-        Debug.Log("Setting control grid to " + splineCage.Count.ToString() + " x " + highestResolution.ToString());
+    //    Debug.Log("Setting control grid to " + splineCage.Count.ToString() + " x " + highestResolution.ToString());
 
-        surfaceGen.CreateScalp(scalpGrid, splineCage.Count, highestResolution);
+    //    surfaceGen.CreateScalp(scalpGrid, splineCage.Count, highestResolution);
 
-        GameObject[] allSplines = GameObject.FindGameObjectsWithTag("Spline");
+    //    GameObject[] allSplines = GameObject.FindGameObjectsWithTag("Spline");
 
-        foreach (GameObject s in allSplines)
-        {
-            Destroy(s);
-        }
-    }
+    //    foreach (GameObject s in allSplines)
+    //    {
+    //        Destroy(s);
+    //    }
+    //}
 }

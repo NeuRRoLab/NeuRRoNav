@@ -10,10 +10,10 @@ public class CameraController : MonoBehaviour
     GameObject targetCamera2;
     enum targetNames : int { mainTarget = 0, targetCamera1Target = 1, targetCamera2Target = 2 };
 
-    GameObject[] cameras = new GameObject[3];
-    GameObject[] targets = new GameObject[3];
+    public GameObject[] cameras = new GameObject[3];
+    public GameObject[] targets = new GameObject[3];
 
-    int activeCamera = 0;
+    public int activeCamera = 0;
 
     Vector3 lastMousePos;
 
@@ -49,7 +49,6 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
-
         if (stylusCam)
         {
 
@@ -290,17 +289,13 @@ public class CameraController : MonoBehaviour
 
     private void rotateCamera(GameObject target, GameObject cam)
     {
-        if (Vector3.Dot(cam.transform.forward, Vector3.up) > 0f && Vector3.Dot(-Vector3.up, cam.transform.up) > 0f && mouseFlip == -1)
-        {
-            mouseFlip = 1;
-        }
-        else
-        {
-            mouseFlip = -1;
-        }
         cam.transform.LookAt(target.transform.position);
         cam.transform.RotateAround(target.transform.position, Vector3.up, (Input.mousePosition.x - lastMousePos.x));
         cam.transform.RotateAround(target.transform.position, cam.transform.right, mouseFlip * (Input.mousePosition.y - lastMousePos.y));
+        if (Vector3.Dot(Vector3.up, cam.transform.up) <= 0)
+        {
+            mouseFlip *= -1;
+        }
     }
 
     private void zoomCamera(GameObject target, GameObject cam, float mouseDelta)
