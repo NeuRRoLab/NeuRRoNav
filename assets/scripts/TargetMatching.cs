@@ -819,7 +819,7 @@ public class TargetMatching : MonoBehaviour
                 Vector3 p = center.transform.InverseTransformPoint(point.pos.transform.position);
                 if (point.rot != null)
                 {
-                    Quaternion r = point.rot.transform.rotation;
+                    Quaternion r = Quaternion.Inverse(center.transform.rotation) * point.rot.transform.rotation;
                     file.WriteLine("0" + "\t" + p.x + "\t" + p.y + "\t" + p.z + "\t" + r.x + "\t" + r.y + "\t" + r.z + "\t" + r.w);
                 }
                 else
@@ -831,7 +831,7 @@ public class TargetMatching : MonoBehaviour
             foreach (TargetPoint point in scalpHotSpots)
             {
                 Vector3 p = center.transform.InverseTransformPoint(point.pos.transform.position);
-                Quaternion r = point.rot.transform.rotation;
+                Quaternion r = Quaternion.Inverse(center.transform.rotation) * point.rot.transform.rotation;
                 file.WriteLine("0" + "\t" + p.x + "\t" + p.y + "\t" + p.z + "\t" + r.x + "\t" + r.y + "\t" + r.z + "\t" + r.w);
                 //CreateScalpHotSpot(p, r);
             }
@@ -910,7 +910,7 @@ public class TargetMatching : MonoBehaviour
             if (dims[0].Equals("0"))
             {
                 t.rot = new GameObject();
-                t.rot.transform.rotation = new Quaternion((float)System.Convert.ToDouble(dims[4]), (float)System.Convert.ToDouble(dims[5]), (float)System.Convert.ToDouble(dims[6]), (float)System.Convert.ToDouble(dims[7]));
+                t.rot.transform.rotation = GameObject.Find("Center").transform.rotation * new Quaternion((float)System.Convert.ToDouble(dims[4]), (float)System.Convert.ToDouble(dims[5]), (float)System.Convert.ToDouble(dims[6]), (float)System.Convert.ToDouble(dims[7]));
             }
             else
             {
@@ -927,7 +927,7 @@ public class TargetMatching : MonoBehaviour
             if (dimshs[0].Equals("0"))
             {
                 Vector3 p = GameObject.Find("Center").transform.TransformPoint(new Vector3((float)System.Convert.ToDouble(dimshs[1]), (float)System.Convert.ToDouble(dimshs[2]), (float)System.Convert.ToDouble(dimshs[3])));
-                Quaternion r = new Quaternion((float)System.Convert.ToDouble(dimshs[4]), (float)System.Convert.ToDouble(dimshs[5]), (float)System.Convert.ToDouble(dimshs[6]), (float)System.Convert.ToDouble(dimshs[7]));
+                Quaternion r = GameObject.Find("Center").transform.rotation * new Quaternion((float)System.Convert.ToDouble(dimshs[4]), (float)System.Convert.ToDouble(dimshs[5]), (float)System.Convert.ToDouble(dimshs[6]), (float)System.Convert.ToDouble(dimshs[7]));
                 CreateScalpHotSpot(p, r);
             }
         }

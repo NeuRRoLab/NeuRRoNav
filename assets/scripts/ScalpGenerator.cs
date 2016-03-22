@@ -239,10 +239,10 @@ public class ScalpGenerator : MonoBehaviour
             scalp.transform.parent = head.transform;
             nasion.transform.parent = scalp.transform;
 
-            foreach (GameObject obj in landmarks)
-            {
-                obj.transform.parent = scalp.transform;
-            }
+            //foreach (GameObject obj in landmarks)
+            //{
+            //    obj.transform.parent = scalp.transform;
+            //}
 
             float scaleZ = (Vector3.Distance(new Vector3(0, 0, landmarks[(int)landmarkNames.inion].transform.localPosition.z), new Vector3(0, 0, landmarks[(int)landmarkNames.nasion].transform.localPosition.z))
                 / Vector3.Distance(new Vector3(0, 0, inion.transform.localPosition.z), new Vector3(0, 0, nasion.transform.localPosition.z)));
@@ -278,18 +278,22 @@ public class ScalpGenerator : MonoBehaviour
             center = new GameObject();
             center.name = "Center";
             center.transform.position = lerpCenter;
-            center.transform.rotation = head.transform.rotation;
-			center.transform.rotation = Quaternion.LookRotation (Vector3.Normalize (landmarks [(int)landmarkNames.nasion].transform.position - lerpCenter), Vector3.Normalize (Vector3.Cross (landmarks [(int)landmarkNames.rightTragus].transform.position - Vector3.Normalize(landmarks[(int)landmarkNames.leftTragus].transform.position),
-                Vector3.Normalize(landmarks[(int)landmarkNames.nasion].transform.position - lerpCenter))));
+            //center.transform.rotation = head.transform.rotation;
+            center.transform.rotation = Quaternion.LookRotation(
+                Vector3.Normalize(landmarks[(int)landmarkNames.nasion].transform.position - lerpCenter), 
+                Vector3.Normalize(
+                    Vector3.Cross(Vector3.Normalize(landmarks[(int)landmarkNames.nasion].transform.position - lerpCenter), 
+                        Vector3.Normalize(Vector3.Normalize(landmarks[(int)landmarkNames.leftTragus].transform.position - landmarks[(int)landmarkNames.rightTragus].transform.position)))));
             center.transform.parent = head.transform;
 
+            //}
+
+            camController.centerMainOnObject(head, 0.5F);
+
+            GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
+            GameObject.Find("Set Grid").GetComponent<Button>().interactable = true;
+            GameObject.Find("Load Grids").GetComponent<Button>().interactable = true;
         }
-
-        camController.centerMainOnObject(head, 0.5F);
-
-        GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
-        GameObject.Find("Set Grid").GetComponent<Button>().interactable = true;
-        GameObject.Find("Load Grids").GetComponent<Button>().interactable = true;
     }
 
     //public void ExportScalpSurfaceXYZ()

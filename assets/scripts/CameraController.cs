@@ -23,6 +23,7 @@ public class CameraController : MonoBehaviour
 
     bool stylusCam;
     bool coilCam;
+    bool listenToMouse;
 
     int mouseFlip = -1;
 
@@ -31,6 +32,8 @@ public class CameraController : MonoBehaviour
         targetCamera1 = GameObject.Find("TargetCam1");
         targetCamera2 = GameObject.Find("TargetCam2");
         mainCamera = Camera.main.gameObject;
+
+        listenToMouse = true;
 
         cameras[0] = mainCamera;
         cameras[1] = targetCamera1;
@@ -89,54 +92,21 @@ public class CameraController : MonoBehaviour
         {
             mouse0 = true;
         }
-        if (mouse0 || Math.Abs(mouseScroll) > 0)
+        if (listenToMouse)
         {
-            if (Input.mousePosition.y > Screen.height / 2 && Input.mousePosition.x < Screen.width - Screen.width * 0.17 && activeCamera == 0 || activeCamera == 1)
+            if (mouse0)
             {
-                if (mouse0)
-                {
-                    activeCamera = 1;
-                    rotateCamera(targets[(int)targetNames.mainTarget], mainCamera);
-                }
-                if (Math.Abs(mouseScroll) > 0)
-                {
-                    zoomCamera(targets[(int)targetNames.mainTarget], mainCamera, mouseScroll);
-                }
+                rotateCamera(targets[activeCamera], cameras[activeCamera]);
             }
-            else if (Input.mousePosition.y < Screen.height / 2 && Input.mousePosition.x < Screen.width - Screen.width * 0.17)
+            if (Math.Abs(mouseScroll) > 0)
             {
-                if (Input.mousePosition.x < (Screen.width - Screen.width * 0.07) / 2 && activeCamera == 0 || activeCamera == 2)
-                {
-                    if (mouse0)
-                    {
-                        activeCamera = 2;
-                        rotateCamera(targets[(int)targetNames.targetCamera1Target], targetCamera1);
-                    }
-                    if (Math.Abs(mouseScroll) > 0)
-                    {
-                        zoomCamera(targets[(int)targetNames.targetCamera1Target], targetCamera1, mouseScroll);
-                    }
-                }
-                else if (Input.mousePosition.x > (Screen.width - Screen.width * 0.07) / 2 && activeCamera == 0 || activeCamera == 3)
-                {
-                    if (mouse0)
-                    {
-                        activeCamera = 3;
-                        rotateCamera(targets[(int)targetNames.targetCamera2Target], targetCamera2);
-                    }
-                    if (Math.Abs(mouseScroll) > 0)
-                    {
-                        zoomCamera(targets[(int)targetNames.targetCamera2Target], targetCamera2, mouseScroll);
-                    }
-                }
+                zoomCamera(targets[activeCamera], cameras[activeCamera], mouseScroll);
             }
         }
-        if (Input.GetKeyUp(KeyCode.Mouse0) && activeCamera != 0)
+        if (Input.GetKeyUp(KeyCode.Mouse0))
         {
-            activeCamera = 0;
             mouseFlip = -1;
         }
-
         lastMousePos = Input.mousePosition;
     }
 
@@ -150,7 +120,7 @@ public class CameraController : MonoBehaviour
             mainCamera.transform.position = new Vector3(targets[(int)targetNames.mainTarget].transform.position.x, targets[(int)targetNames.mainTarget].transform.position.y, targets[(int)targetNames.mainTarget].transform.position.z - distance);
             mainCamera.transform.LookAt(target.transform);
         }
-        catch(NullReferenceException e)
+        catch (NullReferenceException e)
         {
 
         }
@@ -300,11 +270,42 @@ public class CameraController : MonoBehaviour
 
     private void zoomCamera(GameObject target, GameObject cam, float mouseDelta)
     {
-        cam.transform.LookAt(target.transform.position);
+        //cam.transform.LookAt(target.transform.position);
         Vector3 newPos = Vector3.MoveTowards(cam.transform.position, target.transform.position, Math.Sign(mouseDelta) * 0.05F);
         if (Vector3.Distance(newPos, target.transform.position) > 0.1F)
         {
             cam.transform.position = newPos;
         }
+    }
+
+    public void ToggleSkybox()
+    {
+        foreach (GameObject c in cameras)
+        {
+            Camera cam = c.GetComponent<Camera>();
+            if (cam.clearFlags == CameraClearFlags.SolidColor)
+            {
+                c.GetComponent<Camera>().clearFlags = CameraClearFlags.Skybox;
+            }
+            else
+            {
+                c.GetComponent<Camera>().clearFlags = CameraClearFlags.SolidColor;
+            }
+        }
+    }
+
+    public void SetActiveCamera(int panel)
+    {
+        activeCamera = panel;
+        Debug.Log("To " + panel);
+    }
+
+    public void SetListenToMouse(bool b)
+    {
+        listenToMouse = b;
+        if(b)
+            Debug.Log("Listening");
+        else
+            Debug.Log("Not Listening");
     }
 }
