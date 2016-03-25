@@ -33,7 +33,7 @@ public class CameraController : MonoBehaviour
         targetCamera2 = GameObject.Find("TargetCam2");
         mainCamera = Camera.main.gameObject;
 
-        listenToMouse = true;
+        listenToMouse = false;
 
         cameras[0] = mainCamera;
         cameras[1] = targetCamera1;
@@ -297,15 +297,10 @@ public class CameraController : MonoBehaviour
     public void SetActiveCamera(int panel)
     {
         activeCamera = panel;
-        Debug.Log("To " + panel);
     }
 
     public void SetListenToMouse(bool b)
     {
         listenToMouse = b;
-        if(b)
-            Debug.Log("Listening");
-        else
-            Debug.Log("Not Listening");
     }
 }
