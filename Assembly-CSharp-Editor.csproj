@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+	<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+	<ProductVersion>10.0.20506</ProductVersion>
+	<SchemaVersion>2.0</SchemaVersion>
+	<ProjectGuid>{AFC0CF0B-03D2-26A7-57F9-4851143B1547}</ProjectGuid>
+	<OutputType>Library</OutputType>
+	<AppDesignerFolder>Properties</AppDesignerFolder>
+	<RootNamespace></RootNamespace>
+	<AssemblyName>Assembly-CSharp-Editor</AssemblyName>
+	<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+	<FileAlignment>512</FileAlignment>
+	<BaseDirectory>Assets</BaseDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+	<DebugSymbols>true</DebugSymbols>
+	<DebugType>full</DebugType>
+	<Optimize>false</Optimize>
+	<OutputPath>Temp\bin\Debug\</OutputPath>
+	<DefineConstants>DEBUG;TRACE;UNITY_5_1_1;UNITY_5_1;UNITY_5;ENABLE_NEW_BUGREPORTER;ENABLE_2D_PHYSICS;ENABLE_4_6_FEATURES;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_DUCK_TYPING;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PHYSICS_PHYSX3;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_LICENSE;ENABLE_AUDIOMIXER_SUSPEND;ENABLE_EDITOR_METRICS;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_LOCALIZATION;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_SUBSTANCE;ENABLE_TEXTUREID_MAP;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN</DefineConstants>
+	<ErrorReport>prompt</ErrorReport>
+	<WarningLevel>4</WarningLevel>
+	<NoWarn>0169</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+	<DebugType>pdbonly</DebugType>
+	<Optimize>true</Optimize>
+	<OutputPath>Temp\bin\Release\</OutputPath>
+	<DefineConstants>TRACE</DefineConstants>
+	<ErrorReport>prompt</ErrorReport>
+	<WarningLevel>4</WarningLevel>
+	<NoWarn>0169</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+	<Reference Include="System" />
+    <Reference Include="System.XML" />
+	<Reference Include="System.Core" />
+	<Reference Include="System.Xml.Linq" />
+	<Reference Include="UnityEngine">
+	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	</Reference>
+	<Reference Include="UnityEditor">
+	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	</Reference>
+  </ItemGroup>
+  <ItemGroup>
+     <Compile Include="Assets\proceduraltoolkit\Editor\MeshFilterExtension.cs" />
+     <Compile Include="Assets\proceduraltoolkit\Editor\ProceduralToolkitMenu.cs" />
+     <None Include="Assets\Scalps\Scalp.txt" />
+     <None Include="Assets\Logs\RepeatDay2_Grid1Log_11-21am.txt" />
+     <None Include="Assets\Logs\Grid1_session-2016-03-24_04-34-28-PM.txt" />
+     <None Include="Assets\Logs\Grid1_session-2016-03-24_04-53-41-PM.txt" />
+     <None Include="Assets\proceduraltoolkit\Shaders\Standard Vertex Color.shader" />
+     <None Include="Assets\Logs\Grid1_session-2016-11-06_03-51-31-PM.txt" />
+     <None Include="Assets\Grids\Load\Grid1_session-2016-11-02_08-41-37-PM.txt" />
+     <None Include="Assets\Logs\Grid1_session-2016-03-24_04-50-13-PM.txt" />
+     <None Include="Assets\Logs\RepeatableDay1_Grid1_4-03pm.txt" />
+     <None Include="Assets\Logs\Grid1_session-2016-03-24_04-56-04-PM.txt" />
+     <None Include="Assets\Logs\Grid1_session-2016-03-24_04-50-40-PM.txt" />
+     <None Include="Assets\Coils\Saved\Coil1_session-2016-11-06_03-12-19-PM.txt" />
+     <None Include="Assets\Coils\Saved\Coil1_session-2016-03-24_04-55-20-PM.txt" />
+     <None Include="Assets\Coils\Saved\Coil1_session-2016-03-24_04-54-53-PM(4).txt" />
+     <None Include="Assets\Logs\RepeatDay1_Grid2Log_5-07pm.txt" />
+     <None Include="Assets\Grids\Saved\RepeatDay1_Grid2_5-07pm.txt" />
+     <None Include="Assets\proceduraltoolkit\Shaders\Unlit Color.shader" />
+     <None Include="Assets\Grids\Saved\RepeatDay2_Grid1_11-21am(1).txt" />
+     <None Include="Assets\Logs\RepeatableDay1_Grid1.txt" />
+     <None Include="Assets\proceduraltoolkit\Shaders\Unlit Vertex Color.shader" />
+     <None Include="Assets\Grids\Saved\RepeatDay1_Grid1_4-03pm.txt" />
+     <None Include="Assets\Logs\Grid1_session-2016-03-24_04-54-53-PM.txt" />
+     <None Include="Assets\Coils\Saved\Coil1_session-2016-03-24_04-54-53-PM(2).txt" />
+     <None Include="Assets\Coils\Saved\Coil1_session-2016-03-24_04-54-53-PM.txt" />
+     <None Include="Assets\Logs\RepeatableDay1_Grid1Log_4-03pm.txt" />
+     <None Include="Assets\Coils\Saved\RepeatCoil.txt" />
+     <None Include="Assets\Coils\Saved\Coil1_session-2016-03-24_04-34-28-PM.txt" />
+     <None Include="Assets\Coils\Saved\Coil1_session-2016-03-24_04-54-53-PM(1).txt" />
+     <None Include="Assets\proceduraltoolkit\Shaders\Diffuse Vertex Color.shader" />
+     <None Include="Assets\Grids\Saved\RepeatDay2_Grid1_11-21am.txt" />
+     <None Include="Assets\Logs\Grid1_session-2016-03-24_04-55-20-PM.txt" />
+     <None Include="Assets\Coils\Load\Coil1_session-2016-11-02_06-56-00-PM(1).txt" />
+     <None Include="Assets\Logs\Grid1_session-2016-03-24_04-52-53-PM.txt" />
+     <None Include="Assets\Coils\Saved\Coil1_session-2016-03-25_11-20-41-AM.txt" />
+     <None Include="Assets\proceduraltoolkit\Shaders\Specular Vertex Color.shader" />
+     <None Include="Assets\Logs\Grid1_session-2016-03-25_11-20-41-AM.txt" />
+     <None Include="Assets\Coils\Saved\Coil1_session-2016-03-24_04-56-04-PM.txt" />
+     <None Include="Assets\Logs\RepeatDay2_Grid1_11-21am.txt" />
+     <None Include="Assets\Logs\Repeat.txt" />
+     <None Include="Assets\Logs\Grid1_session-2016-03-24_05-02-55-PM.txt" />
+     <None Include="Assets\Coils\Saved\Coil1_session-2016-03-24_04-54-53-PM(3).txt" />
+     <None Include="Assets\Logs\Grid1_session-2016-03-24_05-07-40-PM.txt" />
+     <None Include="Assets\scripts\OptitrackUnityPlugin\Source\Unity3D\ClassDiagram1.cd" />
+ <Reference Include="UnityEngine.UI">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.UI">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/Editor/UnityEditor.UI.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.Networking">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.Networking">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/Editor/UnityEditor.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.Analytics">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.Graphs">
+ <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.Graphs.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.Android.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/androidplayer/UnityEditor.Android.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.iOS.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.WP8.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/wp8support/UnityEditor.WP8.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.Metro.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/metrosupport/UnityEditor.Metro.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.BB10.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/blackberryplayer/UnityEditor.BB10.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.SamsungTV.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/stvplayer/STVPlayer/UnityEditor.SamsungTV.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.WebGL.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/webglsupport/UnityEditor.WebGL.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.LinuxStandalone.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/linuxstandalonesupport/UnityEditor.LinuxStandalone.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.WindowsStandalone.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/windowsstandalonesupport/UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.OSXStandalone.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/macstandalonesupport/UnityEditor.OSXStandalone.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.iOS.Extensions.Xcode">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
+ </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp.csproj">
+      <Project>{D948CBE1-1AA8-447A-AC54-4A4539C4F77B}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+	   Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  
+</Project>

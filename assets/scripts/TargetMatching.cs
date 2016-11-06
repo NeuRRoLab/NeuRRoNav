@@ -44,8 +44,26 @@ public class TargetMatching : MonoBehaviour
     bool logging;
     bool initalized = false;
 
+    public float mThresh = 0.1F;
+    public float rThresh = 1F;
+
+
     FileIO logger;
     SettingsMenu settingsMenu;
+
+    public void setMThresh()
+    {
+        float value = float.Parse(GameObject.Find("mThresh").GetComponent<InputField>().text);
+        print(value);
+        mThresh = value;
+    }
+
+    public void setRThresh()
+    {
+        float value = float.Parse(GameObject.Find("rThresh").GetComponent<InputField>().text);
+        print(value);
+        rThresh = value;
+    }
 
     // Use this for initialization
     void Start()
@@ -337,8 +355,6 @@ public class TargetMatching : MonoBehaviour
             deltZ *= 100;
 
             //Calculate needed corrections
-            float mThresh = 0.1F;
-
             string rl = setMoveInstruction("Right ", "Left ", deltX, mThresh);
             string ud = setMoveInstruction("Up ", "Down ", deltY, mThresh);
             string fb = setMoveInstruction("Back ", "Forward ", deltZ, mThresh);
@@ -421,8 +437,6 @@ public class TargetMatching : MonoBehaviour
                 renderer.material = transMat;
             }
         }
-
-        float rThresh = 1F;
 
         string r = setRotateInstruction("Cntr Clockwise ", "Clockwise ", rpy[0], rThresh);
         string p = setRotateInstruction("Pitch Up ", "Pitch Down ", rpy[1], rThresh);
@@ -950,6 +964,7 @@ public class TargetMatching : MonoBehaviour
     public void ImportGrid()
     {
         string path = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.gridLoadPath);
+        print(path);
         string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.gridLoadName);
 
         //string[] fileNames = System.IO.Directory.GetFiles(path);
@@ -962,7 +977,7 @@ public class TargetMatching : MonoBehaviour
         //System.IO.StreamReader file = new System.IO.StreamReader(filestream);
 
         try {
-            System.IO.FileStream filestream = new System.IO.FileStream(fileName,
+            System.IO.FileStream filestream = new System.IO.FileStream(path + "/" + fileName,
                                               System.IO.FileMode.Open,
                                               System.IO.FileAccess.Read,
                                               System.IO.FileShare.Read);
@@ -1016,6 +1031,7 @@ public class TargetMatching : MonoBehaviour
         }
         catch (Exception e)
         {
+            print(e);
             //tell user something went wrong
             return;
         }

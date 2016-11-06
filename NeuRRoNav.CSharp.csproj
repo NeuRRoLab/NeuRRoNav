@@ -106,6 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\Coils\Load\Coil1.txt" />
+    <None Include="assets\Coils\Load\Coil1_session-2016-11-02_06-56-00-PM(1).txt" />
     <None Include="assets\Coils\Saved\Coil1_session-2016-03-24_04-34-28-PM.txt" />
     <None Include="assets\Coils\Saved\Coil1_session-2016-03-24_04-54-53-PM(1).txt" />
     <None Include="assets\Coils\Saved\Coil1_session-2016-03-24_04-54-53-PM(2).txt" />
@@ -115,6 +116,7 @@
     <None Include="assets\Coils\Saved\Coil1_session-2016-03-24_04-55-20-PM.txt" />
     <None Include="assets\Coils\Saved\Coil1_session-2016-03-24_04-56-04-PM.txt" />
     <None Include="assets\Coils\Saved\Coil1_session-2016-03-25_11-20-41-AM.txt" />
+    <None Include="assets\Coils\Saved\Coil1_session-2016-11-06_03-12-19-PM.txt" />
     <None Include="assets\Coils\Saved\RepeatCoil.txt" />
     <None Include="assets\Logs\Grid1_session-2016-03-24_04-34-28-PM.txt" />
     <None Include="assets\Logs\Grid1_session-2016-03-24_04-50-13-PM.txt" />
@@ -138,6 +140,9 @@
     <None Include="assets\Logs\Grid1_session-2016-11-03_01-18-57-PM.txt" />
     <None Include="assets\Logs\Grid1_session-2016-11-03_01-20-18-PM.txt" />
     <None Include="assets\Logs\Grid1_session-2016-11-03_01-20-44-PM.txt" />
+    <None Include="assets\Logs\Grid1_session-2016-11-06_03-51-31-PM.txt" />
+    <None Include="assets\Logs\Grid1_session-2016-11-06_05-14-57-PM.txt" />
+    <None Include="assets\Logs\Grid1_session-2016-11-06_05-15-20-PM.txt" />
     <None Include="assets\Logs\Repeat.txt" />
     <None Include="assets\Logs\RepeatDay1_Grid2Log_5-07pm.txt" />
     <None Include="assets\Logs\RepeatDay2_Grid1Log_11-21am.txt" />
@@ -146,6 +151,7 @@
     <None Include="assets\Logs\RepeatableDay1_Grid1Log_4-03pm.txt" />
     <None Include="assets\Logs\RepeatableDay1_Grid1_4-03pm.txt" />
     <None Include="assets\Scalps\Scalp.txt" />
+    <None Include="assets\grids\Load\Grid1_session-2016-11-02_08-41-37-PM.txt" />
     <None Include="assets\grids\Saved\RepeatDay1_Grid1_4-03pm.txt" />
     <None Include="assets\grids\Saved\RepeatDay1_Grid2_5-07pm.txt" />
     <None Include="assets\grids\Saved\RepeatDay2_Grid1_11-21am(1).txt" />
