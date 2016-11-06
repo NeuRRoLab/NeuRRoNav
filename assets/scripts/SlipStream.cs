@@ -58,14 +58,13 @@ public class SlipStream : MonoBehaviour
 		
 		mListener.Blocking          = false;
 		mListener.ReceiveBufferSize = 128*1024;
-
-        if (Debug.isDebugBuild)
-        {
-            plugin = System.Diagnostics.Process.Start(Application.dataPath + @"\scripts\OptitrackUnityPlugin\Source\Unity3D\bin\UnityPlugin.exe"); //Start Optitrack Unity Interface
-        }
-        else
+        try
         {
             plugin = System.Diagnostics.Process.Start(Application.dataPath + @"\UnityPlugin.exe"); //Start Optitrack Unity Interface
+        }
+        catch(System.Exception e)
+        {
+            print(e);
         }
 
         UDPRead();
@@ -122,8 +121,11 @@ public class SlipStream : MonoBehaviour
 
 	int OnApplicationQuit()
 	{
-        plugin.CloseMainWindow();
-        plugin.Dispose();
+        if(plugin!=null)
+        {
+            plugin.CloseMainWindow();
+            plugin.Dispose();
+        }
         return 0;
 	}
  
