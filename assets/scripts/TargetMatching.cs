@@ -299,6 +299,7 @@ public class TargetMatching : MonoBehaviour
         if(rotOK && posOK)
         {
             GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "FIRE";
+            setTargetColor(1);
         }
         else
         {
@@ -427,16 +428,7 @@ public class TargetMatching : MonoBehaviour
             angleDif = 1;
         }
 
-        foreach (MeshRenderer renderer in renderers)
-        {
-            if (!renderer.gameObject.name.Equals("Point"))
-            {
-                Material transMat = renderer.material;
-                Color transColor = new Color(angleDif, 1 - angleDif, 0, 0.2F);
-                transMat.color = transColor;
-                renderer.material = transMat;
-            }
-        }
+        setTargetColor(angleDif * 0.9f);
 
         string r = setRotateInstruction("Cntr Clockwise ", "Clockwise ", rpy[0], rThresh);
         string p = setRotateInstruction("Pitch Up ", "Pitch Down ", rpy[1], rThresh);
@@ -460,6 +452,20 @@ public class TargetMatching : MonoBehaviour
         else
         {
             return false;
+        }
+    }
+
+    private void setTargetColor(float decPercent)
+    {
+        foreach (MeshRenderer renderer in renderers)
+        {
+            if (!renderer.gameObject.name.Equals("Point"))
+            {
+                Material transMat = renderer.material;
+                Color transColor = new Color(decPercent, 1 - decPercent, 0, 0.2F);
+                transMat.color = transColor;
+                renderer.material = transMat;
+            }
         }
     }
 
@@ -827,8 +833,9 @@ public class TargetMatching : MonoBehaviour
 
         InstantiateTargetCoil();
 
-        camController.putTargetCam1OnTargetXY(tPoint.pos, head);
-        camController.putTargetCam2OnTargetZY(tPoint.pos, head);
+        camController.putMainCamOnTargetXY(tPoint.pos);
+        camController.putTargetCam1OnTargetXZ(tPoint.pos);
+        camController.putTargetCam2OnTargetZY(tPoint.pos);
 
         //tCoil.transform.FindChild("model").transform.localScale = Vector3.Scale(tCoil.transform.FindChild("model").transform.localScale, new Vector3(1.1F,1.1F,1.1F)); position/stretch problems
 
@@ -836,6 +843,7 @@ public class TargetMatching : MonoBehaviour
         GameObject.Find("Delete Point").GetComponent<Button>().interactable = true;
         GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = true;
         GameObject.Find("Logging").GetComponent<Button>().interactable = true;
+        GameObject.Find("Set Grid").GetComponent<Button>().interactable = false;
         //GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "Match";
     }
 
@@ -1123,6 +1131,7 @@ public class TargetMatching : MonoBehaviour
         GameObject.Find("Reset Grid").GetComponent<Button>().interactable = true;
         GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
         GameObject.Find("Delete Point").GetComponent<Button>().interactable = false;
+        GameObject.Find("Set Grid").GetComponent<Button>().interactable = true;
         GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "";
 
         if(logging)

@@ -164,28 +164,35 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    public void putTargetCam1OnTargetXY(GameObject tPoint, GameObject head)
+
+    public void putMainCamOnTargetXY(GameObject tPoint)
+    {
+            GameObject cam = cameras[0];
+            cam.transform.position = tPoint.transform.position;
+            cam.transform.parent = tPoint.transform;
+            cam.transform.localPosition = new Vector3(targetCamera1.transform.localPosition.x, targetCamera1.transform.localPosition.y, targetCamera1.transform.localPosition.z - 0.5F);
+            cam.transform.LookAt(tPoint.transform.position, GameObject.Find("Scalp").transform.forward);
+            targets[0] = tPoint;
+    }
+
+    public void putTargetCam1OnTargetXZ(GameObject tPoint)
     {
         stylusCam = false;
         targetCamera1 = GameObject.Find("TargetCam1");
         targetCamera1.transform.position = tPoint.transform.position;
         targetCamera1.transform.parent = tPoint.transform;
-        targetCamera1.transform.localScale = new Vector3(1F, 1F, 1F);
-        targetCamera1.transform.localPosition = new Vector3(targetCamera1.transform.localPosition.x, targetCamera1.transform.localPosition.y, targetCamera1.transform.localPosition.z + 0.5F);
-        targetCamera1.transform.rotation = head.transform.rotation;
-        targetCamera1.transform.LookAt(tPoint.transform.position);
+        targetCamera1.transform.localPosition = new Vector3(targetCamera1.transform.localPosition.x, targetCamera1.transform.localPosition.y + 0.5F, targetCamera1.transform.localPosition.z);
+        targetCamera1.transform.LookAt(tPoint.transform.position, GameObject.Find("Scalp").transform.forward);
         targets[1] = tPoint;
     }
 
-    public void putTargetCam2OnTargetZY(GameObject tPoint, GameObject head)
+    public void putTargetCam2OnTargetZY(GameObject tPoint)
     {
         targetCamera2 = GameObject.Find("TargetCam2");
         targetCamera2.transform.position = tPoint.transform.position;
         targetCamera2.transform.parent = tPoint.transform;
-        //targetCamera2.transform.localScale = new Vector3(1F, 1F, 1F);
         targetCamera2.transform.localPosition = new Vector3(targetCamera2.transform.localPosition.x - 0.5F, targetCamera2.transform.localPosition.y, targetCamera2.transform.localPosition.z);
-        targetCamera2.transform.rotation = head.transform.rotation;
-        targetCamera2.transform.LookAt(tPoint.transform.position);
+        targetCamera2.transform.LookAt(tPoint.transform.position, GameObject.Find("Scalp").transform.up);
         targets[2] = tPoint;
     }
 

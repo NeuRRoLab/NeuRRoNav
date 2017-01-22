@@ -12,7 +12,7 @@ public class ScalpGenerator : MonoBehaviour
 
     public bool waitingToDraw;
     bool drawing;
-    bool landmarksFound;
+    bool settingLandmarks;
     bool releaseSpace;
 
     int splines;
@@ -37,6 +37,14 @@ public class ScalpGenerator : MonoBehaviour
     Text headTracking;
     Text calibrationInstruct;
 
+    GameObject nasion;
+    GameObject inion;
+    GameObject lTragus;
+    GameObject rTragus;
+    GameObject vertex;
+
+    float[] scalpStartScale;
+
     void Start()
     {
 
@@ -47,10 +55,22 @@ public class ScalpGenerator : MonoBehaviour
         headTracking = GameObject.Find("HeadTrackStatus").GetComponent<Text>();
         calibrationInstruct = GameObject.Find("CalibrationInstructions").GetComponent<Text>();
 
+        nasion = GameObject.Find("Nasion");
+        inion = GameObject.Find("Inion");
+        lTragus = GameObject.Find("Left Tragus");
+        rTragus = GameObject.Find("Right Tragus");
+        vertex = GameObject.Find("Aprox Vertex");
+
+        scalpStartScale = new float[3];
+
+        scalp = GameObject.Find("Scalp");
+        scalpStartScale[0] = scalp.transform.localScale.x;
+        scalpStartScale[1] = scalp.transform.localScale.y;
+        scalpStartScale[2] = scalp.transform.localScale.z;
         //splines = 0;
         //splinePoints = 0;
         //waitingToDraw = false;
-        landmarksFound = true;
+        settingLandmarks = false;
         //drawing = false;
         //splineCage = new List<IList<Vector3>>();
     }
@@ -58,7 +78,7 @@ public class ScalpGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!landmarksFound)
+        if (settingLandmarks)
         {
             FindLandmarks();
         }
@@ -120,7 +140,7 @@ public class ScalpGenerator : MonoBehaviour
             if (landmarkIndex == 5)
             {
                 waitingToDraw = true;
-                landmarksFound = true;
+                settingLandmarks = false;
                 calibrationInstruct.text = "";
                 CenterHead();
                 stylusTracker.GetComponent<Stylus>().setStylusSensitiveTrackingState(false);
@@ -152,7 +172,7 @@ public class ScalpGenerator : MonoBehaviour
     }
     void setLandmark(int index)
     {
-        stylusPoint = GameObject.Find("Point");
+        stylusPoint = GameObject.Find("Stylus").transform.FindChild("Point").gameObject;
         head = GameObject.Find("Head");
 
         landmarks[index].transform.position = stylusPoint.transform.position;
@@ -204,7 +224,6 @@ public class ScalpGenerator : MonoBehaviour
     void CenterHead()
     {
         head = GameObject.Find("Head");
-        scalp = GameObject.Find("Scalp");
         if (scalp == null)
         {
             scalp = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -221,11 +240,15 @@ public class ScalpGenerator : MonoBehaviour
         }
         else
         {
-            GameObject nasion = GameObject.Find("Nasion");
-            GameObject inion = GameObject.Find("Inion");
-            GameObject lTragus = GameObject.Find("Left Tragus");
-            GameObject rTragus = GameObject.Find("Right Tragus");
-            GameObject vertex = GameObject.Find("Aprox Vertex");
+            for (int i = 0; i < 5; i++)
+            {
+                landmarks[i].transform.parent = null;
+            }
+            scalp.transform.localScale = new Vector3(scalpStartScale[0], scalpStartScale[1], scalpStartScale[2]);
+            for (int i = 0; i < 5; i++)
+            {
+                landmarks[i].transform.parent = scalp.transform;
+            }
 
             //Vector3 centeredX = Vector3.Lerp(landmarks[(int)landmarkNames.leftEar].transform.position, landmarks[(int)landmarkNames.rightEar].transform.position, (float)0.5);
             //Vector3 centeredZ = Vector3.Lerp(landmarks[(int)landmarkNames.forehead].transform.position, landmarks[(int)landmarkNames.backOfHead].transform.position, (float)0.5);
@@ -359,6 +382,13 @@ public class ScalpGenerator : MonoBehaviour
     {
         head = GameObject.Find("Head");
         stylusTracker.GetComponent<Stylus>().setStylusSensitiveTrackingState(true);
+        for (int i = 0; i < 5; i++)
+        {
+            if(landmarks[i] != null)
+            {
+                DestroyImmediate(landmarks[i]);
+            }
+        }
         landmarks = new GameObject[5];
         for (int i = 0; i < 5; i++)
         {
@@ -368,14 +398,23 @@ public class ScalpGenerator : MonoBehaviour
             landmarks[i].transform.parent = head.transform;
         }
         landmarkIndex = 0;
-        landmarksFound = false;
+        settingLandmarks = true;
 
         calibrationInstruct.text = "Select Nasion";
     }
 
     public void LandmarkButtonPress(int landmark)
     {
+        if(landmarks[landmark] != null)
+        {
+            DestroyImmediate(landmarks[landmark]);
+            landmarks[landmark] = new GameObject();
+            landmarks[landmark].transform.position = head.transform.position;
+            landmarks[landmark].transform.rotation = head.transform.rotation;
+            landmarks[landmark].transform.parent = head.transform;
+        }
         setLandmark(landmark);
+        if(landmarkIndex >= 5)
         CenterHead();
     }
 
