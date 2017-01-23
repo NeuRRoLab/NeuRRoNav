@@ -133,7 +133,7 @@ public class ScalpGenerator : MonoBehaviour
 
     void FindLandmarks()
     {
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse1)) && (stylusTracking.color.Equals(Color.green)))
+        if (Input.GetKeyDown(KeyCode.Space) || (Input.GetKeyDown(KeyCode.Mouse1) && stylusTracking.color.Equals(Color.green)))
         {
             setLandmark(landmarkIndex);
             landmarkIndex++;
@@ -172,7 +172,7 @@ public class ScalpGenerator : MonoBehaviour
     }
     void setLandmark(int index)
     {
-        stylusPoint = GameObject.Find("Stylus").transform.FindChild("Point").gameObject;
+        stylusPoint = GameObject.Find("Stylus").transform.Find("Point").gameObject;
         head = GameObject.Find("Head");
 
         landmarks[index].transform.position = stylusPoint.transform.position;
@@ -240,15 +240,15 @@ public class ScalpGenerator : MonoBehaviour
         }
         else
         {
-            for (int i = 0; i < 5; i++)
-            {
-                landmarks[i].transform.parent = null;
-            }
-            scalp.transform.localScale = new Vector3(scalpStartScale[0], scalpStartScale[1], scalpStartScale[2]);
-            for (int i = 0; i < 5; i++)
-            {
-                landmarks[i].transform.parent = scalp.transform;
-            }
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    landmarks[i].transform.parent = null;
+            //}
+            //scalp.transform.localScale = new Vector3(scalpStartScale[0], scalpStartScale[1], scalpStartScale[2]);
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    landmarks[i].transform.parent = scalp.transform;
+            //}
 
             //Vector3 centeredX = Vector3.Lerp(landmarks[(int)landmarkNames.leftEar].transform.position, landmarks[(int)landmarkNames.rightEar].transform.position, (float)0.5);
             //Vector3 centeredZ = Vector3.Lerp(landmarks[(int)landmarkNames.forehead].transform.position, landmarks[(int)landmarkNames.backOfHead].transform.position, (float)0.5);
@@ -382,11 +382,14 @@ public class ScalpGenerator : MonoBehaviour
     {
         head = GameObject.Find("Head");
         stylusTracker.GetComponent<Stylus>().setStylusSensitiveTrackingState(true);
-        for (int i = 0; i < 5; i++)
+        if(landmarks != null)
         {
-            if(landmarks[i] != null)
+            for (int i = 0; i < 5; i++)
             {
-                DestroyImmediate(landmarks[i]);
+                if (landmarks[i] != null)
+                {
+                    DestroyImmediate(landmarks[i]);
+                }
             }
         }
         landmarks = new GameObject[5];

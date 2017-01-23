@@ -45,8 +45,8 @@ public class CameraController : MonoBehaviour
         GameObject obj = new GameObject();
         obj.transform.rotation = Quaternion.identity;
         obj.transform.position = Vector3.zero;
-        putTargetCam1OnTargetXY(obj, obj);
-        putTargetCam2OnTargetZY(obj, obj);
+        putTargetCam1OnTargetXZ(obj);
+        putTargetCam2OnTargetZY(obj);
         centerMainOnObject(obj, 1);
     }
 
