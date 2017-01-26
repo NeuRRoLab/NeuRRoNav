@@ -43,7 +43,7 @@ public class ScalpGenerator : MonoBehaviour
     GameObject rTragus;
     GameObject vertex;
 
-    float[] scalpStartScale;
+    Vector3 scalpStartScale;
 
     void Start()
     {
@@ -61,12 +61,10 @@ public class ScalpGenerator : MonoBehaviour
         rTragus = GameObject.Find("Right Tragus");
         vertex = GameObject.Find("Aprox Vertex");
 
-        scalpStartScale = new float[3];
+        scalpStartScale = new Vector3();
 
         scalp = GameObject.Find("Scalp");
-        scalpStartScale[0] = scalp.transform.localScale.x;
-        scalpStartScale[1] = scalp.transform.localScale.y;
-        scalpStartScale[2] = scalp.transform.localScale.z;
+        scalpStartScale = scalp.transform.localScale;
         //splines = 0;
         //splinePoints = 0;
         //waitingToDraw = false;
@@ -240,15 +238,18 @@ public class ScalpGenerator : MonoBehaviour
         }
         else
         {
-            //for (int i = 0; i < 5; i++)
-            //{
-            //    landmarks[i].transform.parent = null;
-            //}
-            //scalp.transform.localScale = new Vector3(scalpStartScale[0], scalpStartScale[1], scalpStartScale[2]);
-            //for (int i = 0; i < 5; i++)
-            //{
-            //    landmarks[i].transform.parent = scalp.transform;
-            //}
+            if (scalp.transform.localScale != scalpStartScale)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    landmarks[i].transform.parent = null;
+                }
+                scalp.transform.localScale = scalpStartScale;
+                for (int i = 0; i < 5; i++)
+                {
+                    landmarks[i].transform.parent = head.transform;
+                }
+            }
 
             //Vector3 centeredX = Vector3.Lerp(landmarks[(int)landmarkNames.leftEar].transform.position, landmarks[(int)landmarkNames.rightEar].transform.position, (float)0.5);
             //Vector3 centeredZ = Vector3.Lerp(landmarks[(int)landmarkNames.forehead].transform.position, landmarks[(int)landmarkNames.backOfHead].transform.position, (float)0.5);

@@ -169,9 +169,11 @@ public class CameraController : MonoBehaviour
     {
             GameObject cam = cameras[0];
             cam.transform.position = tPoint.transform.position;
+            cam.transform.parent = coilHotSpot.transform;
+            cam.transform.Translate((-coilHotSpot.transform.forward / 2));
+            //cam.transform.localPosition = new Vector3(targetCamera1.transform.localPosition.x, targetCamera1.transform.localPosition.y, targetCamera1.transform.localPosition.z - 0.5F);
+            cam.transform.LookAt(tPoint.transform.position, GameObject.Find("Scalp").transform.up);
             cam.transform.parent = tPoint.transform;
-            cam.transform.localPosition = new Vector3(targetCamera1.transform.localPosition.x, targetCamera1.transform.localPosition.y, targetCamera1.transform.localPosition.z - 0.5F);
-            cam.transform.LookAt(tPoint.transform.position, GameObject.Find("Scalp").transform.forward);
             targets[0] = tPoint;
     }
 
