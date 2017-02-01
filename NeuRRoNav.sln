@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2015
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuRRoNav.CSharp", "NeuRRoNav.CSharp.csproj", "{A94E7F78-27B8-0716-BC80-CB30BC67C8D7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuRRoNav.CSharp.Editor", "NeuRRoNav.CSharp.Editor.csproj", "{844E3B89-45A7-CBED-A68A-8CBBE4112E73}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +15,6 @@ Global
 		{A94E7F78-27B8-0716-BC80-CB30BC67C8D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A94E7F78-27B8-0716-BC80-CB30BC67C8D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A94E7F78-27B8-0716-BC80-CB30BC67C8D7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{844E3B89-45A7-CBED-A68A-8CBBE4112E73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{844E3B89-45A7-CBED-A68A-8CBBE4112E73}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{844E3B89-45A7-CBED-A68A-8CBBE4112E73}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{844E3B89-45A7-CBED-A68A-8CBBE4112E73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
