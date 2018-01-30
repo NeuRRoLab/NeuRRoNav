@@ -28,8 +28,6 @@ using System;
 
 public class CalibrationTool : MonoBehaviour
 {
-
-    public GameObject SlipStreamObject;
     CameraController camController;
     Text headTrackStatus;
     bool tracked;
@@ -40,8 +38,7 @@ public class CalibrationTool : MonoBehaviour
     {
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
         tracked = false;
-        SlipStreamObject = GameObject.Find("Optitrack");
-        SlipStreamObject.GetComponent<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
+        FindObjectOfType<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
     }
 
     // packet received

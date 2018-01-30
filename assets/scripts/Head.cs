@@ -28,8 +28,6 @@ using System;
 
 public class Head : MonoBehaviour
 {
-
-    public GameObject SlipStreamObject;
     CameraController camController;
     Text headTrackStatus;
     bool tracked;
@@ -41,9 +39,8 @@ public class Head : MonoBehaviour
     {
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
         tracked = false;
-        SlipStreamObject = GameObject.Find("Optitrack");
         headTrackStatus = GameObject.Find("HeadTrackStatus").GetComponent<Text>();
-        SlipStreamObject.GetComponent<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
+        FindObjectOfType<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
         container = GameObject.Find("Head");
     }
 

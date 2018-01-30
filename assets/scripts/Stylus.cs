@@ -29,8 +29,7 @@ using UnityEngine.Audio;
 
 public class Stylus : MonoBehaviour
 {
-
-    public GameObject SlipStreamObject;
+	
     CameraController camController;
     Text stylusTrackStatus;
     GameObject stylus;
@@ -50,9 +49,8 @@ public class Stylus : MonoBehaviour
         initialized = false;
         tracked = false;
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
-        SlipStreamObject = GameObject.Find("Optitrack");
         stylusTrackStatus = GameObject.Find("StylusTrackStatus").GetComponent<Text>();
-        SlipStreamObject.GetComponent<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
+        FindObjectOfType<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
         stylusTrackingIsSensitive = false;
 
         trackingWarning = GameObject.Find("Alert").GetComponent<AudioSource>();
@@ -153,8 +151,8 @@ public class Stylus : MonoBehaviour
         GameObject calibrationTool = GameObject.Find("CalibrationTool");
         GameObject model = stylus.transform.FindChild("model").gameObject;
         GameObject tip = model.transform.FindChild("Tip").gameObject;
-
-        tip.transform.rotation = calibrationTool.transform.rotation;
+		
+		tip.transform.rotation = calibrationTool.transform.rotation;
         model.transform.parent = null;
         model.transform.rotation = new Quaternion(0, 0, 0, 0);
         tip.transform.parent = null;
