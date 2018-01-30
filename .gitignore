@@ -35,3 +35,6 @@ sysinfo.txt
 *.unitypackage
 .DS_Store
 thumbs.db
+
+Assets/Logs/*
+Assets/Logs.meta
