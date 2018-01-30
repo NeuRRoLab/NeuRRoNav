@@ -28,8 +28,7 @@ using UnityEngine.Audio;
 // they could be attached to the same object.
 
 public class Stylus : MonoBehaviour
-{
-	
+{	
     CameraController camController;
     Text stylusTrackStatus;
     GameObject stylus;
@@ -44,7 +43,9 @@ public class Stylus : MonoBehaviour
     bool lost;
     bool pauseTracking;
 
-    void Start()
+	Vector3 tipStartOffset = Vector3.zero;
+
+	void Start()
     {
         initialized = false;
         tracked = false;
@@ -54,6 +55,8 @@ public class Stylus : MonoBehaviour
         stylusTrackingIsSensitive = false;
 
         trackingWarning = GameObject.Find("Alert").GetComponent<AudioSource>();
+
+		StartCoroutine(DrawDebugRays());
     }
 
     // packet received
@@ -139,6 +142,18 @@ public class Stylus : MonoBehaviour
         }
     }
 
+	IEnumerator DrawDebugRays() {
+		yield return new WaitForSeconds(10f);
+		GameObject model = stylus.transform.FindChild("model").gameObject;
+		GameObject tip = model.transform.FindChild("Tip").gameObject;
+		GameObject calibrationTool = GameObject.Find("CalibrationTool");
+		while (true) {
+			Debug.DrawRay(tip.transform.position, -stylus.transform.up, Color.blue, .1f);
+			Debug.DrawRay(calibrationTool.transform.position, calibrationTool.transform.up, Color.yellow, .1f);
+			yield return null;
+		}
+	}
+
     public void setPoint()
     {
 
@@ -151,6 +166,14 @@ public class Stylus : MonoBehaviour
         GameObject calibrationTool = GameObject.Find("CalibrationTool");
         GameObject model = stylus.transform.FindChild("model").gameObject;
         GameObject tip = model.transform.FindChild("Tip").gameObject;
+
+		// Save the tip offset for future use, or reuse it if this isn't the first time applying
+		if (tipStartOffset == Vector3.zero)
+			tipStartOffset = tip.transform.localPosition;
+		else {
+			model.transform.rotation = Quaternion.identity;
+			tip.transform.localPosition = tipStartOffset;
+		}
 		
 		tip.transform.rotation = calibrationTool.transform.rotation;
         model.transform.parent = null;
@@ -177,9 +200,7 @@ public class Stylus : MonoBehaviour
 
         camController.putCamOnStylus(1);
         //stylus.transform.LookAt(point.transform);
-
-        Debug.Log(point.transform.position.ToString());
-        Debug.Log(calibrationTool.transform.position.ToString());
+		
         pauseTracking = false;
 
         GameObject.Find("Calibrate Coil").GetComponent<Button>().interactable = true;
