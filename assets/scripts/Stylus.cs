@@ -108,8 +108,8 @@ public class Stylus : MonoBehaviour
                             initialized = true;
                         }
 
-                        stylus.transform.position = position;
-                        stylus.transform.rotation = orientation;
+                        this.transform.position = position;
+                        this.transform.rotation = orientation;
                         break;
                     }
 
@@ -181,7 +181,7 @@ public class Stylus : MonoBehaviour
         tip.transform.parent = null;
         model.transform.parent = tip.transform;
         tip.transform.position = new Vector3(calibrationTool.transform.position.x, tip.transform.position.y, calibrationTool.transform.position.z);
-        model.transform.parent = stylus.transform;
+        model.transform.parent = this.transform;
         tip.transform.parent = model.transform;
         
 
@@ -196,10 +196,10 @@ public class Stylus : MonoBehaviour
         psphere.transform.localPosition = new Vector3(0, 0.005F, 0);
         point.name = "Point";
 
-        point.transform.parent = stylus.transform;
+        point.transform.parent = this.transform;
 
         camController.putCamOnStylus(1);
-        //stylus.transform.LookAt(point.transform);
+        //this.transform.LookAt(point.transform);
 		
         pauseTracking = false;
 
