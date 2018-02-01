@@ -31,7 +31,6 @@ public class Stylus : MonoBehaviour
 {	
     CameraController camController;
     Text stylusTrackStatus;
-    GameObject stylus;
     GameObject point;
     AudioSource trackingWarning;
 
@@ -43,8 +42,6 @@ public class Stylus : MonoBehaviour
     bool lost;
     bool pauseTracking;
 
-	Vector3 tipStartOffset = Vector3.zero;
-
 	void Start()
     {
         initialized = false;
@@ -55,8 +52,6 @@ public class Stylus : MonoBehaviour
         stylusTrackingIsSensitive = false;
 
         trackingWarning = GameObject.Find("Alert").GetComponent<AudioSource>();
-
-		StartCoroutine(DrawDebugRays());
     }
 
     // packet received
@@ -103,8 +98,6 @@ public class Stylus : MonoBehaviour
 
                         if (initialized == false)
                         {
-                            string objectName = "Stylus";
-                            stylus = GameObject.Find(objectName);
                             initialized = true;
                         }
 
@@ -142,76 +135,45 @@ public class Stylus : MonoBehaviour
         }
     }
 
-	IEnumerator DrawDebugRays() {
-		yield return new WaitForSeconds(10f);
-		GameObject model = stylus.transform.FindChild("model").gameObject;
-		GameObject tip = model.transform.FindChild("Tip").gameObject;
+	public void setPoint() {
+		if (point != null) {
+			DestroyImmediate(point.transform.FindChild("Point Sphere").gameObject);
+			DestroyImmediate(point);
+		}
+
 		GameObject calibrationTool = GameObject.Find("CalibrationTool");
-		while (true) {
-			Debug.DrawRay(tip.transform.position, -stylus.transform.up, Color.blue, .1f);
-			Debug.DrawRay(calibrationTool.transform.position, calibrationTool.transform.up, Color.yellow, .1f);
-			yield return null;
+		GameObject pivot = this.transform.FindChild("Pivot").gameObject;
+		GameObject connectorLine = pivot.transform.FindChild("ConnectorLine").gameObject;
+
+		point = new GameObject();
+		point.name = "Point";
+		point.transform.position = calibrationTool.transform.position;
+		point.transform.rotation = calibrationTool.transform.rotation;
+		point.transform.parent = this.transform;
+
+		pivot.transform.LookAt(point.transform.position);
+
+
+		GameObject psphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+		psphere.name = "Point Sphere";
+		Vector3 scale = new Vector3(0.01f, 0.01f, 0.01f);
+		psphere.transform.localScale = scale;
+		psphere.transform.parent = point.transform;
+		psphere.transform.localPosition = Vector3.zero;
+
+		connectorLine.transform.localScale = new Vector3(1, Vector3.Distance(pivot.transform.position, point.transform.position), 1);
+
+		camController.putCamOnStylus(1);
+
+		GameObject.Find("Calibrate Coil").GetComponent<Button>().interactable = true;
+		GameObject.Find("Landmarks").GetComponent<Button>().interactable = true;
+		foreach (Button b in GameObject.Find("LandmarksList").GetComponentsInChildren<Button>()) {
+			b.interactable = true;
 		}
 	}
 
-    public void setPoint()
-    {
 
-        pauseTracking = true;
-        if (point != null)
-        {
-            DestroyImmediate(point.transform.FindChild("Point Sphere").gameObject);
-            DestroyImmediate(point);
-        }
-        GameObject calibrationTool = GameObject.Find("CalibrationTool");
-        GameObject model = stylus.transform.FindChild("model").gameObject;
-        GameObject tip = model.transform.FindChild("Tip").gameObject;
-
-		// Save the tip offset for future use, or reuse it if this isn't the first time applying
-		if (tipStartOffset == Vector3.zero)
-			tipStartOffset = tip.transform.localPosition;
-		else {
-			model.transform.rotation = Quaternion.identity;
-			tip.transform.localPosition = tipStartOffset;
-		}
-		
-		tip.transform.rotation = calibrationTool.transform.rotation;
-        model.transform.parent = null;
-        model.transform.rotation = new Quaternion(0, 0, 0, 0);
-        tip.transform.parent = null;
-        model.transform.parent = tip.transform;
-        tip.transform.position = new Vector3(calibrationTool.transform.position.x, tip.transform.position.y, calibrationTool.transform.position.z);
-        model.transform.parent = this.transform;
-        tip.transform.parent = model.transform;
-        
-
-        point = new GameObject();
-        GameObject psphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        psphere.name = "Point Sphere";
-        Vector3 scale = new Vector3(0.01f, 0.01f, 0.01f);
-        psphere.transform.localScale = scale;
-        point.transform.position = calibrationTool.transform.position;
-        point.transform.rotation = calibrationTool.transform.rotation;
-        psphere.transform.parent = point.transform;
-        psphere.transform.localPosition = new Vector3(0, 0.005F, 0);
-        point.name = "Point";
-
-        point.transform.parent = this.transform;
-
-        camController.putCamOnStylus(1);
-        //this.transform.LookAt(point.transform);
-		
-        pauseTracking = false;
-
-        GameObject.Find("Calibrate Coil").GetComponent<Button>().interactable = true;
-        GameObject.Find("Landmarks").GetComponent<Button>().interactable = true;
-        foreach(Button b in GameObject.Find("LandmarksList").GetComponentsInChildren<Button>())
-        {
-            b.interactable = true;
-        }
-    }
-
-    public void setStylusSensitiveTrackingState(bool state)
+	public void setStylusSensitiveTrackingState(bool state)
     {
         stylusTrackingIsSensitive = state;
     }
