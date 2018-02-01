@@ -216,9 +216,4 @@ public class Stylus : MonoBehaviour
         stylusTrackingIsSensitive = state;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }
