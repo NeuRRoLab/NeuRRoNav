@@ -136,6 +136,7 @@ public class Stylus : MonoBehaviour
     }
 
 	public void setPoint() {
+		pauseTracking = true;
 		if (point != null) {
 			DestroyImmediate(point.transform.FindChild("Point Sphere").gameObject);
 			DestroyImmediate(point);
@@ -170,6 +171,7 @@ public class Stylus : MonoBehaviour
 		foreach (Button b in GameObject.Find("LandmarksList").GetComponentsInChildren<Button>()) {
 			b.interactable = true;
 		}
+		pauseTracking = false;
 	}
 
 

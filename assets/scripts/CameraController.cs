@@ -128,21 +128,15 @@ public class CameraController : MonoBehaviour
 
     public void putCamOnStylus(int camera)
     {
-        try
-        {
-            GameObject cam = cameras[camera];
+        GameObject cam = cameras[camera];
+		GameObject stylus = GameObject.Find("Stylus");
 
-            stylusPoint = GameObject.Find("Stylus").transform.FindChild("Point").gameObject;
-            targets[camera] = stylusPoint;
-            cam.transform.position = Vector3.Lerp(stylusPoint.transform.position, GameObject.Find("Stylus").transform.FindChild("model").transform.position, 0.95F);
-            cam.transform.LookAt(stylusPoint.transform.position);
-            cam.transform.parent = GameObject.Find("Stylus").transform;
-            stylusCam = true;
-        }
-        catch (NullReferenceException e)
-        {
-
-        }
+		stylusPoint = stylus.transform.FindChild("Point").gameObject;
+        targets[camera] = stylusPoint;
+        cam.transform.position = Vector3.Lerp(stylusPoint.transform.position, stylus.transform.position, 0.95F);
+        cam.transform.LookAt(stylusPoint.transform.position);
+        cam.transform.parent = stylus.transform;
+        stylusCam = true;
     }
 
     public void putCamOnCoil(int camera)
