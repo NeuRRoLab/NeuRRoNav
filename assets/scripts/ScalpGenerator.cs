@@ -28,7 +28,6 @@ public class ScalpGenerator : MonoBehaviour
 
     LineRenderer splineRenderer;
     GameObject stylusPoint;
-    GameObject stylusTracker;
     GameObject head;
     GameObject scalp;
     GameObject scalpSpline;
@@ -50,7 +49,6 @@ public class ScalpGenerator : MonoBehaviour
 
         surfaceGen = GameObject.Find("ScalpSurface").GetComponent<SurfaceGen>();
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
-        stylusTracker = GameObject.Find("StylusTracker");
         stylusTracking = GameObject.Find("StylusTrackStatus").GetComponent<Text>();
         headTracking = GameObject.Find("HeadTrackStatus").GetComponent<Text>();
         calibrationInstruct = GameObject.Find("CalibrationInstructions").GetComponent<Text>();
@@ -141,7 +139,7 @@ public class ScalpGenerator : MonoBehaviour
                 settingLandmarks = false;
                 calibrationInstruct.text = "";
                 CenterHead();
-                stylusTracker.GetComponent<Stylus>().setStylusSensitiveTrackingState(false);
+                FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(false);
                 return;
             }
 
@@ -382,7 +380,7 @@ public class ScalpGenerator : MonoBehaviour
     public void LandmarksButtonPress()
     {
         head = GameObject.Find("Head");
-        stylusTracker.GetComponent<Stylus>().setStylusSensitiveTrackingState(true);
+        FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(true);
         if(landmarks != null)
         {
             for (int i = 0; i < 5; i++)
