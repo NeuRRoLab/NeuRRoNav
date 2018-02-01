@@ -142,36 +142,34 @@ public class ScalpGenerator : MonoBehaviour
                 FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(false);
                 return;
             }
-
-            string name;
-
-            switch (landmarkIndex)
-            {
-                case 1:
-                    name = "Right Tragus";
-                    break;
-                case 2:
-                    name = "Left Tragus";
-                    break;
-                case 3:
-                    name = "Aprox Vertex";
-                    break;
-                case 4:
-                    name = "Inion";
-                    break;
-                default:
-                    name = "Index Error";
-                    break;
-            }
-            calibrationInstruct.text = "Select " + name;
+                
+            calibrationInstruct.text = "Select " + LandmarkIndexToName(landmarkIndex);
         }
     }
+
+	string LandmarkIndexToName(int landmarkIndex) {
+		switch (landmarkIndex) {
+			case 0:
+				return "Nasion";
+			case 1:
+                return "Right Tragus";
+            case 2:
+                return "Left Tragus";
+            case 3:
+                return "Aprox Vertex";
+            case 4:
+                return "Inion";
+		}
+		return "Index Error";
+	}
+
     void setLandmark(int index)
     {
         stylusPoint = GameObject.Find("Stylus").transform.Find("Point").gameObject;
         head = GameObject.Find("Head");
 
         landmarks[index].transform.position = stylusPoint.transform.position;
+		landmarks[index].transform.parent = head.transform;
     }
 
     //void StartDraw()
@@ -238,15 +236,7 @@ public class ScalpGenerator : MonoBehaviour
         {
             if (scalp.transform.localScale != scalpStartScale)
             {
-                for (int i = 0; i < 5; i++)
-                {
-                    landmarks[i].transform.parent = null;
-                }
                 scalp.transform.localScale = scalpStartScale;
-                for (int i = 0; i < 5; i++)
-                {
-                    landmarks[i].transform.parent = head.transform;
-                }
             }
 
             //Vector3 centeredX = Vector3.Lerp(landmarks[(int)landmarkNames.leftEar].transform.position, landmarks[(int)landmarkNames.rightEar].transform.position, (float)0.5);
@@ -398,7 +388,23 @@ public class ScalpGenerator : MonoBehaviour
             landmarks[i].transform.position = head.transform.position;
             landmarks[i].transform.rotation = head.transform.rotation;
             landmarks[i].transform.parent = head.transform;
-        }
+			landmarks[i].name = LandmarkIndexToName(i);
+
+			DebugPoint debugPoint = landmarks[i].AddComponent<DebugPoint>();
+			debugPoint.p = PrimitiveType.Cube;
+			if (i == 0)
+				debugPoint.c = Color.red;
+			else if (i == 1)
+				debugPoint.c = Color.yellow;
+			else if (i == 2)
+				debugPoint.c = Color.green;
+			else if (i == 3)
+				debugPoint.c = Color.cyan;
+			else if (i == 4)
+				debugPoint.c = Color.magenta;
+
+
+		}
         landmarkIndex = 0;
         settingLandmarks = true;
 

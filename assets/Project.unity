@@ -272,6 +272,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 47538408}
+  - 114: {fileID: 47538409}
   m_Layer: 0
   m_Name: Inion
   m_TagString: Untagged
@@ -286,12 +287,25 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 47538407}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.00025742874, y: -0, z: 0.093661204}
+  m_LocalPosition: {x: 0, y: -0, z: 0.093661204}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 2115661839}
   m_RootOrder: 2
+--- !u!114 &47538409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 47538407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e395d2a05b73abb478b3b4b94781d80d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  p: 0
+  c: {r: 0.986207, g: 0, b: 1, a: 0}
 --- !u!1 &49348606
 GameObject:
   m_ObjectHideFlags: 0
@@ -6832,6 +6846,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 738561586}
+  - 114: {fileID: 738561587}
   m_Layer: 0
   m_Name: Left Tragus
   m_TagString: Untagged
@@ -6846,12 +6861,25 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 738561585}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.065667406, y: -0.011775017, z: 0.008711182}
+  m_LocalPosition: {x: 0.0663926, y: -0.010043979, z: 0.009681225}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 2115661839}
   m_RootOrder: 4
+--- !u!114 &738561587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 738561585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e395d2a05b73abb478b3b4b94781d80d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  p: 0
+  c: {r: 0, g: 1, b: 0.006896496, a: 0}
 --- !u!1 &738691131
 GameObject:
   m_ObjectHideFlags: 0
@@ -9151,6 +9179,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 994618565}
+  - 114: {fileID: 994618566}
   m_Layer: 0
   m_Name: Right Tragus
   m_TagString: Untagged
@@ -9171,6 +9200,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2115661839}
   m_RootOrder: 3
+--- !u!114 &994618566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 994618564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e395d2a05b73abb478b3b4b94781d80d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  p: 0
+  c: {r: 0.9034482, g: 1, b: 0, a: 0}
 --- !u!1 &1010898796
 GameObject:
   m_ObjectHideFlags: 0
@@ -14269,7 +14311,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 49348607}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.5
+  m_Size: 0.49999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -15727,6 +15769,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 1684130020}
+  - 114: {fileID: 1684130021}
   m_Layer: 0
   m_Name: Aprox Vertex
   m_TagString: Untagged
@@ -15741,12 +15784,25 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1684130019}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.00025749207, y: 0.1032, z: 0.0138}
+  m_LocalPosition: {x: 0, y: 0.1032, z: 0.0138}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 2115661839}
   m_RootOrder: 5
+--- !u!114 &1684130021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1684130019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e395d2a05b73abb478b3b4b94781d80d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  p: 0
+  c: {r: 0, g: 0.9172416, b: 1, a: 0}
 --- !u!1 &1693145172
 GameObject:
   m_ObjectHideFlags: 0
@@ -20141,6 +20197,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 2113560717}
+  - 114: {fileID: 2113560718}
   m_Layer: 0
   m_Name: Nasion
   m_TagString: Untagged
@@ -20155,12 +20212,25 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2113560716}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.00030737743, y: 0.02493596, z: -0.0669688}
+  m_LocalPosition: {x: 0, y: 0.0251, z: -0.0669}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 2115661839}
   m_RootOrder: 1
+--- !u!114 &2113560718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2113560716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e395d2a05b73abb478b3b4b94781d80d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  p: 0
+  c: {r: 1, g: 0, b: 0, a: 0}
 --- !u!1 &2115661838
 GameObject:
   m_ObjectHideFlags: 0
