@@ -10,18 +10,23 @@ public class CenterScalp : MonoBehaviour {
 
 	[ContextMenu("Center")]
 	public void Center() {
+		// Unparent the children to move this accordingly
+		Transform[] children = this.transform.GetComponentsInChildren<Transform>();
+		foreach (Transform child in children) {
+			child.parent = null;
+		}
+
 		Vector3 center = Vector3.zero;
 		foreach (Transform point in points) {
 			center += point.transform.position;
 		}
 		center /= points.Count;
 
-		Transform[] children = this.transform.GetComponentsInChildren<Transform>();
-		foreach (Transform child in children) {
-			child.parent = null;
-		}
-
 		this.transform.position = center;
+		this.transform.rotation = Utility.ThreePointLocalSpaceConversion(
+			points[0].transform.position,
+			points[2].transform.position,
+			points[1].transform.position);
 
 		foreach (Transform child in children) {
 			child.parent = this.transform;
