@@ -117,7 +117,7 @@ public class Head : MonoBehaviour
                         tracker.transform.position = position;
                         tracker.transform.rotation = orientation;
                         tracker.transform.parent = container.transform;
-                        camController.centerMainOnObject(tracker, 0.3F);
+                        camController.centerMainOnObject(tracker, Vector3.forward, 0.3F);
 
                         GameObject text = Instantiate(GameObject.Find("HeadTrackerToolText"));
                         text.transform.position = tracker.transform.position;

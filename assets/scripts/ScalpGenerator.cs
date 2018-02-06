@@ -232,81 +232,92 @@ public class ScalpGenerator : MonoBehaviour
             //scalp.transform.position = centeredPos;
             //scalp.transform.parent = head.transform;
         }
-        else
-        {
-            if (scalp.transform.localScale != scalpStartScale)
-            {
-                scalp.transform.localScale = scalpStartScale;
-            }
+        else {
+			scalp.transform.localScale = scalpStartScale;
+			scalp.GetComponent<CenterScalp>().Center();
 
-            //Vector3 centeredX = Vector3.Lerp(landmarks[(int)landmarkNames.leftEar].transform.position, landmarks[(int)landmarkNames.rightEar].transform.position, (float)0.5);
-            //Vector3 centeredZ = Vector3.Lerp(landmarks[(int)landmarkNames.forehead].transform.position, landmarks[(int)landmarkNames.backOfHead].transform.position, (float)0.5);
+			// Scale
+			float scaleChange = Vector3.Distance(landmarks[0].transform.position, landmarks[1].transform.position) 
+				/ Vector3.Distance(lTragus.transform.position, rTragus.transform.position);
+			scalp.transform.localScale = Vector3.one * scaleChange;
 
-            //scalp.transform.position = new Vector3(centeredX.x, scalp.transform.position.y, centeredZ.z);
+			// Location
+			Vector3 landmarkCenter = landmarks[0].transform.position
+				+ landmarks[1].transform.position
+				+ landmarks[2].transform.position
+				+ landmarks[3].transform.position
+				+ landmarks[4].transform.position;
+			landmarkCenter /= 5;
+			Vector3 scalpCenter = nasion.transform.position
+				+ lTragus.transform.position
+				+ rTragus.transform.position
+				+ inion.transform.position
+				+ vertex.transform.position;
+			scalpCenter /= 5;
+			Vector3 move = landmarkCenter - scalpCenter;
+			scalp.transform.position += move;
 
-            scalp.transform.rotation = head.transform.rotation;
-            nasion.transform.parent = head.transform;
-            scalp.transform.parent = nasion.transform;
-            nasion.transform.position = landmarks[(int)landmarkNames.nasion].transform.position;
-            scalp.transform.parent = head.transform;
-            nasion.transform.parent = scalp.transform;
+			// Rotation
+			float bestDist = float.MaxValue;
+			int maxTries = 75000;
+			for (int tries = 0; tries < maxTries; tries += 1) {
+				Quaternion origRotation = scalp.transform.rotation;
 
-            //foreach (GameObject obj in landmarks)
-            //{
-            //    obj.transform.parent = scalp.transform;
-            //}
+				Quaternion testRotation = transform.rotation * Random.rotation;
+				scalp.transform.rotation = Quaternion.Slerp(origRotation, testRotation, 1 - tries / (float)maxTries);
+				float thisDist = Vector3.Distance(landmarks[0].transform.position, nasion.transform.position)
+					+ Vector3.Distance(landmarks[1].transform.position, rTragus.transform.position)
+					+ Vector3.Distance(landmarks[2].transform.position, lTragus.transform.position)
+					+ Vector3.Distance(landmarks[3].transform.position, inion.transform.position)
+					+ Vector3.Distance(landmarks[4].transform.position, vertex.transform.position);
+				if (thisDist < bestDist) {
+					bestDist = thisDist;
+				} else {
+					scalp.transform.rotation = origRotation;
+				}
+			}
+			// Rotation
+			//Vector3 dirLandmark = (landmarks[4].transform.position - landmarks[0].transform.position).normalized;
+			//Vector3 dirScalp = (inion.transform.position - nasion.transform.position).normalized;
+			//Quaternion rotation = Quaternion.FromToRotation(dirScalp, dirLandmark);
+			//scalp.transform.rotation *= rotation;
 
-            float scaleZ = (Vector3.Distance(new Vector3(0, 0, landmarks[(int)landmarkNames.inion].transform.localPosition.z), new Vector3(0, 0, landmarks[(int)landmarkNames.nasion].transform.localPosition.z))
-                / Vector3.Distance(new Vector3(0, 0, inion.transform.localPosition.z), new Vector3(0, 0, nasion.transform.localPosition.z)));
 
-            float scaleX = (Vector3.Distance(new Vector3(landmarks[(int)landmarkNames.leftTragus].transform.localPosition.x, 0, 0), new Vector3(landmarks[(int)landmarkNames.rightTragus].transform.localPosition.x, 0, 0))
-                / Vector3.Distance(new Vector3(lTragus.transform.localPosition.x, 0, 0), new Vector3(rTragus.transform.localPosition.x, 0, 0)));
+			//float scaleZ = (Vector3.Distance(new Vector3(0, 0, landmarks[(int)landmarkNames.inion].transform.localPosition.z), new Vector3(0, 0, landmarks[(int)landmarkNames.nasion].transform.localPosition.z))
+			//    / Vector3.Distance(new Vector3(0, 0, inion.transform.localPosition.z), new Vector3(0, 0, nasion.transform.localPosition.z)));
 
-            float scaleY = (Vector3.Distance(new Vector3(0, landmarks[(int)landmarkNames.nasion].transform.localPosition.y, 0), new Vector3(0, landmarks[(int)landmarkNames.aproxVertex].transform.localPosition.y, 0))
-                / Vector3.Distance(new Vector3(0, nasion.transform.localPosition.y, 0), new Vector3(0, vertex.transform.localPosition.y, 0)));
+			//float scaleX = (Vector3.Distance(new Vector3(landmarks[(int)landmarkNames.leftTragus].transform.localPosition.x, 0, 0), new Vector3(landmarks[(int)landmarkNames.rightTragus].transform.localPosition.x, 0, 0))
+			//    / Vector3.Distance(new Vector3(lTragus.transform.localPosition.x, 0, 0), new Vector3(rTragus.transform.localPosition.x, 0, 0)));
 
-            Debug.Log(scaleX.ToString() + " " + scaleY.ToString() + " " + scaleZ.ToString());
+			//float scaleY = (Vector3.Distance(new Vector3(0, landmarks[(int)landmarkNames.nasion].transform.localPosition.y, 0), new Vector3(0, landmarks[(int)landmarkNames.aproxVertex].transform.localPosition.y, 0))
+			//    / Vector3.Distance(new Vector3(0, nasion.transform.localPosition.y, 0), new Vector3(0, vertex.transform.localPosition.y, 0)));
 
-            foreach (GameObject obj in landmarks)
-            {
-                obj.transform.parent = head.transform;
-            }
+			//Debug.Log(scaleX.ToString() + " " + scaleY.ToString() + " " + scaleZ.ToString());
 
-            scalp.transform.localScale = new Vector3((scalp.transform.localScale.x * scaleX), (scalp.transform.localScale.y * scaleY), (scalp.transform.localScale.z * scaleZ));
+			if (center != null) {
+				Destroy(center);
+			}
 
-            nasion.transform.parent = head.transform;
-            scalp.transform.parent = nasion.transform;
-            nasion.transform.position = landmarks[(int)landmarkNames.nasion].transform.position;
-            scalp.transform.parent = head.transform;
-            nasion.transform.parent = scalp.transform;
+			//Vector3 lerpCenter = Vector3.Lerp(Vector3.Lerp(landmarks[(int)landmarkNames.leftTragus].transform.position, landmarks[(int)landmarkNames.rightTragus].transform.position, 0.5F), landmarks[(int)landmarkNames.nasion].transform.position, 0.5f);
 
-            if (center != null)
-            {
-                Destroy(center);
-            }
+			center = new GameObject();
+			center.name = "Center";
+			center.transform.position = landmarkCenter;
+			center.transform.rotation = Quaternion.LookRotation(
+				Vector3.Normalize(landmarks[(int)landmarkNames.nasion].transform.position - landmarkCenter),
+				Vector3.Normalize(
+					Vector3.Cross(Vector3.Normalize(landmarks[(int)landmarkNames.nasion].transform.position - landmarkCenter),
+						Vector3.Normalize(Vector3.Normalize(landmarks[(int)landmarkNames.leftTragus].transform.position - landmarks[(int)landmarkNames.rightTragus].transform.position)))));
+			center.transform.parent = head.transform;
 
-            Vector3 lerpCenter = Vector3.Lerp(Vector3.Lerp(landmarks[(int)landmarkNames.leftTragus].transform.position, landmarks[(int)landmarkNames.rightTragus].transform.position, 0.5F), landmarks[(int)landmarkNames.nasion].transform.position, 0.5f);
+			Vector3 forwardVec = (inion.transform.position - nasion.transform.position).normalized;
+			camController.centerMainOnObject(head, forwardVec, 0.5F);
 
-            center = new GameObject();
-            center.name = "Center";
-            center.transform.position = lerpCenter;
-            //center.transform.rotation = head.transform.rotation;
-            center.transform.rotation = Quaternion.LookRotation(
-                Vector3.Normalize(landmarks[(int)landmarkNames.nasion].transform.position - lerpCenter), 
-                Vector3.Normalize(
-                    Vector3.Cross(Vector3.Normalize(landmarks[(int)landmarkNames.nasion].transform.position - lerpCenter), 
-                        Vector3.Normalize(Vector3.Normalize(landmarks[(int)landmarkNames.leftTragus].transform.position - landmarks[(int)landmarkNames.rightTragus].transform.position)))));
-            center.transform.parent = head.transform;
-
-            //}
-
-            camController.centerMainOnObject(head, 0.5F);
-
-            GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
-            GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
-            GameObject.Find("Load Grids").GetComponent<Button>().interactable = true;
-        }
-    }
+			GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
+			GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
+			GameObject.Find("Load Grids").GetComponent<Button>().interactable = true;
+		}
+	}
 
     //public void ExportScalpSurfaceXYZ()
     //{

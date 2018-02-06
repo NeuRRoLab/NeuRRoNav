@@ -47,7 +47,7 @@ public class CameraController : MonoBehaviour
         obj.transform.position = Vector3.zero;
         putTargetCam1OnTargetXZ(obj);
         putTargetCam2OnTargetZY(obj);
-        centerMainOnObject(obj, 1);
+        centerMainOnObject(obj, Vector3.forward, 1);
     }
 
     void Update()
@@ -110,20 +110,13 @@ public class CameraController : MonoBehaviour
         lastMousePos = Input.mousePosition;
     }
 
-    public void centerMainOnObject(GameObject target, float distance)
+    public void centerMainOnObject(GameObject target, Vector3 forward, float distance)
     {
-        try
-        {
-            targets[0] = target;
-            mainCamera.transform.position = targets[(int)targetNames.mainTarget].transform.position;
-            mainCamera.transform.parent = targets[(int)targetNames.mainTarget].transform;
-            mainCamera.transform.position = new Vector3(targets[(int)targetNames.mainTarget].transform.position.x, targets[(int)targetNames.mainTarget].transform.position.y, targets[(int)targetNames.mainTarget].transform.position.z - distance);
-            mainCamera.transform.LookAt(target.transform);
-        }
-        catch (NullReferenceException e)
-        {
+        targets[0] = target;
+        mainCamera.transform.parent = targets[(int)targetNames.mainTarget].transform;
+		mainCamera.transform.position = targets[(int)targetNames.mainTarget].transform.position - forward * distance;
 
-        }
+		mainCamera.transform.LookAt(target.transform);
     }
 
     public void putCamOnStylus(int camera)
