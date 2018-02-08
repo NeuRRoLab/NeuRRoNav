@@ -4,17 +4,17 @@ using System.Collections.Generic;
 
 public class TransformSmoother {
 
-	static int maxSaves = 80;
+	public static int maxSaves = 20;
 	List<Vector3> savedPositions = new List<Vector3>();
 	List<Quaternion> savedRotations = new List<Quaternion>();
 
 	public void AddTransform(Vector3 point, Quaternion rotation) {
 		savedPositions.Add(point);
-		if (savedPositions.Count > maxSaves)
+		while (savedPositions.Count > maxSaves)
 			savedPositions.RemoveAt(0);
 
 		savedRotations.Add(rotation);
-		if (savedRotations.Count > maxSaves)
+		while (savedRotations.Count > maxSaves)
 			savedRotations.RemoveAt(0);
 	}
 
