@@ -13,6 +13,8 @@ public class DebugPoint : MonoBehaviour {
 		g.transform.localPosition = Vector3.zero;
 		g.transform.localRotation = Quaternion.identity;
 		g.transform.localScale = Vector3.one * .01f;
+		if (p == PrimitiveType.Sphere)
+			g.transform.localScale = Vector3.one * .005f;
 		g.GetComponent<MeshRenderer>().material.color = c;
 	}
 }
