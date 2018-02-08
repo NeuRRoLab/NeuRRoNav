@@ -138,7 +138,6 @@ public class Stylus : MonoBehaviour
 	public void setPoint() {
 		pauseTracking = true;
 		if (point != null) {
-			DestroyImmediate(point.transform.FindChild("Point Sphere").gameObject);
 			DestroyImmediate(point);
 		}
 
@@ -149,7 +148,6 @@ public class Stylus : MonoBehaviour
 		point = new GameObject();
 		point.name = "Point";
 		point.transform.position = calibrationTool.transform.position;
-		point.transform.rotation = calibrationTool.transform.rotation;
 		point.transform.parent = this.transform;
 
 		pivot.transform.LookAt(point.transform.position);
@@ -157,10 +155,9 @@ public class Stylus : MonoBehaviour
 
 		GameObject psphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 		psphere.name = "Point Sphere";
-		Vector3 scale = new Vector3(0.01f, 0.01f, 0.01f);
-		psphere.transform.localScale = scale;
+		psphere.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
 		psphere.transform.parent = point.transform;
-		psphere.transform.localPosition = Vector3.zero;
+		psphere.transform.localPosition = new Vector3(0, 0, 0);
 
 		connectorLine.transform.localScale = new Vector3(1, Vector3.Distance(pivot.transform.position, point.transform.position), 1);
 

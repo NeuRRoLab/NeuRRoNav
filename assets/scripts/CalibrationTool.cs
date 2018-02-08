@@ -32,12 +32,14 @@ public class CalibrationTool : MonoBehaviour
     Text headTrackStatus;
     bool tracked;
     GameObject tracker;
+	Text calibrationToolTrackStatus;
 
-    // Use this for initialization
-    void Start()
+	// Use this for initialization
+	void Start()
     {
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
-        tracked = false;
+		calibrationToolTrackStatus = GameObject.Find("CalibrationToolTrackStatus").GetComponent<Text>();
+		tracked = false;
         FindObjectOfType<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
     }
 
@@ -119,6 +121,10 @@ public class CalibrationTool : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+		if (tracked) {
+			calibrationToolTrackStatus.color = Color.green;
+		} else {
+			calibrationToolTrackStatus.color = Color.red;
+		}
     }
 }
