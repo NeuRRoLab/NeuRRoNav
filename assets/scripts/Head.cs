@@ -33,9 +33,10 @@ public class Head : MonoBehaviour
     bool tracked;
     GameObject tracker;
     GameObject container;
+	TransformSmoother transformSmoother = new TransformSmoother();
 
-    // Use this for initialization
-    void Start()
+	// Use this for initialization
+	void Start()
     {
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
         tracked = false;
@@ -125,12 +126,15 @@ public class Head : MonoBehaviour
                         text.transform.parent = tracker.transform;
                     }
 
-                    //== set bone's pose ==--
+					//== set bone's pose ==--
+					transformSmoother.AddTransform(position, orientation);
+					Vector3 avgPosition = transformSmoother.GetAveragePosition();
+					Quaternion avgRotation = transformSmoother.GetAverageRotation();
 
-                    container.transform.position = position;
-                    container.transform.rotation = orientation;
-                    gameObject.transform.position = position;
-                    gameObject.transform.rotation = orientation;
+					container.transform.position = avgPosition;
+                    container.transform.rotation = avgRotation;
+                    gameObject.transform.position = avgPosition;
+                    gameObject.transform.rotation = avgRotation;
                     break;
                 }
                 else

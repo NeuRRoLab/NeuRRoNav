@@ -33,7 +33,7 @@ public class Stylus : MonoBehaviour
     Text stylusTrackStatus;
     GameObject point;
     AudioSource trackingWarning;
-
+	TransformSmoother transformSmoother = new TransformSmoother();
 
     bool stylusTrackingIsSensitive;
 
@@ -101,8 +101,9 @@ public class Stylus : MonoBehaviour
                             initialized = true;
                         }
 
-                        this.transform.position = position;
-                        this.transform.rotation = orientation;
+						transformSmoother.AddTransform(position, orientation);
+                        this.transform.position = transformSmoother.GetAveragePosition();
+                        this.transform.rotation = transformSmoother.GetAverageRotation();
                         break;
                     }
 

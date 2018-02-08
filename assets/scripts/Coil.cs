@@ -39,8 +39,9 @@ public class Coil : MonoBehaviour
     GameObject right;
     GameObject calibrateForward;
     GameObject calibrateRight;
+	TransformSmoother transformSmoother = new TransformSmoother();
 
-    Text calibrationInstruct;
+	Text calibrationInstruct;
 
     AudioSource trackingWarning;
 
@@ -113,9 +114,10 @@ public class Coil : MonoBehaviour
                         initialized = true;
                     }
 
-                    coil.transform.position = position;
-                    coil.transform.rotation = orientation;
-                    break;
+					transformSmoother.AddTransform(position, orientation);
+					coil.transform.position = transformSmoother.GetAveragePosition();
+					coil.transform.rotation = transformSmoother.GetAverageRotation();
+					break;
                 }
 
                 else

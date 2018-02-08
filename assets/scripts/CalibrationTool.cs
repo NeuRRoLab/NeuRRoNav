@@ -33,6 +33,7 @@ public class CalibrationTool : MonoBehaviour
     bool tracked;
     GameObject tracker;
 	Text calibrationToolTrackStatus;
+	TransformSmoother transformSmoother = new TransformSmoother();
 
 	// Use this for initialization
 	void Start()
@@ -103,11 +104,11 @@ public class CalibrationTool : MonoBehaviour
 
                     }
 
-                    //== set bone's pose ==--
-
-                    tracker.transform.position = position;
-                    tracker.transform.rotation = orientation;
-                    break;
+					//== set bone's pose ==--
+					transformSmoother.AddTransform(position, orientation);
+					tracker.transform.position = transformSmoother.GetAveragePosition();
+					tracker.transform.rotation = transformSmoother.GetAverageRotation();
+					break;
                 }
                 else
                 {
