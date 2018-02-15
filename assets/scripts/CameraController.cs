@@ -134,38 +134,28 @@ public class CameraController : MonoBehaviour
 
     public void putCamOnCoil(int camera)
     {
-        try
-        {
-            GameObject coil = GameObject.Find(GameObject.Find("CoilTracker").GetComponent<Coil>().coilName);
-            GameObject cam = cameras[camera];
-            coilHotSpot = coil.transform.FindChild("container").FindChild("hotspot").gameObject;
-            targets[camera] = coilHotSpot;
-            cam.transform.position = Vector3.Lerp(coilHotSpot.transform.position, coil.transform.position, 0.95F);
-            cam.transform.LookAt(coilHotSpot.transform.position, coilHotSpot.transform.forward);
-            cam.transform.parent = coil.transform;
-            coilCam = true;
-        }
-        catch (NullReferenceException e)
-        {
-
-        }
+        GameObject coil = GameObject.Find(GameObject.Find("CoilTracker").GetComponent<Coil>().coilName);
+        GameObject cam = cameras[camera];
+        coilHotSpot = coil.transform.FindChild("container").FindChild("hotspot").gameObject;
+        targets[camera] = coilHotSpot;
+        cam.transform.position = Vector3.Lerp(coilHotSpot.transform.position, coil.transform.position, 0.95F);
+        cam.transform.LookAt(coilHotSpot.transform.position, coilHotSpot.transform.forward);
+        cam.transform.parent = coil.transform;
+        coilCam = true;
     }
 
 
     public void putMainCamOnTargetXY(GameObject tPoint) {
-		try {
-			GameObject cam = cameras[0];
-            cam.transform.position = tPoint.transform.position;
-            cam.transform.parent = coilHotSpot.transform;
-            cam.transform.Translate((-coilHotSpot.transform.forward / 2));
-            //cam.transform.localPosition = new Vector3(targetCamera1.transform.localPosition.x, targetCamera1.transform.localPosition.y, targetCamera1.transform.localPosition.z - 0.5F);
-            cam.transform.LookAt(tPoint.transform.position, GameObject.Find("Scalp").transform.up);
-            cam.transform.parent = tPoint.transform;
-            targets[0] = tPoint;
-		}
-		catch (NullReferenceException e) {
-
-		}
+		GameObject cam = cameras[0];
+        cam.transform.position = tPoint.transform.position;
+        GameObject coil = GameObject.Find(GameObject.Find("CoilTracker").GetComponent<Coil>().coilName);
+		coilHotSpot = coil.transform.FindChild("container").FindChild("hotspot").gameObject;
+		cam.transform.parent = coilHotSpot.transform;
+        cam.transform.Translate((-coilHotSpot.transform.forward / 2));
+        //cam.transform.localPosition = new Vector3(targetCamera1.transform.localPosition.x, targetCamera1.transform.localPosition.y, targetCamera1.transform.localPosition.z - 0.5F);
+        cam.transform.LookAt(tPoint.transform.position, GameObject.Find("Scalp").transform.up);
+        cam.transform.parent = tPoint.transform;
+        targets[0] = tPoint;
 	}
 
     public void putTargetCam1OnTargetXZ(GameObject tPoint)

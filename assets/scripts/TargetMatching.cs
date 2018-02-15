@@ -112,15 +112,15 @@ public class TargetMatching : MonoBehaviour
     {
         coilTracker.setStylusSensitiveTrackingState(matching);
         
-        if (settingGrid && Utility.AnyInputDown())
+        if (settingGrid && (Utility.AnyInputDown()))
         {
             currentGrid.gridPoints.Add(CreateGridPoint());
         }
-        if (usingGrid && Utility.AnyInputDown() && !matching)
+        if (usingGrid && Input.GetKeyDown(KeyCode.Mouse1) && !matching)
         {
             MouseSelectGridPoint();
         }
-        if (settingHotSpot && Utility.AnyInputDown())
+        if (settingHotSpot && (Input.GetKeyDown(KeyCode.Space)))
         {
             prepareHotSpot();
         }
