@@ -166,7 +166,7 @@ public class Coil : MonoBehaviour
 
     void Update()
     {
-        if (calibrating && Input.GetKeyDown(KeyCode.Space))
+        if (calibrating && Utility.AnyInputDown())
         {
             if (point == 0)
             {

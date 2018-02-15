@@ -18,4 +18,8 @@ public class Utility {
 			);
 
 	}
+
+	public static bool AnyInputDown() {
+		return (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse1) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Escape));
+	}
 }

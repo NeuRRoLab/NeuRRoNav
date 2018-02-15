@@ -80,7 +80,7 @@ public class ScalpGenerator : MonoBehaviour
         }
         else
         {
-            if (waitingToDraw && (Input.GetKeyDown(KeyCode.Space)) && !releaseSpace)
+            if (waitingToDraw && Utility.AnyInputDown() && !releaseSpace)
             {
                 //StartDraw();
             }
@@ -127,7 +127,7 @@ public class ScalpGenerator : MonoBehaviour
 
     void FindLandmarks()
     {
-        if (Input.GetKeyDown(KeyCode.Space) || (Input.GetKeyDown(KeyCode.Mouse1) && stylusTracking.color.Equals(Color.green)))
+		if (Utility.AnyInputDown() && stylusTracking.color.Equals(Color.green))
         {
             setLandmark(landmarkIndex);
             landmarkIndex++;
