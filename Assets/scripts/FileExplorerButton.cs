@@ -32,10 +32,13 @@ public class FileExplorerButton : MonoBehaviour {
 		else {
 			OpenFileDialog ofd = new OpenFileDialog();
 			string startPath = settingsMenu.getField((int)field - 1);
-			ofd.InitialDirectory = startPath;
+			ofd.InitialDirectory = startPath + "/../";
 			if (ofd.ShowDialog() == DialogResult.OK) {
 				string path = System.IO.Path.GetDirectoryName(ofd.FileName) + '/';
 				string fileName = System.IO.Path.GetFileName(ofd.FileName);
+				settingsMenu.setField((int)field - 1, path);
+				settingsMenu.setField((int)field, fileName);
+
 			}
 		}
 #endif
