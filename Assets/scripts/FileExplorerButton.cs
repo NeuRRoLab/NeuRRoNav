@@ -21,6 +21,7 @@ public class FileExplorerButton : MonoBehaviour {
 		if ((int)field % 2 == 0) {
 			FolderBrowserDialog fbd = new FolderBrowserDialog();
 			string startPath = settingsMenu.getField((int)field);
+			fbd.RootFolder = System.Environment.SpecialFolder.Desktop;
 			fbd.SelectedPath = startPath;
 			if (fbd.ShowDialog() == DialogResult.OK) {
 				string correctedPath = fbd.SelectedPath.Replace('\\', '/');
