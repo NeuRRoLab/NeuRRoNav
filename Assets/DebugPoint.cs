@@ -16,5 +16,6 @@ public class DebugPoint : MonoBehaviour {
 		if (p == PrimitiveType.Sphere)
 			g.transform.localScale = Vector3.one * .005f;
 		g.GetComponent<MeshRenderer>().material.color = c;
+		Destroy(g.GetComponent<Collider>());
 	}
 }
