@@ -306,7 +306,7 @@ public class TargetMatching : MonoBehaviour
             GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "Match";
         }
 
-        if (Utility.AnyInputDown())
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             tmsFire();
         }
