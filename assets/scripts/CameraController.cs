@@ -152,9 +152,9 @@ public class CameraController : MonoBehaviour
     }
 
 
-    public void putMainCamOnTargetXY(GameObject tPoint)
-    {
-            GameObject cam = cameras[0];
+    public void putMainCamOnTargetXY(GameObject tPoint) {
+		try {
+			GameObject cam = cameras[0];
             cam.transform.position = tPoint.transform.position;
             cam.transform.parent = coilHotSpot.transform;
             cam.transform.Translate((-coilHotSpot.transform.forward / 2));
@@ -162,7 +162,11 @@ public class CameraController : MonoBehaviour
             cam.transform.LookAt(tPoint.transform.position, GameObject.Find("Scalp").transform.up);
             cam.transform.parent = tPoint.transform;
             targets[0] = tPoint;
-    }
+		}
+		catch (NullReferenceException e) {
+
+		}
+	}
 
     public void putTargetCam1OnTargetXZ(GameObject tPoint)
     {
