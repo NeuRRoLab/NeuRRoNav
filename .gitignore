@@ -39,3 +39,6 @@ thumbs.db
 Assets/Logs/*
 Assets/Logs.meta
 Assets/Coils/Saved/*
+Assets/Coils/Load/*
+Assets/Grids/Saved/*
+Assets/Grids/Load/*
