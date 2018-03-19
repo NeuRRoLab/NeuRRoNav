@@ -363,7 +363,7 @@ public class TargetMatching : MonoBehaviour
             //Calculate needed corrections
             string rl = setMoveInstruction("Right ", "Left ", deltX, mThresh);
             string ud = setMoveInstruction("Up ", "Down ", deltY, mThresh);
-            string fb = setMoveInstruction("Back ", "Forward ", deltZ, mThresh);
+            string fb = setMoveInstruction("Back ", "Fward ", deltZ, mThresh);
 
             //Update the status of each dimension
             xStatus[0].text = xStatus[1].text = "X: " + rl + deltX.ToString("0.0");
@@ -435,9 +435,9 @@ public class TargetMatching : MonoBehaviour
 
         setTargetColor(angleDif * 0.9f);
 
-        string r = setRotateInstruction("Cntr Clockwise ", "Clockwise ", rpy[0], rThresh);
-        string p = setRotateInstruction("Pitch Up ", "Pitch Down ", rpy[1], rThresh);
-        string y = setRotateInstruction("Yaw Left ", "Yaw Right ", rpy[2], rThresh);
+        string r = setRotateInstruction("CtrClk ", "Clkwse ", rpy[0], rThresh);
+        string p = setRotateInstruction("Up ", "Down ", rpy[1], rThresh);
+        string y = setRotateInstruction("Left ", "Right ", rpy[2], rThresh);
 
         pitchStatus[0].text = pitchStatus[1].text = "Pitch: " + p + rpy[1].ToString("0.00");
         yawStatus[0].text = yawStatus[1].text = "Yaw: " + y + rpy[2].ToString("0.00");
