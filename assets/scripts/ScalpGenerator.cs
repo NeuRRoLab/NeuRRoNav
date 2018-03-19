@@ -231,6 +231,7 @@ public class ScalpGenerator : MonoBehaviour
             //scalp.transform.parent = head.transform;
         }
         else {
+            // If we are recreating the center, ie it already existed, undo the existing center object. 
 			if (center != null) {
 				Transform[] children = center.GetComponentsInChildren<Transform>();
 				foreach (Transform child in children) {

@@ -150,6 +150,7 @@ public class TargetMatching : MonoBehaviour
         GameObject hs = new GameObject();
         hs.transform.position = GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.position;
         hs.transform.rotation = GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.rotation;
+        // Yuck
         CreateScalpHotSpot(GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.position, GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.rotation);
 
         setHotSpot.text = "New Hot Spot";
@@ -212,10 +213,12 @@ public class TargetMatching : MonoBehaviour
         {
             GameObject hitObj = hit.collider.gameObject.transform.parent.gameObject;
             TargetPoint newTPoint = null;
-            UnityEngine.Debug.Log(hitObj.name.ToString());
+            // UnityEngine.Debug.Log("Hit an object:");
+            // UnityEngine.Debug.Log(hitObj.name.ToString());
+
             foreach (TargetPoint t in currentGrid.gridPoints)
-            {
-                if(t.pos.Equals(hitObj))
+            {  
+                if (t.pos.Equals(hitObj))
                 {
                     newTPoint = t;
                     break;
@@ -225,6 +228,7 @@ public class TargetMatching : MonoBehaviour
             {
                 foreach (TargetPoint t in currentGrid.hotSpots)
                 {
+                    
                     if (t.pos.Equals(hitObj))
                     {
                         newTPoint = t;
@@ -234,6 +238,7 @@ public class TargetMatching : MonoBehaviour
             }
             if(newTPoint!=null && newTPoint.fired == false)
             {
+                UnityEngine.Debug.Log("Case 3");
                 tPoint = newTPoint;
                 target();
             }
@@ -833,7 +838,15 @@ public class TargetMatching : MonoBehaviour
 
         InstantiateTargetCoil();
 
+        // LEGACY
+        /*
         camController.putMainCamOnTargetXY(tPoint.pos);
+        camController.putTargetCam1OnTargetXZ(tPoint.pos);
+        camController.putTargetCam2OnTargetZY(tPoint.pos);
+        */
+
+        //camController.putMainCamOnTargetXY(coil);
+        camController.putMainCam1FacingBackOfCoil(tPoint.pos);
         camController.putTargetCam1OnTargetXZ(tPoint.pos);
         camController.putTargetCam2OnTargetZY(tPoint.pos);
 
