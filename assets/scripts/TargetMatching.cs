@@ -327,7 +327,7 @@ public class TargetMatching : MonoBehaviour
         float deltY = p.y - t.y;
         float deltZ = p.z - t.z;
 
-        if (distance > 0.05)
+        if (distance > 0.5) // 0.05 is what this should be
         {
             distance = 1;
             deltX *= 100;
@@ -361,8 +361,8 @@ public class TargetMatching : MonoBehaviour
             deltZ *= 100;
 
             //Calculate needed corrections
-            string rl = setMoveInstruction("Right ", "Left ", deltX, mThresh);
-            string ud = setMoveInstruction("Up ", "Down ", deltY, mThresh);
+            string rl = setMoveInstruction("Right ", "Left ", -deltX, mThresh);
+            string ud = setMoveInstruction("Up ", "Down ", -deltY, mThresh);
             string fb = setMoveInstruction("Back ", "Fward ", deltZ, mThresh);
 
             //Update the status of each dimension
@@ -391,11 +391,13 @@ public class TargetMatching : MonoBehaviour
 
     private Quaternion quaternionDifference(Quaternion fromRotation, Quaternion toRotation)
     {
-        return fromRotation * Quaternion.Inverse(toRotation);
+        //return fromRotation * Quaternion.Inverse(toRotation);
+        return Quaternion.Inverse(fromRotation) * toRotation;
     }
 
     private float[] AngleDecomposition(Quaternion angle)//Returns Roll Pitch Yaw
     {
+        // 
         float w = angle.w;
         float y = angle.y;
         float z = angle.z;
@@ -415,6 +417,8 @@ public class TargetMatching : MonoBehaviour
         //float pitch = coilHotSpot.transform.rotation.eulerAngles.x - tPoint.rot.transform.rotation.eulerAngles.x;
         //float yaw = coilHotSpot.transform.rotation.eulerAngles.y - tPoint.rot.transform.rotation.eulerAngles.y;
         //float roll = coilHotSpot.transform.rotation.eulerAngles.z - tPoint.rot.transform.rotation.eulerAngles.z;
+
+        // This gives the angle that when applied to coilHotSpot, will result in tPoint.rotation
         Quaternion angle =  quaternionDifference(coilHotSpot.transform.rotation, tPoint.rot.transform.rotation);
 
         float[] rpy = AngleDecomposition(angle);
@@ -435,13 +439,13 @@ public class TargetMatching : MonoBehaviour
 
         setTargetColor(angleDif * 0.9f);
 
-        string r = setRotateInstruction("CtrClk ", "Clkwse ", rpy[0], rThresh);
-        string p = setRotateInstruction("Up ", "Down ", rpy[1], rThresh);
-        string y = setRotateInstruction("Left ", "Right ", rpy[2], rThresh);
+        string r = setRotateInstruction("CtrCl ", "Clk ", rpy[0], rThresh);
+        string p = setRotateInstruction("Up ", "Dwn ", -rpy[1], rThresh);
+        string y = setRotateInstruction("Lef ", "Rigt ", rpy[2], rThresh);
 
-        pitchStatus[0].text = pitchStatus[1].text = "Pitch: " + p + rpy[1].ToString("0.00");
-        yawStatus[0].text = yawStatus[1].text = "Yaw: " + y + rpy[2].ToString("0.00");
-        rollStatus[0].text = rollStatus[1].text = "Roll: " + r + rpy[0].ToString("0.00");
+        pitchStatus[0].text = pitchStatus[1].text = "P: " + p + rpy[1].ToString("0.00");
+        yawStatus[0].text = yawStatus[1].text = "Y: " + y + rpy[2].ToString("0.00");
+        rollStatus[0].text = rollStatus[1].text = "R: " + r + rpy[0].ToString("0.00");
 
         //loggingString[3] = "Pitch: " + rpy[1].ToString("0.00");
         //loggingString[4] = "Yaw: " + rpy[2].ToString("0.00");
