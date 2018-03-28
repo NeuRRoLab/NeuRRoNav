@@ -232,13 +232,21 @@ public class ScalpGenerator : MonoBehaviour
         }
         else {
             // If we are recreating the center, ie it already existed, undo the existing center object. 
+            // First, do any cameras currently point here?
+            for (int i = 0; i < 3; ++i) {
+                if (camController.targets[i] == center) {
+                    camController.putCamOnStylus(i);
+                }
+            }
 			if (center != null) {
 				Transform[] children = center.GetComponentsInChildren<Transform>();
 				foreach (Transform child in children) {
 					if (child.transform.parent == this.transform)
 						child.transform.parent = center.transform.parent;
 				}
+                center.name = "junk";
 				Destroy(center);
+                
 			}
 
 			// Find the center of the three most important points
@@ -297,8 +305,12 @@ public class ScalpGenerator : MonoBehaviour
 			GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
 			GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
 			GameObject.Find("Load Grids").GetComponent<Button>().interactable = true;
-		}
-	}
+
+           // camController.putMainCam1FacingBackOfCoil(tPoint.pos);
+          //  camController.putTargetCam1OnTargetXZ(tPoint.pos);
+           // camController.putTargetCam2OnTargetZY(tPoint.pos);
+        }
+    }
 
     //public void ExportScalpSurfaceXYZ()
     //{
