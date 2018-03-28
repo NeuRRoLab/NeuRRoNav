@@ -238,7 +238,7 @@ public class TargetMatching : MonoBehaviour
             }
             if(newTPoint!=null && newTPoint.fired == false)
             {
-                UnityEngine.Debug.Log("Case 3");
+               // UnityEngine.Debug.Log("Case 3");
                 tPoint = newTPoint;
                 target();
             }
@@ -763,6 +763,7 @@ public class TargetMatching : MonoBehaviour
     {
         if (matching)
         {
+            /* OLD BUGGY BEHAVIOR: would put both bottom cameras on stylus, and break the top one
             int i = 0;
             foreach(GameObject t in camController.targets)
             {
@@ -771,7 +772,14 @@ public class TargetMatching : MonoBehaviour
                     camController.putCamOnStylus(i);
                 }
                 i++;
-            }
+            }*/
+
+            // New behavior: Put all three cameras on head, with similar orientation as when points are being lined up.
+            camController.putMainCam1FacingBackOfHead();
+            camController.putTargetCam1OnHeadXZ();
+            camController.putTargetCam2OnHeadZY();
+
+
             DestroyImmediate(tPoint.pos.transform.FindChild("point").gameObject);
             DestroyImmediate(tPoint.pos.gameObject);
             DestroyImmediate(tPoint.rot.gameObject);
@@ -790,7 +798,7 @@ public class TargetMatching : MonoBehaviour
             GameObject.Find("Delete Point").GetComponent<Button>().interactable = false;
             GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
             GameObject.Find("Logging").GetComponent<Button>().interactable = false;
-
+            GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
             matching = false;
 
         }
@@ -841,6 +849,8 @@ public class TargetMatching : MonoBehaviour
         coilHotSpot = coil.transform.FindChild("container").FindChild("hotspot").gameObject;
 
         InstantiateTargetCoil();
+        // Disable adding new points during target mode
+        
 
         // LEGACY
         /*
@@ -857,6 +867,7 @@ public class TargetMatching : MonoBehaviour
         //tCoil.transform.FindChild("model").transform.localScale = Vector3.Scale(tCoil.transform.FindChild("model").transform.localScale, new Vector3(1.1F,1.1F,1.1F)); position/stretch problems
 
         matching = true;
+        GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = false;
         GameObject.Find("Delete Point").GetComponent<Button>().interactable = true;
         GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = true;
         GameObject.Find("Logging").GetComponent<Button>().interactable = true;
@@ -1077,6 +1088,8 @@ public class TargetMatching : MonoBehaviour
         }
 
         GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
+        // Re-enables adding new points during target mode
+        GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
         settingGrid = false;
         usingGrid = true;
         matching = false;
@@ -1106,6 +1119,7 @@ public class TargetMatching : MonoBehaviour
 
     void tmsFire()
     {
+        /*
         if (tPoint.rot == null)
         {
             UnityEngine.Debug.Log("rotation set on fire");
@@ -1114,7 +1128,18 @@ public class TargetMatching : MonoBehaviour
             tPoint.rot.transform.parent = GameObject.Find("Head").transform;
             DestroyImmediate(tPoint.pos.transform.FindChild("point"));
             VisualizePoint(tPoint.pos, tPoint.rot);
-        }
+        }*/
+
+        // New mode: destroy tPoint after firing, need to realign cameras too
+        camController.putMainCam1FacingBackOfHead();
+        camController.putTargetCam1OnHeadXZ();
+        camController.putTargetCam2OnHeadZY();
+
+        DestroyImmediate(tPoint.pos.transform.FindChild("point").gameObject);
+        DestroyImmediate(tPoint.pos.gameObject);
+        DestroyImmediate(tPoint.rot.gameObject);
+        tPoint.containedIn.Remove(tPoint);
+
         if (tCoil != null)
         {
             Destroy(tCoil);
@@ -1123,12 +1148,15 @@ public class TargetMatching : MonoBehaviour
         {
             Destroy(tHotSpot);
         }
+        
 
-        //output firing error
-
+        //Not needed anymore, because we deleted it instead above.
+        /*
         tPoint.fired = true;
         matching = false;
         Renderer renderer = tPoint.pos.GetComponentInChildren<Renderer>();
+        CapsuleCollider collider = tPoint.pos.GetComponentInChildren<CapsuleCollider>();
+        collider.enabled = false;
         Material transMat = renderer.material;
         Color transColor = Color.red;
         transColor.a = 0.2F;
@@ -1142,9 +1170,9 @@ public class TargetMatching : MonoBehaviour
         transMat.EnableKeyword("_ALPHAPREMULTIPLY_ON");
         transMat.renderQueue = 3000;
         renderer.material = transMat;
-
-        tPoint.containedIn[tPoint.containedIn.IndexOf(tPoint)] = tPoint;
-
+        
+        tPoint.containedIn[tPoint.containedIn.IndexOf(tPoint)] = tPoint;*/
+        GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
         GameObject.Find("Reset Grid").GetComponent<Button>().interactable = true;
         GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
         GameObject.Find("Delete Point").GetComponent<Button>().interactable = false;
@@ -1155,6 +1183,7 @@ public class TargetMatching : MonoBehaviour
         {
             LogToggle();
         }
+        matching = false;
     }
 
     public void setGridName(string name)
