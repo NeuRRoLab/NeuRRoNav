@@ -32,6 +32,7 @@ public class ScalpMeshMenuController : MonoBehaviour {
 	void Update () {
         if (STATE == "GENHEAD")
         {
+            GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "PRESS RMB AND DRAG";
             if (Input.GetKey(KeyCode.Mouse1))
             {
                 // Get current stylus point in local coordinates
@@ -40,7 +41,7 @@ public class ScalpMeshMenuController : MonoBehaviour {
                 // Check if within bounds
                 if (Mathf.Abs(localpos.x) < width / 2 && Mathf.Abs(localpos.y) < length / 2)
                 {
-                    GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "PRESS RMB AND DRAG";
+                    
                     // Ok, we are within the zone, time to find out which vertex to update
                     // Should be as simple as rounding to the nearest gridspacing interval,
                     // then finding the proper index, then updating that vertex's z position to be localpos.z
@@ -63,6 +64,23 @@ public class ScalpMeshMenuController : MonoBehaviour {
             if (Input.GetKeyDown(KeyCode.Space)) {
                 STATE = "INACTIVE";
                 GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "";
+                float base_x = -width / 2;
+                float base_y = -length / 2;
+
+                vertices = filter.mesh.vertices;
+                for (int x = 0; x < verticeswide; x += 1)
+                {
+                    for (int y = 0; y < verticeslong; y += 1)
+                    {
+                        if (vertices[(verticeslong * x) + y] == new Vector3(base_x + x * gridspacing, base_y + y * gridspacing, -0.5f)) {
+                            vertices[(verticeslong * x) + y] = Vector3.zero;
+                        }
+                        
+                    }
+                }
+                filter.mesh.vertices = vertices;
+                filter.mesh.RecalculateNormals();
+
             }
         }
 	}
@@ -181,5 +199,19 @@ public class ScalpMeshMenuController : MonoBehaviour {
         filter.mesh.RecalculateNormals();
         
         STATE = "GENHEAD";
+    }
+    public void HeadVisibilityToggle() {
+        if (GameObject.Find("headTest"))
+        {
+            GameObject head = GameObject.Find("headTest");
+            if (head.GetComponent<MeshRenderer>().enabled)
+            {
+                head.GetComponent<MeshRenderer>().enabled = false;
+            }
+            else
+            {
+                head.GetComponent<MeshRenderer>().enabled = true;
+            }
+        }
     }
 }

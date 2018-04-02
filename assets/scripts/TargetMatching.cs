@@ -1105,6 +1105,8 @@ public class TargetMatching : MonoBehaviour
             t.fired = false;
             Renderer renderer = t.pos.GetComponentInChildren<Renderer>();
             renderer.material = pmat;
+            CapsuleCollider collider = t.pos.GetComponentInChildren<CapsuleCollider>();
+            collider.enabled = true;
             currentGrid.gridPoints[i] = t;
         }
         for (int i = 0; i < currentGrid.hotSpots.Count; i++)
@@ -1112,6 +1114,8 @@ public class TargetMatching : MonoBehaviour
             TargetPoint t = currentGrid.hotSpots[i];
             t.fired = false;
             Renderer renderer = t.pos.GetComponentInChildren<Renderer>();
+            CapsuleCollider collider = t.pos.GetComponentInChildren<CapsuleCollider>();
+            collider.enabled = true;
             renderer.material = hmat;
             currentGrid.hotSpots[i] = t;
         }
