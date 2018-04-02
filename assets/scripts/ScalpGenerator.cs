@@ -18,6 +18,7 @@ public class ScalpGenerator : MonoBehaviour
     int splines;
     int splinePoints;
 
+   
     GameObject[] landmarks;
     enum landmarkNames { nasion = 0, leftTragus = 1, rightTragus = 2, inion = 4, aproxVertex = 3 };
     int landmarkIndex;
