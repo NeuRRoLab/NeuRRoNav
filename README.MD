@@ -1,6 +1,6 @@
 Free and open source TMS neuronavigation software for use with Optitrack cameras. Developed by the University of Michigan NeuRRo Lab http://neurro-lab.engin.umich.edu/
 
-This work was published in Restorative Neurology and Neuroscience. If using for research, please cite at: 
+This work was published in Restorative Neurology and Neuroscience (https://www.ncbi.nlm.nih.gov/pubmed/29036851). If using for research, please cite at: 
 
 Rodseth, Jakob, Edward P. Washabaugh, and Chandramouli Krishnan. "A novel low-cost approach for navigated transcranial magnetic      stimulation." Restorative neurology and neuroscience Preprint (2017): 1-9.
 
