@@ -1119,7 +1119,7 @@ public class TargetMatching : MonoBehaviour
 
     void tmsFire()
     {
-        /*
+        
         if (tPoint.rot == null)
         {
             UnityEngine.Debug.Log("rotation set on fire");
@@ -1128,9 +1128,10 @@ public class TargetMatching : MonoBehaviour
             tPoint.rot.transform.parent = GameObject.Find("Head").transform;
             DestroyImmediate(tPoint.pos.transform.FindChild("point"));
             VisualizePoint(tPoint.pos, tPoint.rot);
-        }*/
-
+        }
+        /*
         // New mode: destroy tPoint after firing, need to realign cameras too
+        EDIT: Nevermind!
         camController.putMainCam1FacingBackOfHead();
         camController.putTargetCam1OnHeadXZ();
         camController.putTargetCam2OnHeadZY();
@@ -1139,7 +1140,7 @@ public class TargetMatching : MonoBehaviour
         DestroyImmediate(tPoint.pos.gameObject);
         DestroyImmediate(tPoint.rot.gameObject);
         tPoint.containedIn.Remove(tPoint);
-
+        */
         if (tCoil != null)
         {
             Destroy(tCoil);
@@ -1149,9 +1150,6 @@ public class TargetMatching : MonoBehaviour
             Destroy(tHotSpot);
         }
         
-
-        //Not needed anymore, because we deleted it instead above.
-        /*
         tPoint.fired = true;
         matching = false;
         Renderer renderer = tPoint.pos.GetComponentInChildren<Renderer>();
@@ -1170,8 +1168,8 @@ public class TargetMatching : MonoBehaviour
         transMat.EnableKeyword("_ALPHAPREMULTIPLY_ON");
         transMat.renderQueue = 3000;
         renderer.material = transMat;
-        
-        tPoint.containedIn[tPoint.containedIn.IndexOf(tPoint)] = tPoint;*/
+        tPoint.containedIn[tPoint.containedIn.IndexOf(tPoint)] = tPoint;
+
         GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
         GameObject.Find("Reset Grid").GetComponent<Button>().interactable = true;
         GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
