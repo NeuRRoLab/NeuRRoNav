@@ -304,12 +304,13 @@ public class ScalpGenerator : MonoBehaviour
 			camController.centerMainOnObject(head, -center.transform.forward, 0.5F);
 
 			GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
-			GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
+			//GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
 			GameObject.Find("Load Grids").GetComponent<Button>().interactable = true;
+            GameObject.Find("Scalp Mesh").GetComponent<Button>().interactable = true;
 
-           // camController.putMainCam1FacingBackOfCoil(tPoint.pos);
-          //  camController.putTargetCam1OnTargetXZ(tPoint.pos);
-           // camController.putTargetCam2OnTargetZY(tPoint.pos);
+            // camController.putMainCam1FacingBackOfCoil(tPoint.pos);
+            //  camController.putTargetCam1OnTargetXZ(tPoint.pos);
+            // camController.putTargetCam2OnTargetZY(tPoint.pos);
         }
     }
 

@@ -514,6 +514,22 @@ public class TargetMatching : MonoBehaviour
 
     public void AddPoints()
     {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Old stuff I don't get, ignore for now
+        /*
         if (!settingGrid)
         {
             if(currentGrid == null)
@@ -544,7 +560,7 @@ public class TargetMatching : MonoBehaviour
             GameObject.Find("ScalpGenerator").GetComponent<ScalpGenerator>().waitingToDraw = true;
             GameObject.Find("Save Grids").GetComponent<Button>().interactable = true;
 
-        }
+        }*/
     }
 
     private void CalculateEstimatedTangentsForGridPoints()
@@ -1087,7 +1103,7 @@ public class TargetMatching : MonoBehaviour
             VisualizePoint(point.pos, point.rot);
         }
 
-        GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
+        //GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
         // Re-enables adding new points during target mode
         GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
         settingGrid = false;

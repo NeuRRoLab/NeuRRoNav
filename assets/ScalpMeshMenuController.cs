@@ -80,6 +80,7 @@ public class ScalpMeshMenuController : MonoBehaviour {
                 }
                 filter.mesh.vertices = vertices;
                 filter.mesh.RecalculateNormals();
+                planeObj.GetComponent<MeshCollider>().sharedMesh = filter.mesh;
 
             }
         }
