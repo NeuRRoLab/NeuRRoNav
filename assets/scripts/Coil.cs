@@ -28,8 +28,6 @@ using System;
 
 public class Coil : MonoBehaviour
 {
-
-    public GameObject SlipStreamObject;
     public string coilName;
     CameraController camController;
     Text coilTrackStatus;
@@ -41,8 +39,9 @@ public class Coil : MonoBehaviour
     GameObject right;
     GameObject calibrateForward;
     GameObject calibrateRight;
+	TransformSmoother transformSmoother = new TransformSmoother();
 
-    Text calibrationInstruct;
+	Text calibrationInstruct;
 
     AudioSource trackingWarning;
 
@@ -59,9 +58,8 @@ public class Coil : MonoBehaviour
         tracked = false;
         calibrationInstruct = GameObject.Find("CalibrationInstructions").GetComponent<Text>();
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
-        SlipStreamObject = GameObject.Find("Optitrack");
         coilTrackStatus = GameObject.Find("CoilTrackStatus").GetComponent<Text>();
-        SlipStreamObject.GetComponent<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
+        FindObjectOfType<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
 
         coilTrackingIsSensitive = false;
         trackingWarning = GameObject.Find("Alert").GetComponent<AudioSource>();
@@ -116,9 +114,10 @@ public class Coil : MonoBehaviour
                         initialized = true;
                     }
 
-                    coil.transform.position = position;
-                    coil.transform.rotation = orientation;
-                    break;
+					transformSmoother.AddTransform(position, orientation);
+					coil.transform.position = transformSmoother.GetAveragePosition();
+					coil.transform.rotation = transformSmoother.GetAverageRotation();
+					break;
                 }
 
                 else
@@ -167,7 +166,7 @@ public class Coil : MonoBehaviour
 
     void Update()
     {
-        if (calibrating && Input.GetKeyDown(KeyCode.Space))
+        if (calibrating && Utility.AnyInputDown())
         {
             if (point == 0)
             {

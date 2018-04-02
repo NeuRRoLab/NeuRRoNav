@@ -14,9 +14,8 @@ public class SettingsMenu : MonoBehaviour
     InputField[] inputs;
     public enum settings { loggingPath, loggingName, coilSavePath, coilSaveName, coilLoadPath, coilLoadName, gridSavePath, gridSaveName, gridLoadPath, gridLoadName, mThresh, rThresh };
 
-
     // Use for initialization
-    void Start()
+    void Awake()
     {
         fields = new string[12];
         inputs = GameObject.Find("Panels").GetComponentsInChildren<InputField>();
@@ -56,7 +55,8 @@ public class SettingsMenu : MonoBehaviour
 
     public void setField(int field, string input)
     {
-        fields[field] = input;
+		inputs[field].text = input;
+		fields[field] = input;
         if (field <= 9)
         {
             if (field == 0 || field % 2 == 0)
@@ -84,7 +84,6 @@ public class SettingsMenu : MonoBehaviour
 
     public void setField(int field)
     {
-        print(inputs[field].text);
         setField(field, inputs[field].text);
     }
 

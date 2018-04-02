@@ -28,7 +28,6 @@ public class ScalpGenerator : MonoBehaviour
 
     LineRenderer splineRenderer;
     GameObject stylusPoint;
-    GameObject stylusTracker;
     GameObject head;
     GameObject scalp;
     GameObject scalpSpline;
@@ -50,7 +49,6 @@ public class ScalpGenerator : MonoBehaviour
 
         surfaceGen = GameObject.Find("ScalpSurface").GetComponent<SurfaceGen>();
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
-        stylusTracker = GameObject.Find("StylusTracker");
         stylusTracking = GameObject.Find("StylusTrackStatus").GetComponent<Text>();
         headTracking = GameObject.Find("HeadTrackStatus").GetComponent<Text>();
         calibrationInstruct = GameObject.Find("CalibrationInstructions").GetComponent<Text>();
@@ -82,7 +80,7 @@ public class ScalpGenerator : MonoBehaviour
         }
         else
         {
-            if (waitingToDraw && (Input.GetKeyDown(KeyCode.Space)) && !releaseSpace)
+            if (waitingToDraw && Utility.AnyInputDown() && !releaseSpace)
             {
                 //StartDraw();
             }
@@ -127,11 +125,9 @@ public class ScalpGenerator : MonoBehaviour
         //}
     }
 
-
-
     void FindLandmarks()
     {
-        if (Input.GetKeyDown(KeyCode.Space) || (Input.GetKeyDown(KeyCode.Mouse1) && stylusTracking.color.Equals(Color.green)))
+		if (Utility.AnyInputDown() && stylusTracking.color.Equals(Color.green))
         {
             setLandmark(landmarkIndex);
             landmarkIndex++;
@@ -141,39 +137,37 @@ public class ScalpGenerator : MonoBehaviour
                 settingLandmarks = false;
                 calibrationInstruct.text = "";
                 CenterHead();
-                stylusTracker.GetComponent<Stylus>().setStylusSensitiveTrackingState(false);
+                FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(false);
                 return;
             }
-
-            string name;
-
-            switch (landmarkIndex)
-            {
-                case 1:
-                    name = "Right Tragus";
-                    break;
-                case 2:
-                    name = "Left Tragus";
-                    break;
-                case 3:
-                    name = "Aprox Vertex";
-                    break;
-                case 4:
-                    name = "Inion";
-                    break;
-                default:
-                    name = "Index Error";
-                    break;
-            }
-            calibrationInstruct.text = "Select " + name;
+                
+            calibrationInstruct.text = "Select " + LandmarkIndexToName(landmarkIndex);
         }
     }
+
+	string LandmarkIndexToName(int landmarkIndex) {
+		switch (landmarkIndex) {
+			case 0:
+				return "Nasion";
+			case 1:
+                return "Right Tragus";
+            case 2:
+                return "Left Tragus";
+            case 3:
+                return "Aprox Vertex";
+            case 4:
+                return "Inion";
+		}
+		return "Index Error";
+	}
+
     void setLandmark(int index)
     {
         stylusPoint = GameObject.Find("Stylus").transform.Find("Point").gameObject;
         head = GameObject.Find("Head");
 
         landmarks[index].transform.position = stylusPoint.transform.position;
+		landmarks[index].transform.parent = head.transform;
     }
 
     //void StartDraw()
@@ -236,89 +230,74 @@ public class ScalpGenerator : MonoBehaviour
             //scalp.transform.position = centeredPos;
             //scalp.transform.parent = head.transform;
         }
-        else
-        {
-            if (scalp.transform.localScale != scalpStartScale)
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    landmarks[i].transform.parent = null;
-                }
-                scalp.transform.localScale = scalpStartScale;
-                for (int i = 0; i < 5; i++)
-                {
-                    landmarks[i].transform.parent = head.transform;
-                }
-            }
+        else {
+			if (center != null) {
+				Transform[] children = center.GetComponentsInChildren<Transform>();
+				foreach (Transform child in children) {
+					if (child.transform.parent == this.transform)
+						child.transform.parent = center.transform.parent;
+				}
+				Destroy(center);
+			}
 
-            //Vector3 centeredX = Vector3.Lerp(landmarks[(int)landmarkNames.leftEar].transform.position, landmarks[(int)landmarkNames.rightEar].transform.position, (float)0.5);
-            //Vector3 centeredZ = Vector3.Lerp(landmarks[(int)landmarkNames.forehead].transform.position, landmarks[(int)landmarkNames.backOfHead].transform.position, (float)0.5);
+			// Find the center of the three most important points
+			// The nasion, right tragus, and left tragus
+			Vector3 threePointCenter = 
+				landmarks[(int)landmarkNames.nasion].transform.position +
+				landmarks[(int)landmarkNames.leftTragus].transform.position +
+				landmarks[(int)landmarkNames.rightTragus].transform.position;
+			threePointCenter /= 3;
 
-            //scalp.transform.position = new Vector3(centeredX.x, scalp.transform.position.y, centeredZ.z);
+			// Create the center at the landmark important center
+			center = new GameObject();
+			center.name = "Center";
+			center.transform.position = threePointCenter;
 
-            scalp.transform.rotation = head.transform.rotation;
-            nasion.transform.parent = head.transform;
-            scalp.transform.parent = nasion.transform;
-            nasion.transform.position = landmarks[(int)landmarkNames.nasion].transform.position;
-            scalp.transform.parent = head.transform;
-            nasion.transform.parent = scalp.transform;
+			// Set the rotation such that the forward vector points to the nasion and the right vector points to the right tragus
+			center.transform.rotation = Utility.ThreePointLocalSpaceConversion(
+				landmarks[(int)landmarkNames.nasion].transform.position,
+				landmarks[(int)landmarkNames.rightTragus].transform.position,
+				landmarks[(int)landmarkNames.leftTragus].transform.position);
 
-            //foreach (GameObject obj in landmarks)
-            //{
-            //    obj.transform.parent = scalp.transform;
-            //}
+			// Parent the center object to the head tracker
+			center.transform.parent = head.transform;
 
-            float scaleZ = (Vector3.Distance(new Vector3(0, 0, landmarks[(int)landmarkNames.inion].transform.localPosition.z), new Vector3(0, 0, landmarks[(int)landmarkNames.nasion].transform.localPosition.z))
-                / Vector3.Distance(new Vector3(0, 0, inion.transform.localPosition.z), new Vector3(0, 0, nasion.transform.localPosition.z)));
+			// Parent the landmarks to the center to make calculations easier
+			foreach (GameObject landmark in landmarks) {
+				landmark.transform.parent = center.transform;
+			}
 
-            float scaleX = (Vector3.Distance(new Vector3(landmarks[(int)landmarkNames.leftTragus].transform.localPosition.x, 0, 0), new Vector3(landmarks[(int)landmarkNames.rightTragus].transform.localPosition.x, 0, 0))
-                / Vector3.Distance(new Vector3(lTragus.transform.localPosition.x, 0, 0), new Vector3(rTragus.transform.localPosition.x, 0, 0)));
+			// Setup the scalp to use similair local coordinates to the center
+			scalp.transform.localScale = scalpStartScale;
+			scalp.GetComponent<CenterScalp>().Center();
 
-            float scaleY = (Vector3.Distance(new Vector3(0, landmarks[(int)landmarkNames.nasion].transform.localPosition.y, 0), new Vector3(0, landmarks[(int)landmarkNames.aproxVertex].transform.localPosition.y, 0))
-                / Vector3.Distance(new Vector3(0, nasion.transform.localPosition.y, 0), new Vector3(0, vertex.transform.localPosition.y, 0)));
+			// Find the new scalp scale
+			Vector3 newScalpScale = Vector3.one;
+			newScalpScale.x =
+				Mathf.Abs(landmarks[(int)landmarkNames.leftTragus].transform.localPosition.x - landmarks[(int)landmarkNames.rightTragus].transform.localPosition.x) /
+				Mathf.Abs(lTragus.transform.localPosition.x - rTragus.transform.localPosition.x);
+			newScalpScale.z =
+				Mathf.Abs(landmarks[(int)landmarkNames.nasion].transform.localPosition.z - landmarks[(int)landmarkNames.inion].transform.localPosition.z) /
+				Mathf.Abs(nasion.transform.localPosition.z - inion.transform.localPosition.z);
+			//newScalpScale.y =
+			//	(Mathf.Abs(landmarks[(int)landmarkNames.nasion].transform.localPosition.y - landmarks[(int)landmarkNames.aproxVertex].transform.localPosition.x) /
+			//	Mathf.Abs(nasion.transform.localPosition.y - vertex.transform.localPosition.y)) / 2.2f;
+			newScalpScale.y = (newScalpScale.x + newScalpScale.z) / 2;
 
-            Debug.Log(scaleX.ToString() + " " + scaleY.ToString() + " " + scaleZ.ToString());
+			// Move the scalp under center and setup the transform properties
+			scalp.transform.parent = center.transform;
+			scalp.transform.localPosition = Vector3.zero;
+			scalp.transform.localRotation = Quaternion.identity;
+			scalp.transform.localScale = newScalpScale;
 
-            foreach (GameObject obj in landmarks)
-            {
-                obj.transform.parent = head.transform;
-            }
+			// Set the camera to view the front of the head
+			camController.centerMainOnObject(head, -center.transform.forward, 0.5F);
 
-            scalp.transform.localScale = new Vector3((scalp.transform.localScale.x * scaleX), (scalp.transform.localScale.y * scaleY), (scalp.transform.localScale.z * scaleZ));
-
-            nasion.transform.parent = head.transform;
-            scalp.transform.parent = nasion.transform;
-            nasion.transform.position = landmarks[(int)landmarkNames.nasion].transform.position;
-            scalp.transform.parent = head.transform;
-            nasion.transform.parent = scalp.transform;
-
-            if (center != null)
-            {
-                Destroy(center);
-            }
-
-            Vector3 lerpCenter = Vector3.Lerp(Vector3.Lerp(landmarks[(int)landmarkNames.leftTragus].transform.position, landmarks[(int)landmarkNames.rightTragus].transform.position, 0.5F), landmarks[(int)landmarkNames.nasion].transform.position, 0.5f);
-
-            center = new GameObject();
-            center.name = "Center";
-            center.transform.position = lerpCenter;
-            //center.transform.rotation = head.transform.rotation;
-            center.transform.rotation = Quaternion.LookRotation(
-                Vector3.Normalize(landmarks[(int)landmarkNames.nasion].transform.position - lerpCenter), 
-                Vector3.Normalize(
-                    Vector3.Cross(Vector3.Normalize(landmarks[(int)landmarkNames.nasion].transform.position - lerpCenter), 
-                        Vector3.Normalize(Vector3.Normalize(landmarks[(int)landmarkNames.leftTragus].transform.position - landmarks[(int)landmarkNames.rightTragus].transform.position)))));
-            center.transform.parent = head.transform;
-
-            //}
-
-            camController.centerMainOnObject(head, 0.5F);
-
-            GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
-            GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
-            GameObject.Find("Load Grids").GetComponent<Button>().interactable = true;
-        }
-    }
+			GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
+			GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
+			GameObject.Find("Load Grids").GetComponent<Button>().interactable = true;
+		}
+	}
 
     //public void ExportScalpSurfaceXYZ()
     //{
@@ -382,7 +361,7 @@ public class ScalpGenerator : MonoBehaviour
     public void LandmarksButtonPress()
     {
         head = GameObject.Find("Head");
-        stylusTracker.GetComponent<Stylus>().setStylusSensitiveTrackingState(true);
+        FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(true);
         if(landmarks != null)
         {
             for (int i = 0; i < 5; i++)
@@ -400,7 +379,23 @@ public class ScalpGenerator : MonoBehaviour
             landmarks[i].transform.position = head.transform.position;
             landmarks[i].transform.rotation = head.transform.rotation;
             landmarks[i].transform.parent = head.transform;
-        }
+			landmarks[i].name = LandmarkIndexToName(i);
+
+			DebugPoint debugPoint = landmarks[i].AddComponent<DebugPoint>();
+			debugPoint.p = PrimitiveType.Cube;
+			if (i == 0)
+				debugPoint.c = Color.red;
+			else if (i == 1)
+				debugPoint.c = Color.yellow;
+			else if (i == 2)
+				debugPoint.c = Color.green;
+			else if (i == 3)
+				debugPoint.c = Color.cyan;
+			else if (i == 4)
+				debugPoint.c = Color.magenta;
+
+
+		}
         landmarkIndex = 0;
         settingLandmarks = true;
 
@@ -409,16 +404,7 @@ public class ScalpGenerator : MonoBehaviour
 
     public void LandmarkButtonPress(int landmark)
     {
-        if(landmarks[landmark] != null)
-        {
-            DestroyImmediate(landmarks[landmark]);
-            landmarks[landmark] = new GameObject();
-            landmarks[landmark].transform.position = head.transform.position;
-            landmarks[landmark].transform.rotation = head.transform.rotation;
-            landmarks[landmark].transform.parent = head.transform;
-        }
         setLandmark(landmark);
-        if(landmarkIndex >= 5)
         CenterHead();
     }
 
