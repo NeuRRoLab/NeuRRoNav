@@ -28,8 +28,6 @@ using System;
 
 public class Coil : MonoBehaviour
 {
-
-    public GameObject SlipStreamObject;
     public string coilName;
     CameraController camController;
     Text coilTrackStatus;
@@ -41,8 +39,9 @@ public class Coil : MonoBehaviour
     GameObject right;
     GameObject calibrateForward;
     GameObject calibrateRight;
+	TransformSmoother transformSmoother = new TransformSmoother();
 
-    Text calibrationInstruct;
+	Text calibrationInstruct;
 
     AudioSource trackingWarning;
 
@@ -59,9 +58,8 @@ public class Coil : MonoBehaviour
         tracked = false;
         calibrationInstruct = GameObject.Find("CalibrationInstructions").GetComponent<Text>();
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
-        SlipStreamObject = GameObject.Find("Optitrack");
         coilTrackStatus = GameObject.Find("CoilTrackStatus").GetComponent<Text>();
-        SlipStreamObject.GetComponent<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
+        FindObjectOfType<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
 
         coilTrackingIsSensitive = false;
         trackingWarning = GameObject.Find("Alert").GetComponent<AudioSource>();
@@ -84,7 +82,7 @@ public class Coil : MonoBehaviour
             if (name.Equals("coil") || name.Equals("doublecone") || name.Equals("figureeight"))
             {
                 coilName = name;
-                if (System.Convert.ToInt32(rigidBodyList[index].Attributes["Tracked"].InnerText ) == 1)
+                if (System.Convert.ToInt32(rigidBodyList[index].Attributes["Tracked"].InnerText) == 1)
                 {
                     tracked = true;
                     int id = System.Convert.ToInt32(rigidBodyList[index].Attributes["ID"].InnerText);
@@ -116,9 +114,10 @@ public class Coil : MonoBehaviour
                         initialized = true;
                     }
 
-                    coil.transform.position = position;
-                    coil.transform.rotation = orientation;
-                    break;
+					transformSmoother.AddTransform(position, orientation);
+					coil.transform.position = transformSmoother.GetAveragePosition();
+					coil.transform.rotation = transformSmoother.GetAverageRotation();
+					break;
                 }
 
                 else
@@ -167,7 +166,7 @@ public class Coil : MonoBehaviour
 
     void Update()
     {
-        if (calibrating && Input.GetKeyDown(KeyCode.Space))
+        if (calibrating && Utility.AnyInputDown())
         {
             if (point == 0)
             {
@@ -241,20 +240,16 @@ public class Coil : MonoBehaviour
         ExportCoil();
 
         GameObject.Find("ScalpGenerator").GetComponent<ScalpGenerator>().waitingToDraw = true;
+
     }
 
     public void ExportCoil()
     {
-        string path = Application.dataPath + @"\Coils\Saved";
 
-        if (!System.IO.Directory.Exists(path))
-        {
-            System.IO.Directory.CreateDirectory(path);
-        }
+        string path = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.coilSavePath);
+        string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.coilSaveName);
 
-        string time = string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", DateTime.Now);
-
-        path += @"\" + coil.name + time + ".txt";
+        path += fileName;
 
         using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(path, true))
@@ -267,51 +262,60 @@ public class Coil : MonoBehaviour
             file.WriteLine(rightLoc.x + "\t" + rightLoc.y + "\t" + rightLoc.z);
             file.WriteLine(forwarLoc.x + "\t" + forwarLoc.y + "\t" + forwarLoc.z);
         }
+
+        GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().incrementField((int)SettingsMenu.settings.coilSaveName);
     }
 
     public void ImportCoil()
     {
-        GameObject container = coil.transform.FindChild("container").gameObject;
-        forward = container.transform.FindChild("forward").gameObject;
-        hotspot = container.transform.FindChild("hotspot").gameObject;
-        right = container.transform.FindChild("right").gameObject;
-
-        string path = Application.dataPath + @"\Coils\Load";
-
-        if (!System.IO.Directory.Exists(path))
+        if (initialized)
         {
-            System.IO.Directory.CreateDirectory(path);
+            GameObject container = coil.transform.FindChild("container").gameObject;
+            forward = container.transform.FindChild("forward").gameObject;
+            hotspot = container.transform.FindChild("hotspot").gameObject;
+            right = container.transform.FindChild("right").gameObject;
+
+            string path = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.coilLoadPath);
+            string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.coilLoadName);
+
+            path += fileName;
+
+            try
+            {
+
+                System.IO.FileStream filestream = new System.IO.FileStream(path,
+                                                  System.IO.FileMode.Open,
+                                                  System.IO.FileAccess.Read,
+                                                  System.IO.FileShare.Read);
+                System.IO.StreamReader file = new System.IO.StreamReader(filestream);
+
+                GameObject[] points = { calibrateHotSpot, calibrateRight, calibrateForward };
+                string[] names = { "calibrateHotSpot", "calibrateRight", "calibrateForward" };
+                for (int i = 0; i < 3; i++)
+                {
+                    string data = file.ReadLine();
+                    char[] d = new char[1];
+                    d[0] = '\t';
+                    string[] dims = data.Split(d);
+                    points[i] = new GameObject(names[i]);
+                    points[i].transform.position = coil.transform.TransformPoint(new Vector3((float)System.Convert.ToDouble(dims[0]), (float)System.Convert.ToDouble(dims[1]), (float)System.Convert.ToDouble(dims[2])));
+                    points[i].transform.parent = coil.transform;
+                }
+                file.Close();
+
+
+                calibrateHotSpot = points[0];
+                calibrateRight = points[1];
+                calibrateForward = points[2];
         }
-
-        string[] fileNames = System.IO.Directory.GetFiles(path);
-
-
-        System.IO.FileStream filestream = new System.IO.FileStream(fileNames[0],
-                                          System.IO.FileMode.Open,
-                                          System.IO.FileAccess.Read,
-                                          System.IO.FileShare.Read);
-        System.IO.StreamReader file = new System.IO.StreamReader(filestream);
-
-        GameObject[] points = { calibrateHotSpot, calibrateRight, calibrateForward};
-        string[] names = { "calibrateHotSpot", "calibrateRight", "calibrateForward" };
-        for(int i = 0; i < 3; i++)
+            catch (Exception e)
         {
-            string data = file.ReadLine();
-            char[] d = new char[1];
-            d[0] = '\t';
-            string[] dims = data.Split(d);
-            points[i] = new GameObject(names[i]);
-            points[i].transform.position = coil.transform.TransformPoint(new Vector3((float)System.Convert.ToDouble(dims[0]), (float)System.Convert.ToDouble(dims[1]), (float)System.Convert.ToDouble(dims[2])));
-            points[i].transform.parent = coil.transform;
+            //something went wrong, warn user
+            return;
         }
-        file.Close();
-
-        calibrateHotSpot = points[0];
-        calibrateRight = points[1];
-        calibrateForward = points[2];
-
 
         MatchRotation();
+        }
     }
 
     public void setStylusSensitiveTrackingState(bool state)

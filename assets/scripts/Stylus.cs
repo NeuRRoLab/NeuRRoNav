@@ -28,15 +28,12 @@ using UnityEngine.Audio;
 // they could be attached to the same object.
 
 public class Stylus : MonoBehaviour
-{
-
-    public GameObject SlipStreamObject;
+{	
     CameraController camController;
     Text stylusTrackStatus;
-    GameObject stylus;
     GameObject point;
     AudioSource trackingWarning;
-
+	TransformSmoother transformSmoother = new TransformSmoother();
 
     bool stylusTrackingIsSensitive;
 
@@ -45,14 +42,13 @@ public class Stylus : MonoBehaviour
     bool lost;
     bool pauseTracking;
 
-    void Start()
+	void Start()
     {
         initialized = false;
         tracked = false;
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
-        SlipStreamObject = GameObject.Find("Optitrack");
         stylusTrackStatus = GameObject.Find("StylusTrackStatus").GetComponent<Text>();
-        SlipStreamObject.GetComponent<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
+        FindObjectOfType<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
         stylusTrackingIsSensitive = false;
 
         trackingWarning = GameObject.Find("Alert").GetComponent<AudioSource>();
@@ -102,13 +98,12 @@ public class Stylus : MonoBehaviour
 
                         if (initialized == false)
                         {
-                            string objectName = "Stylus";
-                            stylus = GameObject.Find(objectName);
                             initialized = true;
                         }
 
-                        stylus.transform.position = position;
-                        stylus.transform.rotation = orientation;
+						transformSmoother.AddTransform(position, orientation);
+                        this.transform.position = transformSmoother.GetAveragePosition();
+                        this.transform.rotation = transformSmoother.GetAverageRotation();
                         break;
                     }
 
@@ -141,60 +136,46 @@ public class Stylus : MonoBehaviour
         }
     }
 
-    public void setPoint()
-    {
+	public void setPoint() {
+		pauseTracking = true;
+		if (point != null) {
+			DestroyImmediate(point);
+		}
 
-        pauseTracking = true;
-        if (point != null)
-        {
-            DestroyImmediate(point.transform.FindChild("Point Sphere").gameObject);
-            DestroyImmediate(point);
-        }
-        GameObject calibrationTool = GameObject.Find("CalibrationTool");
+		GameObject calibrationTool = GameObject.Find("CalibrationTool");
+		GameObject pivot = this.transform.FindChild("Pivot").gameObject;
+		GameObject connectorLine = pivot.transform.FindChild("ConnectorLine").gameObject;
 
-        
-        GameObject model = stylus.transform.FindChild("model").gameObject;
-        GameObject tip = model.transform.FindChild("Tip").gameObject;
+		point = new GameObject();
+		point.name = "Point";
+		point.transform.position = calibrationTool.transform.position;
+		point.transform.parent = this.transform;
 
-        tip.transform.rotation = calibrationTool.transform.rotation;
-        model.transform.parent = null;
-        model.transform.rotation = new Quaternion(0, 0, 0, 0);
-        tip.transform.parent = null;
-        model.transform.parent = tip.transform;
-        tip.transform.position = new Vector3(calibrationTool.transform.position.x, tip.transform.position.y, calibrationTool.transform.position.z);
-        model.transform.parent = stylus.transform;
-        tip.transform.parent = model.transform;
-        
+		pivot.transform.LookAt(point.transform.position);
 
-        point = new GameObject();
-        GameObject psphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        psphere.name = "Point Sphere";
-        Vector3 scale = new Vector3(0.01f, 0.01f, 0.01f);
-        psphere.transform.localScale = scale;
-        point.transform.position = calibrationTool.transform.position;
-        point.transform.rotation = calibrationTool.transform.rotation;
-        psphere.transform.parent = point.transform;
-        psphere.transform.localPosition = new Vector3(0, 0.005F, 0);
-        point.name = "Point";
 
-        point.transform.parent = stylus.transform;
+		GameObject psphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+		psphere.name = "Point Sphere";
+		psphere.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+		psphere.transform.parent = point.transform;
+		psphere.transform.localPosition = new Vector3(0, 0, 0);
 
-        camController.putCamOnStylus(1);
-        //stylus.transform.LookAt(point.transform);
+		connectorLine.transform.localScale = new Vector3(1, Vector3.Distance(pivot.transform.position, point.transform.position), 1);
 
-        Debug.Log(point.transform.position.ToString());
-        Debug.Log(calibrationTool.transform.position.ToString());
-        pauseTracking = false;
-    }
+		camController.putCamOnStylus(1);
 
-    public void setStylusSensitiveTrackingState(bool state)
+		GameObject.Find("Calibrate Coil").GetComponent<Button>().interactable = true;
+		GameObject.Find("Landmarks").GetComponent<Button>().interactable = true;
+		foreach (Button b in GameObject.Find("LandmarksList").GetComponentsInChildren<Button>()) {
+			b.interactable = true;
+		}
+		pauseTracking = false;
+	}
+
+
+	public void setStylusSensitiveTrackingState(bool state)
     {
         stylusTrackingIsSensitive = state;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }

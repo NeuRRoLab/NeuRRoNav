@@ -28,22 +28,20 @@ using System;
 
 public class Head : MonoBehaviour
 {
-
-    public GameObject SlipStreamObject;
     CameraController camController;
     Text headTrackStatus;
     bool tracked;
     GameObject tracker;
     GameObject container;
+	TransformSmoother transformSmoother = new TransformSmoother();
 
-    // Use this for initialization
-    void Start()
+	// Use this for initialization
+	void Start()
     {
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
         tracked = false;
-        SlipStreamObject = GameObject.Find("Optitrack");
         headTrackStatus = GameObject.Find("HeadTrackStatus").GetComponent<Text>();
-        SlipStreamObject.GetComponent<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
+        FindObjectOfType<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
         container = GameObject.Find("Head");
     }
 
@@ -120,7 +118,7 @@ public class Head : MonoBehaviour
                         tracker.transform.position = position;
                         tracker.transform.rotation = orientation;
                         tracker.transform.parent = container.transform;
-                        camController.centerMainOnObject(tracker, 0.3F);
+                        camController.centerMainOnObject(tracker, Vector3.forward, 0.3F);
 
                         GameObject text = Instantiate(GameObject.Find("HeadTrackerToolText"));
                         text.transform.position = tracker.transform.position;
@@ -128,12 +126,15 @@ public class Head : MonoBehaviour
                         text.transform.parent = tracker.transform;
                     }
 
-                    //== set bone's pose ==--
+					//== set bone's pose ==--
+					transformSmoother.AddTransform(position, orientation);
+					Vector3 avgPosition = transformSmoother.GetAveragePosition();
+					Quaternion avgRotation = transformSmoother.GetAverageRotation();
 
-                    container.transform.position = position;
-                    container.transform.rotation = orientation;
-                    gameObject.transform.position = position;
-                    gameObject.transform.rotation = orientation;
+					container.transform.position = avgPosition;
+                    container.transform.rotation = avgRotation;
+                    gameObject.transform.position = avgPosition;
+                    gameObject.transform.rotation = avgRotation;
                     break;
                 }
                 else

@@ -1,0 +1,42 @@
+Initialize engine version: 5.4.1f1 (649f48bbbf0f)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce GTX 1080 (ID=0x1b80)
+    Vendor:   NVIDIA
+    VRAM:     3072 MB
+Begin MonoManager ReloadAssembly
+Platform assembly: I:\GitHub\NeuRRo\NeuRRoNav\Build\NeuRRoNav_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading I:\GitHub\NeuRRo\NeuRRoNav\Build\NeuRRoNav_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: I:\GitHub\NeuRRo\NeuRRoNav\Build\NeuRRoNav_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading I:\GitHub\NeuRRo\NeuRRoNav\Build\NeuRRoNav_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: I:\GitHub\NeuRRo\NeuRRoNav\Build\NeuRRoNav_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading I:\GitHub\NeuRRo\NeuRRoNav\Build\NeuRRoNav_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: I:\GitHub\NeuRRo\NeuRRoNav\Build\NeuRRoNav_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading I:\GitHub\NeuRRo\NeuRRoNav\Build\NeuRRoNav_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+- Completed reload, in  0.041 seconds
+Platform assembly: I:\GitHub\NeuRRo\NeuRRoNav\Build\NeuRRoNav_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: I:\GitHub\NeuRRo\NeuRRoNav\Build\NeuRRoNav_Data\Managed\System.dll (this message is harmless)
+desktop: 3440x1440 60Hz; virtual: 4520x1920 at 0,-153
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+UnloadTime: 0.555777 ms
+Win32Exception: The system cannot find the file specified.
+
+  at System.Diagnostics.Process.Start_shell (System.Diagnostics.ProcessStartInfo startInfo, System.Diagnostics.Process process) [0x00000] in <filename unknown>:0 
+  at System.Diagnostics.Process.Start_common (System.Diagnostics.ProcessStartInfo startInfo, System.Diagnostics.Process process) [0x00000] in <filename unknown>:0 
+  at System.Diagnostics.Process.Start (System.Diagnostics.ProcessStartInfo startInfo) [0x00000] in <filename unknown>:0 
+  at System.Diagnostics.Process.Start (System.String fileName) [0x00000] in <filename unknown>:0 
+  at SlipStream.Start () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+Setting up 2 worker threads for Enlighten.
+  Thread -> id: 97dc -> priority: 1 
+  Thread -> id: 7348 -> priority: 1 
+NullReferenceException: Object reference not set to an instance of an object
+  at SlipStream.OnApplicationQuit () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+

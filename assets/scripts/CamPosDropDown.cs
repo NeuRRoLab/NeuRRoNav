@@ -11,12 +11,13 @@ public class CamPosDropDown : MonoBehaviour {
     Vector3 hide;
 
 	// Use this for initialization
-	void Start () {
+	void Start ()
+    {
         hoverSelf = false;
         hoverChild = false;
         hidden = true;
         menu = transform.parent.FindChild("List").gameObject;
-        defaultPos = menu.transform.position;
+        defaultPos = menu.transform.localPosition;
         hide = new Vector3(Screen.width*2, Screen.height*2, 0);
         Hide();
 
@@ -59,12 +60,12 @@ public class CamPosDropDown : MonoBehaviour {
 
     private void Hide()
     {
-        menu.transform.position = hide;
+        menu.transform.localPosition = hide;
         hidden = true;
     }
     private void Show()
     {
-        menu.transform.position = defaultPos;
+        menu.transform.localPosition = defaultPos;
         hidden = false;
     }
 

@@ -28,20 +28,20 @@ using System;
 
 public class CalibrationTool : MonoBehaviour
 {
-
-    public GameObject SlipStreamObject;
     CameraController camController;
     Text headTrackStatus;
     bool tracked;
     GameObject tracker;
+	Text calibrationToolTrackStatus;
+	TransformSmoother transformSmoother = new TransformSmoother();
 
-    // Use this for initialization
-    void Start()
+	// Use this for initialization
+	void Start()
     {
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
-        tracked = false;
-        SlipStreamObject = GameObject.Find("Optitrack");
-        SlipStreamObject.GetComponent<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
+		calibrationToolTrackStatus = GameObject.Find("CalibrationToolTrackStatus").GetComponent<Text>();
+		tracked = false;
+        FindObjectOfType<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
     }
 
     // packet received
@@ -104,11 +104,11 @@ public class CalibrationTool : MonoBehaviour
 
                     }
 
-                    //== set bone's pose ==--
-
-                    tracker.transform.position = position;
-                    tracker.transform.rotation = orientation;
-                    break;
+					//== set bone's pose ==--
+					transformSmoother.AddTransform(position, orientation);
+					tracker.transform.position = transformSmoother.GetAveragePosition();
+					tracker.transform.rotation = transformSmoother.GetAverageRotation();
+					break;
                 }
                 else
                 {
@@ -122,6 +122,10 @@ public class CalibrationTool : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+		if (tracked) {
+			calibrationToolTrackStatus.color = Color.green;
+		} else {
+			calibrationToolTrackStatus.color = Color.red;
+		}
     }
 }

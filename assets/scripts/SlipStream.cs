@@ -24,20 +24,17 @@
 
 
 using UnityEngine;
-using System.Collections;
-using System;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
-
 
 
 public delegate void PacketReceivedHandler(object sender, string PacketData);
 
 public class SlipStream : MonoBehaviour
 {
-	public string IP = "127.0.0.1";
-	public int Port  = 16000;
+	public string IP = "127.0.0.1" ;
+	public int    Port  = 16000;
 	
 	public event PacketReceivedHandler PacketNotification;
 	
@@ -47,15 +44,10 @@ public class SlipStream : MonoBehaviour
 	private string     mPacket;
 	private int        mPreviousSubPacketIndex = 0;
 	private const int  kMaxSubPacketSize       = 1400;
-	private System.Diagnostics.Process plugin;
+	private            System.Diagnostics.Process plugin;
 	
 	void Start()
 	{
-        GameObject[] trackers = GameObject.FindGameObjectsWithTag("Tracker");
-        foreach (GameObject tracker in trackers)
-        {
-            tracker.SetActive(false);
-        }
 
 		mReceiveBuffer = new byte[kMaxSubPacketSize];
 		mPacket        = System.String.Empty;
@@ -69,19 +61,14 @@ public class SlipStream : MonoBehaviour
 
         if (Debug.isDebugBuild)
         {
-            plugin = System.Diagnostics.Process.Start(Application.dataPath + @"\Scripts\OptitrackUnityPlugin\Source\Unity3D\bin\UnityPlugin.exe"); //Start Optitrack Unity Interface
+            plugin = System.Diagnostics.Process.Start(Application.dataPath + @"\scripts\OptitrackUnityPlugin\Source\Unity3D\bin\UnityPlugin.exe"); //Start Optitrack Unity Interface
         }
         else
         {
-            plugin = System.Diagnostics.Process.Start(Application.dataPath + @"Assets\Scripts\OptitrackUnityPlugin\Source\Unity3D\bin\UnityPlugin.exe"); //Start Optitrack Unity Interface
+            plugin = System.Diagnostics.Process.Start("UnityPlugin.exe"); //Start Optitrack Unity Interface
         }
 
         UDPRead();
-
-        foreach (GameObject tracker in trackers)
-        {
-            tracker.SetActive(true);
-        }
 	}
  
 	public void UDPRead()
@@ -140,9 +127,8 @@ public class SlipStream : MonoBehaviour
         return 0;
 	}
  
-	void Update()
+	void FixedUpdate()
 	{
 		UDPRead();
-	
 	}
 }
