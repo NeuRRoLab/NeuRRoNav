@@ -814,6 +814,8 @@ public class TargetMatching : MonoBehaviour
             GameObject.Find("Delete Point").GetComponent<Button>().interactable = false;
             GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
             GameObject.Find("Logging").GetComponent<Button>().interactable = false;
+            GameObject.Find("Generate Grid").GetComponent<Button>().interactable = false;
+            GameObject.Find("Scalp Mesh").GetComponent<Button>().interactable = true;
             GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
             matching = false;
 
@@ -886,8 +888,10 @@ public class TargetMatching : MonoBehaviour
         GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = false;
         GameObject.Find("Delete Point").GetComponent<Button>().interactable = true;
         GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = true;
+        GameObject.Find("Generate Grid").GetComponent<Button>().interactable = true;
         GameObject.Find("Logging").GetComponent<Button>().interactable = true;
         GameObject.Find("Set Grid").GetComponent<Button>().interactable = false;
+        GameObject.Find("Scalp Mesh").GetComponent<Button>().interactable = false;
         //GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "Match";
     }
 
@@ -1195,9 +1199,11 @@ public class TargetMatching : MonoBehaviour
         GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
         GameObject.Find("Delete Point").GetComponent<Button>().interactable = false;
         GameObject.Find("Set Grid").GetComponent<Button>().interactable = true;
+        GameObject.Find("Generate Grid").GetComponent<Button>().interactable = false;
         GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "";
+        GameObject.Find("Scalp Mesh").GetComponent<Button>().interactable = true;
 
-        if(logging)
+        if (logging)
         {
             LogToggle();
         }

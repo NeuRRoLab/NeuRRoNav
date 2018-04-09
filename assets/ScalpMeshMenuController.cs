@@ -20,9 +20,10 @@ public class ScalpMeshMenuController : MonoBehaviour {
     float width = 0;
     float length = 0;
     MeshFilter filter;
-
+    public Button activationkey;
     // Use this for initialization
     void Start () {
+        activationkey = GameObject.Find("Scalp Mesh").GetComponent<Button>();
         inactivepos = new Vector3(680,98,0);
         activepos = new Vector3(-934,90,0);
         myrect = GetComponent<RectTransform>();
@@ -30,6 +31,11 @@ public class ScalpMeshMenuController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        if (isactive) {
+            if (!activationkey.interactable) {
+                activationKey();
+            }
+        }
         if (STATE == "GENHEAD")
         {
             GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "PRESS RMB AND DRAG";
