@@ -45,6 +45,12 @@ public class ScalpGenerator : MonoBehaviour
 
     Vector3 scalpStartScale;
 
+    // If this is enabled, then an average of 5 clicks for each landmark are used. 
+    bool averageMode = false;
+    int clicks_per_landmark = 1;
+    int clicks_per_landmark_placehold = 0;
+    Vector3 currentlandmark_runningaverage = Vector3.zero;
+
     void Start()
     {
 
@@ -125,24 +131,58 @@ public class ScalpGenerator : MonoBehaviour
         //    ExportScalpSurfaceXYZ();
         //}
     }
-
+    public void ToggleAverageMode() {
+        if (GameObject.Find("AverageLandmarksToggle").GetComponent<Toggle>().isOn)
+        {
+            averageMode = true;
+            clicks_per_landmark = System.Convert.ToInt32(GameObject.Find("NumberOfClicksField").GetComponent<InputField>().text);
+        }
+        else {
+            averageMode = false;
+            clicks_per_landmark = 1;
+        }
+    }
     void FindLandmarks()
     {
 		if (Utility.AnyInputDown() && stylusTracking.color.Equals(Color.green))
         {
-            setLandmark(landmarkIndex);
-            landmarkIndex++;
-            if (landmarkIndex == 5)
+            stylusPoint = GameObject.Find("Stylus").transform.Find("Point").gameObject;
+            head = GameObject.Find("Head");
+            // Keep a running average of all points
+            currentlandmark_runningaverage += stylusPoint.transform.position;
+
+            clicks_per_landmark_placehold++;
+            
+            if (clicks_per_landmark_placehold >= clicks_per_landmark)
             {
-                waitingToDraw = true;
-                settingLandmarks = false;
-                calibrationInstruct.text = "";
-                CenterHead();
-                FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(false);
-                return;
+                // Have collected all 5 points, get their average, keep on rolling
+                setLandmarkFromVector(landmarkIndex,currentlandmark_runningaverage*((float)1/(float)clicks_per_landmark));
+
+                // reset used variables
+                currentlandmark_runningaverage = Vector3.zero;
+                clicks_per_landmark_placehold = 0;
+
+                landmarkIndex++;
+                if (landmarkIndex == 5)
+                {
+                    // We have set all landmarks, and are done.
+                    waitingToDraw = true;
+                    settingLandmarks = false;
+                    calibrationInstruct.text = "";
+                    CenterHead();
+                    FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(false);
+                    GameObject.Find("AverageLandmarksToggle").GetComponent<Toggle>().interactable = true;
+                    GameObject.Find("NumberOfClicksField").GetComponent<InputField>().interactable = true;
+                    return;
+                }
             }
-                
-            calibrationInstruct.text = "Select " + LandmarkIndexToName(landmarkIndex);
+            if (!averageMode)
+            {
+                calibrationInstruct.text = "Select " + LandmarkIndexToName(landmarkIndex);
+            }
+            else {
+                calibrationInstruct.text = "Select " + LandmarkIndexToName(landmarkIndex) + ", Iteration: "+clicks_per_landmark_placehold.ToString();
+            }
         }
     }
 
@@ -161,6 +201,13 @@ public class ScalpGenerator : MonoBehaviour
 		}
 		return "Index Error";
 	}
+
+    void setLandmarkFromVector(int index, Vector3 pos) {
+        head = GameObject.Find("Head");
+
+        landmarks[index].transform.position = pos;
+        landmarks[index].transform.parent = head.transform;
+    }
 
     void setLandmark(int index)
     {
@@ -377,7 +424,12 @@ public class ScalpGenerator : MonoBehaviour
     {
         head = GameObject.Find("Head");
         FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(true);
-        if(landmarks != null)
+        if (averageMode) {
+            clicks_per_landmark = System.Convert.ToInt32(GameObject.Find("NumberOfClicksField").GetComponent<InputField>().text);
+        }
+        GameObject.Find("AverageLandmarksToggle").GetComponent<Toggle>().interactable = false;
+        GameObject.Find("NumberOfClicksField").GetComponent<InputField>().interactable = false;
+        if (landmarks != null)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -414,7 +466,15 @@ public class ScalpGenerator : MonoBehaviour
         landmarkIndex = 0;
         settingLandmarks = true;
 
-        calibrationInstruct.text = "Select Nasion";
+        if (!averageMode)
+        {
+            calibrationInstruct.text = "Select Nasion";
+        }
+        else
+        {
+            calibrationInstruct.text = "Select Nasion, Iteration 0"; 
+        }
+
     }
 
     public void LandmarkButtonPress(int landmark)

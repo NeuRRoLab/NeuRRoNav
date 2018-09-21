@@ -796,9 +796,9 @@ public class TargetMatching : MonoBehaviour
             camController.putTargetCam2OnHeadZY();
 
 
-            DestroyImmediate(tPoint.pos.transform.FindChild("point").gameObject);
-            DestroyImmediate(tPoint.pos.gameObject);
-            DestroyImmediate(tPoint.rot.gameObject);
+            Destroy(tPoint.pos.transform.FindChild("point").gameObject);
+            Destroy(tPoint.pos.gameObject);
+            Destroy(tPoint.rot.gameObject);
             tPoint.containedIn.Remove(tPoint);
 
             if (tCoil != null)

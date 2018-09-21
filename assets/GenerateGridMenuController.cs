@@ -37,6 +37,9 @@ public class GenerateGridMenuController : MonoBehaviour
         // Need to get n and spacing
         int n = System.Convert.ToInt32(GameObject.Find("InputFieldGridDim").GetComponent<InputField>().text);
         float gridspacing = float.Parse(GameObject.Find("InputFieldGridSpacing").GetComponent<InputField>().text);
+        if (gridspacing == 0) {
+            return;
+        }
         // Plot out arr of vectors where needed
         //      - Get Central Point
         //GameObject coil = GameObject.Find(GameObject.Find("CoilTracker").GetComponent<Coil>().coilName);
