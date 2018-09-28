@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 public class ScalpGenerator : MonoBehaviour
 {
@@ -166,6 +167,7 @@ public class ScalpGenerator : MonoBehaviour
                 if (landmarkIndex == 5)
                 {
                     // We have set all landmarks, and are done.
+                    ExportLandmarks();
                     waitingToDraw = true;
                     settingLandmarks = false;
                     calibrationInstruct.text = "";
@@ -204,7 +206,7 @@ public class ScalpGenerator : MonoBehaviour
 
     void setLandmarkFromVector(int index, Vector3 pos) {
         head = GameObject.Find("Head");
-
+        Debug.Log(landmarks[index].name);
         landmarks[index].transform.position = pos;
         landmarks[index].transform.parent = head.transform;
     }
@@ -435,7 +437,7 @@ public class ScalpGenerator : MonoBehaviour
             {
                 if (landmarks[i] != null)
                 {
-                    DestroyImmediate(landmarks[i]);
+                    Destroy(landmarks[i]);
                 }
             }
         }
@@ -563,7 +565,7 @@ public class ScalpGenerator : MonoBehaviour
     //        //        index++;
     //        //    }
     //        //}
-            
+
     //        for (j = 0; j < highestResolution; j++)
     //        {
     //            if (j < splineCage[i].Count)
@@ -589,4 +591,130 @@ public class ScalpGenerator : MonoBehaviour
     //        Destroy(s);
     //    }
     //}
+
+    public void ImportLandmarks()
+    {
+        head = GameObject.Find("Head");
+        FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(true);
+        if (averageMode)
+        {
+            clicks_per_landmark = System.Convert.ToInt32(GameObject.Find("NumberOfClicksField").GetComponent<InputField>().text);
+        }
+        GameObject.Find("AverageLandmarksToggle").GetComponent<Toggle>().interactable = false;
+        GameObject.Find("NumberOfClicksField").GetComponent<InputField>().interactable = false;
+        if (landmarks != null)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                if (landmarks[i] != null)
+                {
+                    Destroy(landmarks[i]);
+                }
+            }
+        }
+        landmarks = new GameObject[5];
+        for (int i = 0; i < 5; i++)
+        {
+            landmarks[i] = new GameObject();
+            landmarks[i].transform.position = head.transform.position;
+            landmarks[i].transform.rotation = head.transform.rotation;
+            landmarks[i].transform.parent = head.transform;
+            landmarks[i].name = LandmarkIndexToName(i);
+
+            DebugPoint debugPoint = landmarks[i].AddComponent<DebugPoint>();
+            debugPoint.p = PrimitiveType.Cube;
+            if (i == 0)
+                debugPoint.c = Color.red;
+            else if (i == 1)
+                debugPoint.c = Color.yellow;
+            else if (i == 2)
+                debugPoint.c = Color.green;
+            else if (i == 3)
+                debugPoint.c = Color.cyan;
+            else if (i == 4)
+                debugPoint.c = Color.magenta;
+
+
+        }
+
+        string path = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.landmarkLoadPath);
+        print(path);
+        string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.landmarkLoadName);
+
+        try
+        {
+            System.IO.FileStream filestream = new System.IO.FileStream(path + "/" + fileName,
+                                              System.IO.FileMode.Open,
+                                              System.IO.FileAccess.Read,
+                                              System.IO.FileShare.Read);
+            System.IO.StreamReader file = new System.IO.StreamReader(filestream);
+
+            for (int i = 0; i < 5; ++i) {
+                string line = file.ReadLine();
+                var elements = line.Split('\t');
+                Vector3 pos = head.transform.position + new Vector3(float.Parse(elements[1]), float.Parse(elements[2]), float.Parse(elements[3]));
+                switch (i) {
+                    case 0:
+                        setLandmarkFromVector((int)landmarkNames.nasion, pos);
+                        break;
+                    case 1:
+                        setLandmarkFromVector((int)landmarkNames.rightTragus, pos);
+                        break;
+                    case 2:
+                        setLandmarkFromVector((int)landmarkNames.leftTragus, pos);
+                        break;
+                    case 3:
+                        setLandmarkFromVector((int)landmarkNames.aproxVertex, pos);
+                        break;
+                    case 4:
+                        setLandmarkFromVector((int)landmarkNames.inion, pos);
+                        break;
+                }
+            }
+
+            
+
+            file.Close();
+        }
+        catch (Exception e)
+        {
+            print(e);
+            //tell user something went wrong
+            return;
+        }
+        // We have set all landmarks, and are done.
+        waitingToDraw = true;
+        settingLandmarks = false;
+        calibrationInstruct.text = "";
+        CenterHead();
+        FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(false);
+        GameObject.Find("AverageLandmarksToggle").GetComponent<Toggle>().interactable = true;
+        GameObject.Find("NumberOfClicksField").GetComponent<InputField>().interactable = true;
+    }
+
+    public void ExportLandmarks()
+    {
+        head = GameObject.Find("Head");
+        GameObject center = GameObject.Find("Center");
+
+        string path = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.landmarkSavePath);
+        string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.landmarkSaveName);
+
+        path += fileName;
+
+        using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(path, true))
+        {
+            Vector3 pos = landmarks[(int)landmarkNames.nasion].transform.position - head.transform.position;
+            file.WriteLine("Nasion:\t"+pos.x.ToString()+'\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
+            pos = landmarks[(int)landmarkNames.rightTragus].transform.position - head.transform.position;
+            file.WriteLine("rTragus:\t" + pos.x.ToString() + '\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
+            pos = landmarks[(int)landmarkNames.leftTragus].transform.position - head.transform.position;
+            file.WriteLine("lTragus:\t" + pos.x.ToString() + '\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
+            pos = landmarks[(int)landmarkNames.aproxVertex].transform.position - head.transform.position;
+            file.WriteLine("Vertex:\t" + pos.x.ToString() + '\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
+            pos = landmarks[(int)landmarkNames.inion].transform.position - head.transform.position;
+            file.WriteLine("Inion:\t" + pos.x.ToString() + '\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
+        }
+    }
 }
