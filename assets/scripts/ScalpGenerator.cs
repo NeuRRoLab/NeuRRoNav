@@ -338,13 +338,15 @@ public class ScalpGenerator : MonoBehaviour
 			newScalpScale.z =
 				Mathf.Abs(landmarks[(int)landmarkNames.nasion].transform.localPosition.z - landmarks[(int)landmarkNames.inion].transform.localPosition.z) /
 				Mathf.Abs(nasion.transform.localPosition.z - inion.transform.localPosition.z);
-			//newScalpScale.y =
-			//	(Mathf.Abs(landmarks[(int)landmarkNames.nasion].transform.localPosition.y - landmarks[(int)landmarkNames.aproxVertex].transform.localPosition.x) /
-			//	Mathf.Abs(nasion.transform.localPosition.y - vertex.transform.localPosition.y)) / 2.2f;
-			newScalpScale.y = (newScalpScale.x + newScalpScale.z) / 2;
 
-			// Move the scalp under center and setup the transform properties
-			scalp.transform.parent = center.transform;
+            //newScalpScale.y = (newScalpScale.x + newScalpScale.z) / 2;
+            newScalpScale.y =
+                Mathf.Abs(landmarks[(int)landmarkNames.aproxVertex].transform.localPosition.y ) /
+                Mathf.Abs(vertex.transform.localPosition.y);
+
+
+            // Move the scalp under center and setup the transform properties
+            scalp.transform.parent = center.transform;
 			scalp.transform.localPosition = Vector3.zero;
 			scalp.transform.localRotation = Quaternion.identity;
 			scalp.transform.localScale = newScalpScale;
