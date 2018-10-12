@@ -718,5 +718,7 @@ public class ScalpGenerator : MonoBehaviour
             pos = landmarks[(int)landmarkNames.inion].transform.position - head.transform.position;
             file.WriteLine("Inion:\t" + pos.x.ToString() + '\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
         }
+
+        GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().incrementField((int)SettingsMenu.settings.landmarkSaveName);
     }
 }
