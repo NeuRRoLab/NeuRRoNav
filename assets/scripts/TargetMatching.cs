@@ -187,7 +187,7 @@ public class TargetMatching : MonoBehaviour
         logger.setColumn(6, watch.ElapsedMilliseconds.ToString());
         logger.Log();
     }
-
+    /*
     public void SetPointOrientation()
     {
         tPoint.rot.transform.rotation = coilHotSpot.transform.rotation;
@@ -202,7 +202,7 @@ public class TargetMatching : MonoBehaviour
         DestroyImmediate(tPoint.pos.transform.FindChild("point").gameObject);
         InstantiateTargetCoil();
         VisualizePoint(tPoint.pos, tPoint.rot);
-    }
+    }*/
 
     private void MouseSelectHotSpot()
     {
@@ -761,6 +761,11 @@ public class TargetMatching : MonoBehaviour
 
     private void DestroyAllHotSpots()
     {
+        // New behavior: Put all three cameras on head, with similar orientation as when points are being lined up.
+        camController.putMainCam1FacingBackOfHead();
+        camController.putTargetCam1OnHeadXZ();
+        camController.putTargetCam2OnHeadZY();
+
         if (currentGrid.hotSpots.Count > 0)
         {
             foreach (TargetPoint point in currentGrid.hotSpots)
@@ -812,7 +817,7 @@ public class TargetMatching : MonoBehaviour
 
             GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "";
             GameObject.Find("Delete Point").GetComponent<Button>().interactable = false;
-            GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
+            //GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
             GameObject.Find("Logging").GetComponent<Button>().interactable = false;
             GameObject.Find("Generate Grid").GetComponent<Button>().interactable = false;
             GameObject.Find("Scalp Mesh").GetComponent<Button>().interactable = true;
@@ -887,7 +892,7 @@ public class TargetMatching : MonoBehaviour
         matching = true;
         GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = false;
         GameObject.Find("Delete Point").GetComponent<Button>().interactable = true;
-        GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = true;
+        //GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = true;
         GameObject.Find("Generate Grid").GetComponent<Button>().interactable = true;
         GameObject.Find("Logging").GetComponent<Button>().interactable = true;
         GameObject.Find("Set Grid").GetComponent<Button>().interactable = false;
@@ -1111,6 +1116,8 @@ public class TargetMatching : MonoBehaviour
         //GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
         // Re-enables adding new points during target mode
         GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
+        GameObject.Find("Set Grid").GetComponent<Button>().interactable = true;
+        GameObject.Find("Reset Grid").GetComponent<Button>().interactable = true;
         settingGrid = false;
         usingGrid = true;
         matching = false;
@@ -1198,7 +1205,7 @@ public class TargetMatching : MonoBehaviour
 
         GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
         GameObject.Find("Reset Grid").GetComponent<Button>().interactable = true;
-        GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
+        //GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
         GameObject.Find("Delete Point").GetComponent<Button>().interactable = false;
         GameObject.Find("Set Grid").GetComponent<Button>().interactable = true;
         GameObject.Find("Generate Grid").GetComponent<Button>().interactable = false;
