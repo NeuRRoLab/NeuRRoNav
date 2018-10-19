@@ -705,7 +705,7 @@ public class ScalpGenerator : MonoBehaviour
         path += fileName;
 
         using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(path, true))
+            new System.IO.StreamWriter(path, false))
         {
             Vector3 pos = landmarks[(int)landmarkNames.nasion].transform.position - head.transform.position;
             file.WriteLine("Nasion:\t"+pos.x.ToString()+'\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');

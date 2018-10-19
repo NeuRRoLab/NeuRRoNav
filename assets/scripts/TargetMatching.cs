@@ -954,7 +954,7 @@ public class TargetMatching : MonoBehaviour
         path += fileName;
 
         using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(path, true))
+            new System.IO.StreamWriter(path, false))
         {
             Grid grid = currentGrid;
             file.WriteLine(grid.name);

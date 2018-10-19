@@ -252,7 +252,7 @@ public class Coil : MonoBehaviour
         path += fileName;
 
         using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(path, true))
+            new System.IO.StreamWriter(path, false))
         {
             Vector3 hotspotLoc = coil.transform.InverseTransformPoint(calibrateHotSpot.transform.position);
             Vector3 rightLoc = coil.transform.InverseTransformPoint(calibrateRight.transform.position);
