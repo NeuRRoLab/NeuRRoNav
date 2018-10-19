@@ -112,13 +112,13 @@ public class TargetMatching : MonoBehaviour
     {
         coilTracker.setStylusSensitiveTrackingState(matching);
         
-        if (settingGrid && (Utility.AnyInputDown()))
-        {
-            currentGrid.gridPoints.Add(CreateGridPoint());
-        }
+        //if (settingGrid && (Utility.AnyInputDown()))
+       // {
+        //    currentGrid.gridPoints.Add(CreateGridPoint());
+       // }
         if (usingGrid && Input.GetKeyDown(KeyCode.Mouse1) && !matching)
         {
-            MouseSelectGridPoint();
+            MouseSelectHotSpot();
         }
         if (settingHotSpot && (Input.GetKeyDown(KeyCode.Space)))
         {
@@ -204,7 +204,7 @@ public class TargetMatching : MonoBehaviour
         VisualizePoint(tPoint.pos, tPoint.rot);
     }
 
-    private void MouseSelectGridPoint()
+    private void MouseSelectHotSpot()
     {
         Ray ray = camController.cameras[camController.activeCamera].GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -215,7 +215,7 @@ public class TargetMatching : MonoBehaviour
             TargetPoint newTPoint = null;
             // UnityEngine.Debug.Log("Hit an object:");
             // UnityEngine.Debug.Log(hitObj.name.ToString());
-
+            /*
             foreach (TargetPoint t in currentGrid.gridPoints)
             {  
                 if (t.pos.Equals(hitObj))
@@ -223,7 +223,7 @@ public class TargetMatching : MonoBehaviour
                     newTPoint = t;
                     break;
                 }
-            }
+            }*/
             if(newTPoint==null)
             {
                 foreach (TargetPoint t in currentGrid.hotSpots)
@@ -248,7 +248,7 @@ public class TargetMatching : MonoBehaviour
             }
         }
     }
-
+    /*
     private TargetPoint CreateGridPoint()
     {
         TargetPoint point = new TargetPoint(false, currentGrid.gridPoints);
@@ -263,7 +263,7 @@ public class TargetMatching : MonoBehaviour
         VisualizePoint(pos);
 
         return point;
-    }
+    }*/
 
     private static void VisualizePoint(GameObject pos)
     {
@@ -500,13 +500,13 @@ public class TargetMatching : MonoBehaviour
 
     public class Grid
     {
-        public IList<TargetPoint> gridPoints;
-        public IList<TargetPoint> hotSpots;
+        //public IList<TargetPoint> gridPoints;
+        public IList<TargetPoint> hotSpots; 
         public string name;
 
-        public Grid(string name, IList<TargetPoint> points, IList<TargetPoint> hotSpots)
+        public Grid(string name, /*IList<TargetPoint> points,*/ IList<TargetPoint> hotSpots)
         {
-            this.gridPoints = points;
+            //this.gridPoints = points;
             this.hotSpots = hotSpots;
             this.name = name;
         }
@@ -562,7 +562,7 @@ public class TargetMatching : MonoBehaviour
 
         }*/
     }
-
+    /*
     private void CalculateEstimatedTangentsForGridPoints()
     {
         foreach (TargetPoint point in currentGrid.gridPoints)
@@ -688,7 +688,7 @@ public class TargetMatching : MonoBehaviour
 
             point.pos.transform.FindChild("point").transform.rotation = point.rot.transform.rotation;
         }
-    }
+    }*/
 
     public void setScalpHotspotButton(GameObject button)
     {
@@ -715,7 +715,7 @@ public class TargetMatching : MonoBehaviour
 
     public void newGrid()
     {
-        DestroyCurrentGrid();
+        DestroyAllHotSpots();
         CreateNewGrid();
     }
 
@@ -723,9 +723,9 @@ public class TargetMatching : MonoBehaviour
     {
         numPoints = 0;
         int numg = ++numGrids;
-        IList<TargetPoint> gp = new List<TargetPoint>();
+        //IList<TargetPoint> gp = new List<TargetPoint>();
         IList<TargetPoint> hs = new List<TargetPoint>();
-        currentGrid = new Grid(gridName, gp, hs);
+        currentGrid = new Grid(gridName, /*gp,*/ hs);
         GameObject.Find("Set Grid").GetComponent<Button>().interactable = true;
         //GameObject.Find("ScalpGenerator").GetComponent<ScalpGenerator>().waitingToDraw = false;
     }
@@ -759,18 +759,18 @@ public class TargetMatching : MonoBehaviour
         }
     }
 
-    private void DestroyCurrentGrid()
+    private void DestroyAllHotSpots()
     {
-        if (currentGrid.gridPoints.Count > 0)
+        if (currentGrid.hotSpots.Count > 0)
         {
-            foreach (TargetPoint point in currentGrid.gridPoints)
+            foreach (TargetPoint point in currentGrid.hotSpots)
             {
                 Destroy(point.pos.transform.FindChild("point").gameObject);
                 Destroy(point.pos.gameObject);
                 Destroy(point.rot.gameObject);
 
             }
-            currentGrid.gridPoints = null;
+            currentGrid.hotSpots = null;
         }
         GameObject.Find("Set Grid").GetComponent<Button>().interactable = false;
     }
@@ -953,8 +953,9 @@ public class TargetMatching : MonoBehaviour
         {
             Grid grid = currentGrid;
             file.WriteLine(grid.name);
-            file.WriteLine(grid.gridPoints.Count.ToString());
+            //file.WriteLine(grid.gridPoints.Count.ToString());
             file.WriteLine(grid.hotSpots.Count.ToString());
+            /*
             foreach (TargetPoint point in grid.gridPoints)
             {
                 //Vector3 p = center.transform.InverseTransformPoint(GameObject.Find("Head").transform.TransformPoint(point.pos.transform.position));
@@ -968,7 +969,7 @@ public class TargetMatching : MonoBehaviour
                 {
                     file.WriteLine("1" + "\t" + p.x + "\t" + p.y + "\t" + p.z);
                 }
-            }
+            }*/
             //if (scalpHotSpots.pos != null)
             foreach (TargetPoint point in grid.hotSpots)
             {
@@ -1041,13 +1042,13 @@ public class TargetMatching : MonoBehaviour
 
             if (currentGrid != null)
             {
-                DestroyCurrentGrid();
+                DestroyAllHotSpots();
             }
 
-            currentGrid = new Grid(file.ReadLine(), new List<TargetPoint>(), new List<TargetPoint>());
-            int points = System.Convert.ToInt32(file.ReadLine());
+            currentGrid = new Grid(file.ReadLine(), /*new List<TargetPoint>(),*/ new List<TargetPoint>());
+            //int points = System.Convert.ToInt32(file.ReadLine());
             int hotSpots = System.Convert.ToInt32(file.ReadLine());
-
+            /*
             for (int i = 0; i < points; i++)
             {
                 TargetPoint t = new TargetPoint(false, currentGrid.gridPoints);
@@ -1069,7 +1070,7 @@ public class TargetMatching : MonoBehaviour
                 }
                 currentGrid.gridPoints.Add(t);
                 t.index = currentGrid.gridPoints.IndexOf(t);
-            }
+            }*/
             for (int i = 0; i < hotSpots; i++)
             {
                 string datahs = file.ReadLine();
@@ -1091,7 +1092,7 @@ public class TargetMatching : MonoBehaviour
             //tell user something went wrong
             return;
         }
-
+        /*
         foreach (TargetPoint point in currentGrid.gridPoints)
         {
             point.pos.transform.parent = GameObject.Find("Head").transform;
@@ -1105,7 +1106,7 @@ public class TargetMatching : MonoBehaviour
             //pshere.transform.parent = point.pos.transform;
 
             VisualizePoint(point.pos, point.rot);
-        }
+        }*/
 
         //GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
         // Re-enables adding new points during target mode
@@ -1119,6 +1120,7 @@ public class TargetMatching : MonoBehaviour
     {
         Material pmat = GameObject.Find("Arrow").GetComponent<Renderer>().material;
         Material hmat = GameObject.Find("HotSpot Arrow").GetComponent<Renderer>().material;
+        /*
         for (int i = 0; i < currentGrid.gridPoints.Count; i++)
         {
             TargetPoint t = currentGrid.gridPoints[i];
@@ -1128,7 +1130,7 @@ public class TargetMatching : MonoBehaviour
             CapsuleCollider collider = t.pos.GetComponentInChildren<CapsuleCollider>();
             collider.enabled = true;
             currentGrid.gridPoints[i] = t;
-        }
+        }*/
         for (int i = 0; i < currentGrid.hotSpots.Count; i++)
         {
             TargetPoint t = currentGrid.hotSpots[i];
