@@ -98,7 +98,7 @@ public class Head : MonoBehaviour
                         tracker.name = objectName;
 
                         MeshRenderer renderer = GameObject.Find("headTest").GetComponent<MeshRenderer>();
-
+                        /*
                         Material transMat = renderer.material;
                         Color transColor = transMat.color;
                         transColor.a = 0.2F;
@@ -111,7 +111,7 @@ public class Head : MonoBehaviour
                         transMat.DisableKeyword("_ALPHABLEND_ON");
                         transMat.EnableKeyword("_ALPHAPREMULTIPLY_ON");
                         transMat.renderQueue = 3000;
-                        renderer.material = transMat;
+                        renderer.material = transMat;*/
 
                         container.transform.position = position;
                         container.transform.rotation = orientation;
