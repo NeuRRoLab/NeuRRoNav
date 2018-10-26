@@ -52,6 +52,8 @@ public class Coil : MonoBehaviour
 
     int point;
 
+    Text stylusTracking;
+
     void Start()
     {
         initialized = false;
@@ -59,6 +61,7 @@ public class Coil : MonoBehaviour
         calibrationInstruct = GameObject.Find("CalibrationInstructions").GetComponent<Text>();
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
         coilTrackStatus = GameObject.Find("CoilTrackStatus").GetComponent<Text>();
+        stylusTracking = GameObject.Find("StylusTrackStatus").GetComponent<Text>();
         FindObjectOfType<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
 
         coilTrackingIsSensitive = false;
@@ -166,7 +169,7 @@ public class Coil : MonoBehaviour
 
     void Update()
     {
-        if (calibrating && Utility.AnyInputDown())
+        if (calibrating && Utility.AnyInputDown() && stylusTracking.color.Equals(Color.green))
         {
             if (point == 0)
             {
@@ -307,14 +310,46 @@ public class Coil : MonoBehaviour
                 calibrateHotSpot = points[0];
                 calibrateRight = points[1];
                 calibrateForward = points[2];
-        }
+            }
             catch (Exception e)
-        {
-            //something went wrong, warn user
-            return;
-        }
+            {
+                //something went wrong, warn user
+                return;
+            }
 
-        MatchRotation();
+            //MatchRotation();
+
+            hotspot.transform.parent = null;
+            calibrateHotSpot.transform.parent = null;
+            calibrateForward.transform.parent = null;
+            calibrateRight.transform.parent = null;
+
+            container.transform.parent = hotspot.transform;
+            hotspot.transform.position = calibrateHotSpot.transform.position;
+            container.transform.parent = null;
+
+            hotspot.transform.LookAt(forward.transform);
+            container.transform.parent = hotspot.transform;
+            hotspot.transform.LookAt(calibrateForward.transform);
+
+            container.transform.parent = null;
+            hotspot.transform.LookAt(right.transform, calibrateForward.transform.position - calibrateHotSpot.transform.position);
+            container.transform.parent = hotspot.transform;
+            hotspot.transform.LookAt(calibrateRight.transform, calibrateForward.transform.position - calibrateHotSpot.transform.position);
+
+            container.transform.parent = coil.transform;
+            hotspot.transform.rotation = container.transform.rotation;
+            hotspot.transform.parent = container.transform;
+
+            calibrateForward.transform.parent = coil.transform;
+            calibrateHotSpot.transform.parent = coil.transform;
+            calibrateRight.transform.parent = coil.transform;
+
+            calibrating = false;
+            point = 0;
+            calibrationInstruct.text = "";
+
+            GameObject.Find("ScalpGenerator").GetComponent<ScalpGenerator>().waitingToDraw = true;
         }
     }
 

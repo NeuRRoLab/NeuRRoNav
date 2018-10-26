@@ -25,7 +25,7 @@ public class FileExplorerButton : MonoBehaviour {
                 dialog.SelectedPath = startPath;
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    settingsMenu.setField((int)field, dialog.SelectedPath);
+                    settingsMenu.setField((int)field, dialog.SelectedPath+"\\");
                 }
             }
         }
@@ -37,7 +37,7 @@ public class FileExplorerButton : MonoBehaviour {
                 dialog.InitialDirectory = startPath;
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    string path = System.IO.Path.GetDirectoryName(dialog.FileName);
+                    string path = System.IO.Path.GetDirectoryName(dialog.FileName)+"\\";
                     string fileName = System.IO.Path.GetFileName(dialog.FileName);
                     settingsMenu.setField((int)field - 1, path);
                     settingsMenu.setField((int)field, fileName);

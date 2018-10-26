@@ -99,25 +99,25 @@ public class SettingsMenu : MonoBehaviour
 
     private void Initialize()
     {
-        fields[(int)settings.loggingPath] = Application.dataPath + @"/Logs/";
+        fields[(int)settings.loggingPath] = Application.dataPath + @"/SaveData/Logs/";
         fields[(int)settings.loggingName] = "Log1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
 
-        fields[(int)settings.coilSavePath] = Application.dataPath + @"/Coils/Saved/";
+        fields[(int)settings.coilSavePath] = Application.dataPath + @"/SaveData/Coils/Saved/";
         fields[(int)settings.coilSaveName] = "Coil1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
 
-        fields[(int)settings.coilLoadPath] = Application.dataPath + @"/Coils/Load/";
+        fields[(int)settings.coilLoadPath] = Application.dataPath + @"/SaveData/Coils/Load/";
         fields[(int)settings.coilLoadName] = "Coil1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
 
-        fields[(int)settings.gridSavePath] = Application.dataPath + @"/Grids/Saved/";
+        fields[(int)settings.gridSavePath] = Application.dataPath + @"/SaveData/Grids/Saved/";
         fields[(int)settings.gridSaveName] = "Grid1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
 
-        fields[(int)settings.gridLoadPath] = Application.dataPath + @"/Grids/Load/";
+        fields[(int)settings.gridLoadPath] = Application.dataPath + @"/SaveData/Grids/Load/";
         fields[(int)settings.gridLoadName] = "Grid1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
         //
-        fields[(int)settings.landmarkSavePath] = Application.dataPath + @"/Landmarks/Saved/";
+        fields[(int)settings.landmarkSavePath] = Application.dataPath + @"/SaveData/Landmarks/Saved/";
         fields[(int)settings.landmarkSaveName] = "Landmark1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
 
-        fields[(int)settings.landmarkLoadPath] = Application.dataPath + @"/Landmarks/Load/";
+        fields[(int)settings.landmarkLoadPath] = Application.dataPath + @"/SaveData/Landmarks/Load/";
         fields[(int)settings.landmarkLoadName] = "Landmark1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
         //
         fields[(int)settings.mThresh] = "0.1";
