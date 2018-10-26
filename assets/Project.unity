@@ -3630,7 +3630,7 @@ GameObject:
   - 222: {fileID: 323170835}
   - 114: {fileID: 323170834}
   m_Layer: 5
-  m_Name: Background
+  m_Name: Toggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3650,10 +3650,10 @@ RectTransform:
   - {fileID: 2076397602}
   m_Father: {fileID: 910925881}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -78.5, y: 8}
-  m_SizeDelta: {x: 30, y: 30}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0.1, y: 1}
+  m_AnchoredPosition: {x: 5, y: -14.618}
+  m_SizeDelta: {x: 12, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &323170834
 MonoBehaviour:
@@ -5845,10 +5845,10 @@ RectTransform:
   - {fileID: 811862830}
   m_Father: {fileID: 910925881}
   m_RootOrder: 2
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 36.7, y: 7.6}
-  m_SizeDelta: {x: 77, y: 30}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -0.000038146973, y: -13.236027}
+  m_SizeDelta: {x: -22, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &508578788
 MonoBehaviour:
@@ -18971,8 +18971,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 49348608}
   m_HandleRect: {fileID: 49348607}
   m_Direction: 2
-  m_Value: 0.100173794
-  m_Size: 0.38723344
+  m_Value: 0.1001737
+  m_Size: 0.3872334
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -19955,10 +19955,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 910925881}
   m_RootOrder: 1
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -24.6, y: 7.1}
-  m_SizeDelta: {x: 60.16, y: 31}
+  m_AnchorMin: {x: 0.2, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 8.636, y: -13.736}
+  m_SizeDelta: {x: 21.16, y: 31}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1629431108
 MonoBehaviour:
