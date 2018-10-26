@@ -8,6 +8,8 @@ using System.Diagnostics;
 
 public class TargetMatching : MonoBehaviour
 {
+    Text calibrationInstruct;
+
     Stopwatch watch;
     GameObject coil;
     GameObject tCoil;
@@ -70,6 +72,7 @@ public class TargetMatching : MonoBehaviour
     {
         coilTracker = GameObject.Find("CoilTracker").GetComponent<Coil>();
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
+        calibrationInstruct = GameObject.Find("CalibrationInstructions").GetComponent<Text>();
         settingsMenu = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>();
         matching = false;
         usingGrid = false;
@@ -154,6 +157,7 @@ public class TargetMatching : MonoBehaviour
         CreateScalpHotSpot(GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.position, GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.rotation);
 
         setHotSpot.text = "New Hot Spot";
+        calibrationInstruct.text = "";
         settingHotSpot = false;
     }
 
@@ -694,12 +698,15 @@ public class TargetMatching : MonoBehaviour
     {
         if (settingHotSpot == false)
         {
+            calibrationInstruct.text = "Press Space";
+
             settingHotSpot = true;
             setHotSpot = button.GetComponentInChildren<Text>();
             setHotSpot.text = "Cancel";
         }
         else
         {
+            calibrationInstruct.text = "";
             settingHotSpot = false;
             setHotSpot.text = "New Hot Spot";
         }
@@ -816,6 +823,7 @@ public class TargetMatching : MonoBehaviour
             }
 
             GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "";
+            GameObject.Find("Set Grid").GetComponent<Button>().interactable = true;
             GameObject.Find("Delete Point").GetComponent<Button>().interactable = false;
             //GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
             GameObject.Find("Logging").GetComponent<Button>().interactable = false;
