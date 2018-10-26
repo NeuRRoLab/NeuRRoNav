@@ -19,18 +19,7 @@ public class FileExplorerButton : MonoBehaviour {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
 		// Folder
 		if ((int)field % 2 == 0) {
-            /*
-			FolderBrowserDialog fbd = new FolderBrowserDialog();
-			string startPath = settingsMenu.getField((int)field);
-			fbd.RootFolder = System.Environment.SpecialFolder.DesktopDirectory;
-			fbd.SelectedPath = startPath;
-			if (fbd.ShowDialog() == DialogResult.OK) {
-				string correctedPath = fbd.SelectedPath.Replace('\\', '/');
-				correctedPath += '/';
-				settingsMenu.setField((int)field, correctedPath);
-			}*/
             string startPath = settingsMenu.getField((int)field );
-            
             using (var dialog = new FolderBrowserDialog())
             {
                 dialog.SelectedPath = startPath;
@@ -42,6 +31,19 @@ public class FileExplorerButton : MonoBehaviour {
         }
 		// File
 		else {
+            string startPath = settingsMenu.getField(((int)field)-1);
+            using (var dialog = new OpenFileDialog())
+            {
+                dialog.InitialDirectory = startPath;
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    string path = System.IO.Path.GetDirectoryName(dialog.FileName);
+                    string fileName = System.IO.Path.GetFileName(dialog.FileName);
+                    settingsMenu.setField((int)field - 1, path);
+                    settingsMenu.setField((int)field, fileName);
+                }
+            }
+            /*
 			OpenFileDialog ofd = new OpenFileDialog();
 			string startPath = settingsMenu.getField((int)field - 1);
 			//ofd.InitialDirectory = startPath;
@@ -51,8 +53,8 @@ public class FileExplorerButton : MonoBehaviour {
 				settingsMenu.setField((int)field - 1, path);
 				settingsMenu.setField((int)field, fileName);
 
-			}
-		}
+			}*/
+        }
 #endif
 	}
 }
