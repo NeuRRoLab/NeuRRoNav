@@ -16,13 +16,16 @@ public class SettingsMenu : MonoBehaviour
                            coilSaveName=3, coilLoadPath=4, coilLoadName = 5,
                            gridSavePath = 6, gridSaveName = 7, gridLoadPath = 8,
                            gridLoadName = 9, landmarkSavePath = 10, landmarkSaveName = 11,
-                           landmarkLoadPath = 12 ,landmarkLoadName = 13,mThresh = 14, rThresh = 15};
+                           landmarkLoadPath = 12 ,landmarkLoadName = 13,
+                           stylusSavePath = 14, stylusSaveName = 15, stylusLoadPath = 16, stylusLoadName = 17,
+                           scalpMeshSavePath = 18, scalpMeshSaveName = 19, scalpMeshLoadPath = 20, scalpMeshLoadName = 21,
+                           mThresh = 22, rThresh = 23};
 
     // Use for initialization
     void Awake()
     {
 
-        fields = new string[16];
+        fields = new string[24];
         inputs = GameObject.Find("Panels").GetComponentsInChildren<InputField>();
 
         menu = GameObject.Find("SettingMenu");
@@ -119,6 +122,19 @@ public class SettingsMenu : MonoBehaviour
 
         fields[(int)settings.landmarkLoadPath] = Application.dataPath + @"/SaveData/Landmarks/Load/";
         fields[(int)settings.landmarkLoadName] = "Landmark1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+        //
+        //
+        fields[(int)settings.stylusSavePath] = Application.dataPath + @"/SaveData/Stylus/Saved/";
+        fields[(int)settings.stylusSaveName] = "Landmark1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+
+        fields[(int)settings.stylusLoadPath] = Application.dataPath + @"/SaveData/Stylus/Load/";
+        fields[(int)settings.stylusLoadName] = "Landmark1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+        //
+        fields[(int)settings.scalpMeshSavePath] = Application.dataPath + @"/SaveData/ScalpMesh/Saved/";
+        fields[(int)settings.scalpMeshSaveName] = "Landmark1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+
+        fields[(int)settings.scalpMeshLoadPath] = Application.dataPath + @"/SaveData/ScalpMesh/Load/";
+        fields[(int)settings.scalpMeshLoadName] = "Landmark1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
         //
         fields[(int)settings.mThresh] = "0.25";
         fields[(int)settings.rThresh] = "2.5";
