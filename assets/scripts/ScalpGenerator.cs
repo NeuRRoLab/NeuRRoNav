@@ -145,7 +145,7 @@ public class ScalpGenerator : MonoBehaviour
     }
     void FindLandmarks()
     {
-		if (Utility.AnyInputDown() && stylusTracking.color.Equals(Color.green))
+		if (Input.anyKeyDown && stylusTracking.color.Equals(Color.green) && (!Input.GetMouseButton(0)))
         {
             stylusPoint = GameObject.Find("Stylus").transform.Find("Point").gameObject;
             head = GameObject.Find("Head");
@@ -358,7 +358,10 @@ public class ScalpGenerator : MonoBehaviour
 			//GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
 			GameObject.Find("Load Grids").GetComponent<Button>().interactable = true;
             GameObject.Find("Scalp Mesh").GetComponent<Button>().interactable = true;
-
+            foreach (Button b in GameObject.Find("LandmarksList").GetComponentsInChildren<Button>())
+            {
+                b.interactable = true;
+            }
             // camController.putMainCam1FacingBackOfCoil(tPoint.pos);
             //  camController.putTargetCam1OnTargetXZ(tPoint.pos);
             // camController.putTargetCam2OnTargetZY(tPoint.pos);

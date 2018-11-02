@@ -46,8 +46,8 @@ public class TargetMatching : MonoBehaviour
     bool logging;
     bool initalized = false;
 
-    public float mThresh = 0.1F;
-    public float rThresh = 1F;
+    public float mThresh = 0.25F;
+    public float rThresh = 2.5F;
 
 
     FileIO logger;
@@ -123,7 +123,7 @@ public class TargetMatching : MonoBehaviour
         {
             MouseSelectHotSpot();
         }
-        if (settingHotSpot && (Input.GetKeyDown(KeyCode.Space)))
+        if (settingHotSpot && (Input.anyKeyDown) &&(!Input.GetMouseButton(0)))
         {
             prepareHotSpot();
         }

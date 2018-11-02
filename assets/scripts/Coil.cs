@@ -169,7 +169,7 @@ public class Coil : MonoBehaviour
 
     void Update()
     {
-        if (calibrating && Utility.AnyInputDown() && stylusTracking.color.Equals(Color.green))
+        if (calibrating && Input.anyKeyDown && stylusTracking.color.Equals(Color.green) &&(!Input.GetMouseButton(0)))
         {
             if (point == 0)
             {

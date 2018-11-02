@@ -120,8 +120,8 @@ public class SettingsMenu : MonoBehaviour
         fields[(int)settings.landmarkLoadPath] = Application.dataPath + @"/SaveData/Landmarks/Load/";
         fields[(int)settings.landmarkLoadName] = "Landmark1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
         //
-        fields[(int)settings.mThresh] = "0.1";
-        fields[(int)settings.rThresh] = "1";
+        fields[(int)settings.mThresh] = "0.25";
+        fields[(int)settings.rThresh] = "2.5";
 
         int i = 0;
         foreach (InputField input in GameObject.Find("Panels").GetComponentsInChildren<InputField>())

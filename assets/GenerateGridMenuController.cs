@@ -35,9 +35,18 @@ public class GenerateGridMenuController : MonoBehaviour
     public void generateGridofHotSpots() {
         GameObject TPoint = GameObject.Find("TargetMatching").GetComponent<TargetMatching>().tPoint.pos.gameObject;
         // Need to get n and spacing
-        int n = System.Convert.ToInt32(GameObject.Find("InputFieldGridDim").GetComponent<InputField>().text);
-        float gridspacing = float.Parse(GameObject.Find("InputFieldGridSpacing").GetComponent<InputField>().text);
-        if (gridspacing == 0) {
+        float gridspacing = 0;
+        int n = 0;
+        try
+        {
+            n = System.Convert.ToInt32(GameObject.Find("InputFieldGridDim").GetComponent<InputField>().text);
+            gridspacing = float.Parse(GameObject.Find("InputFieldGridSpacing").GetComponent<InputField>().text);
+        }
+        catch {
+            // if anything goes wrong with these, return
+            return;
+        }
+        if (gridspacing <= 0) {
             return;
         }
         // Plot out arr of vectors where needed
