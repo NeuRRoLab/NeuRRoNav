@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System;
 
 public class ScalpMeshMenuController : MonoBehaviour {
+    bool activeMesh = false;
     bool isactive = false;
     Vector3 inactivepos;
     Vector3 activepos;
@@ -69,24 +71,40 @@ public class ScalpMeshMenuController : MonoBehaviour {
             }
             if (Input.GetKeyDown(KeyCode.Space)) {
                 STATE = "INACTIVE";
+                
                 GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "";
+                
                 float base_x = -width / 2;
                 float base_y = -length / 2;
-
+                
                 vertices = filter.mesh.vertices;
+                bool changedany = false;
                 for (int x = 0; x < verticeswide; x += 1)
                 {
                     for (int y = 0; y < verticeslong; y += 1)
                     {
                         if (vertices[(verticeslong * x) + y] == new Vector3(base_x + x * gridspacing, base_y + y * gridspacing, -0.5f)) {
                             vertices[(verticeslong * x) + y] = Vector3.zero;
+                            changedany = true;
                         }
                         
                     }
                 }
+                //if (changedany)
+               // {
+                activeMesh = true;
                 filter.mesh.vertices = vertices;
                 filter.mesh.RecalculateNormals();
                 planeObj.GetComponent<MeshCollider>().sharedMesh = filter.mesh;
+                //try
+                //{
+                //    
+                //}
+                // catch
+                // {
+                //    Debug.Log("Ur mesh sucks");
+                //  }
+                // }
 
             }
         }
@@ -103,10 +121,158 @@ public class ScalpMeshMenuController : MonoBehaviour {
         }
     }
     public void loadHeadMeshFromFile() {
-        // TODO
+        // Don't save if we are currently making one
+        if (STATE != "INACTIVE")
+        {
+            return;
+        }
+        Vector3[] vertices = new Vector3[0];
+        Vector3[] loadedvertices = new Vector3[0];
+        int totalverts;
+        try
+        {
+            // Load the data we want
+            string path = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.scalpMeshLoadPath);
+            string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.scalpMeshLoadName);
+
+            path += fileName;
+
+            System.IO.FileStream filestream = new System.IO.FileStream(path,
+                                                 System.IO.FileMode.Open,
+                                                 System.IO.FileAccess.Read,
+                                                 System.IO.FileShare.Read);
+            System.IO.StreamReader file = new System.IO.StreamReader(filestream);
+
+            // Load planePoint pos/rot
+            string data = file.ReadLine();
+
+            // planepoint pos
+            string[] dims = data.Split('\t');
+            planePoint.localPosition = new Vector3((float)System.Convert.ToDouble(dims[0]), (float)System.Convert.ToDouble(dims[1]), (float)System.Convert.ToDouble(dims[2]));
+            // planepoint rot
+            data = file.ReadLine();
+            dims = data.Split('\t');
+            planePoint.localRotation = new Quaternion((float)System.Convert.ToDouble(dims[1]), (float)System.Convert.ToDouble(dims[2]), (float)System.Convert.ToDouble(dims[3]), (float)System.Convert.ToDouble(dims[0]));
+
+            // Width and length
+            width = (float)System.Convert.ToDouble(file.ReadLine());
+            length = (float)System.Convert.ToDouble(file.ReadLine());
+
+            // Generate verts
+            verticeswide = System.Convert.ToInt32(width / gridspacing);
+            verticeslong = System.Convert.ToInt32(length / gridspacing);
+            totalverts = verticeslong * verticeswide;
+            vertices = new Vector3[totalverts];
+            loadedvertices = new Vector3[totalverts];
+
+            for (int i = 0; i < totalverts; ++i) {
+                data = file.ReadLine();
+                dims = data.Split('\t');
+                loadedvertices[i] = new Vector3((float)System.Convert.ToDouble(dims[0]), (float)System.Convert.ToDouble(dims[1]), (float)System.Convert.ToDouble(dims[2]));
+
+            }
+
+            file.Close();
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e.Message);
+            return;
+        }
+        // Now initialize as before
+        // Now to create our mesh
+        // start from back left
+        filter = planeObj.GetComponent<MeshFilter>();
+        filter.mesh.Clear();
+
+        
+        
+        float base_x = -width / 2;
+        float base_y = -length / 2;
+        for (int x = 0; x < verticeswide; x += 1)
+        {
+            for (int y = 0; y < verticeslong; y += 1)
+            {
+                vertices[(verticeslong * x) + y] = new Vector3(base_y + y * gridspacing, base_x + x * gridspacing, 0);
+            }
+        }
+
+        filter.mesh.vertices = vertices;
+
+        // Now tris
+        int[] tri = new int[(2 * (verticeswide - 1) * (verticeslong - 1)) * 3];
+        ulong cur_tri_index = 0;
+        for (int x = 0; x < verticeswide - 1; x += 1)
+        {
+            for (int y = 0; y < verticeslong - 1; y += 1)
+            {
+                //  Lower left triangle.
+                tri[cur_tri_index] = (verticeslong * x) + y;
+                tri[cur_tri_index + 1] = (verticeslong * (x + 1)) + y + 1;
+                tri[cur_tri_index + 2] = (verticeslong * x) + y + 1;
+                //  Upper right triangle.   
+                tri[cur_tri_index + 3] = (verticeslong * x) + y;
+                tri[cur_tri_index + 4] = (verticeslong * (x + 1)) + y;
+                tri[cur_tri_index + 5] = (verticeslong * (x + 1)) + y + 1;
+                //vertices[(verticeslong * x) + y]
+                cur_tri_index += 6;
+            }
+        }
+
+        filter.mesh.triangles = tri;
+
+        // Now normals
+        Vector3[] normals = new Vector3[totalverts];
+        for (int i = 0; i < totalverts; ++i)
+        {
+            normals[i] = -Vector3.forward;
+        }
+
+        filter.mesh.normals = normals;
+
+        filter.mesh.vertices = loadedvertices;
+        filter.mesh.RecalculateNormals();
+        planeObj.GetComponent<MeshCollider>().sharedMesh = filter.mesh;
+
     }
     public void saveHeadMeshToFile(){
-        // TODO
+        // Don't save if there is no mesh, or if we are currently making one
+        if ((!activeMesh) || (STATE != "INACTIVE")) {
+            return;
+        }
+        try
+        {
+            string path = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.scalpMeshSavePath);
+            string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.scalpMeshSaveName);
+
+            path += fileName;
+
+            using (System.IO.StreamWriter file =
+                new System.IO.StreamWriter(path, false))
+            {
+                // Write planePoint position,rotation in subsequent lines
+                file.WriteLine(planePoint.localPosition.x + "\t" + planePoint.localPosition.y + "\t" + planePoint.localPosition.z);
+                file.WriteLine(planePoint.localRotation.w + "\t" + planePoint.localRotation.x + "\t" + planePoint.localRotation.y + "\t" + planePoint.localRotation.z);
+
+                // Then write width and height
+                file.WriteLine(width);
+                file.WriteLine(length);
+
+                // Now store the vertices vector
+                filter = planeObj.GetComponent<MeshFilter>();
+
+                Vector3[] vertices = filter.mesh.vertices;
+                for (int i = 0; i < vertices.Length; ++i) {
+                    file.WriteLine(vertices[i].x + "\t" + vertices[i].y + "\t" + vertices[i].z);
+                }
+            }
+
+            GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().incrementField((int)SettingsMenu.settings.scalpMeshSaveName);
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e.Message);
+        }
     }
     Vector3 midpoint_calc(Vector3 josh, Vector3 mark)
     {
@@ -117,6 +283,7 @@ public class ScalpMeshMenuController : MonoBehaviour {
         return newvec;
     }
     public void generateNewHeadMesh() {
+        activeMesh = false;
         activationKey(); // Get this out of the way
         stylusPoint = GameObject.Find("Stylus").transform.Find("Point");
         // Need to make the new plane

@@ -7,7 +7,7 @@ using System;
 
 public class ScalpGenerator : MonoBehaviour
 {
-
+    public Transform planeCenter;
     CameraController camController;
     SurfaceGen surfaceGen;
 
@@ -325,6 +325,11 @@ public class ScalpGenerator : MonoBehaviour
 			foreach (GameObject landmark in landmarks) {
 				landmark.transform.parent = center.transform;
 			}
+
+            // Take the scalp Mesh center object and parent that too, makes stuff easier
+            planeCenter.parent = center.transform;
+            planeCenter.localPosition = Vector3.zero;
+            planeCenter.rotation = center.transform.rotation;
 
 			// Setup the scalp to use similair local coordinates to the center
 			scalp.transform.localScale = scalpStartScale;

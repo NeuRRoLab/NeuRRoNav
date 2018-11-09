@@ -216,7 +216,7 @@ public class Stylus : MonoBehaviour
     {
         if (initialized)
         {
-            Debug.Log("Input stylus!!!");
+            //Debug.Log("Input stylus!!!");
             Vector3 pos = Vector3.zero;
             try
             {
