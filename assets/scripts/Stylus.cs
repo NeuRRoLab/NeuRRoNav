@@ -4,6 +4,12 @@ using System.Collections;
 using System.Xml;
 using System;
 using UnityEngine.Audio;
+
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+using System.Windows.Forms;
+using System.Drawing;
+#endif
+
 //=============================================================================----
 // Copyright © NaturalPoint, Inc. All Rights Reserved.
 // 
@@ -92,7 +98,6 @@ public class Stylus : MonoBehaviour
                         qz = -qz;
                         qw = -qw;
 
-
                         Vector3 position = new Vector3(x, y, z);
                         Quaternion orientation = new Quaternion(qx, qy, qz, qw);
 
@@ -116,7 +121,7 @@ public class Stylus : MonoBehaviour
             }
             if (tracked == false)
             {
-                stylusTrackStatus.color = Color.red;
+                stylusTrackStatus.color = UnityEngine.Color.red;
                 if (stylusTrackingIsSensitive)
                 {
                     if (!trackingWarning.isPlaying)
@@ -131,7 +136,7 @@ public class Stylus : MonoBehaviour
                 {
                     trackingWarning.Stop();
                 }
-                stylusTrackStatus.color = Color.green;
+                stylusTrackStatus.color = UnityEngine.Color.green;
             }
         }
     }
@@ -164,8 +169,8 @@ public class Stylus : MonoBehaviour
 
 		camController.putCamOnStylus(1);
 
-		GameObject.Find("Calibrate Coil").GetComponent<Button>().interactable = true;
-		GameObject.Find("Landmarks").GetComponent<Button>().interactable = true;
+		GameObject.Find("Calibrate Coil").GetComponent<UnityEngine.UI.Button>().interactable = true;
+		GameObject.Find("Landmarks").GetComponent<UnityEngine.UI.Button>().interactable = true;
 		//foreach (Button b in GameObject.Find("LandmarksList").GetComponentsInChildren<Button>()) {
 		//	b.interactable = true;
 		//}
@@ -204,8 +209,8 @@ public class Stylus : MonoBehaviour
 
         camController.putCamOnStylus(1);
 
-        GameObject.Find("Calibrate Coil").GetComponent<Button>().interactable = true;
-        GameObject.Find("Landmarks").GetComponent<Button>().interactable = true;
+        GameObject.Find("Calibrate Coil").GetComponent<UnityEngine.UI.Button>().interactable = true;
+        GameObject.Find("Landmarks").GetComponent<UnityEngine.UI.Button>().interactable = true;
         //foreach (Button b in GameObject.Find("LandmarksList").GetComponentsInChildren<Button>()) {
         //	b.interactable = true;
         //}
@@ -247,6 +252,46 @@ public class Stylus : MonoBehaviour
     }
 
     public void ExportStylus() {
+        using (var form1 = new Form())
+        {
+            System.Windows.Forms.Button button1 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button button2 = new System.Windows.Forms.Button();
+
+            // Set the text of button1 to "OK".
+            button1.Text = "OK";
+            // Set the position of the button on the form.
+            button1.Location = new Point(10, 10);
+            // Set the text of button2 to "Cancel".
+            button2.Text = "Cancel";
+            // Set the position of the button based on the location of button1.
+            button2.Location
+               = new Point(button1.Left, button1.Height + button1.Top + 10);
+            // Set the caption bar text of the form.   
+            form1.Text = "My Dialog Box";
+            // Display a help button on the form.
+            form1.HelpButton = true;
+
+            // Define the border style of the form to a dialog box.
+            form1.FormBorderStyle = FormBorderStyle.FixedDialog;
+            // Set the MaximizeBox to false to remove the maximize box.
+            form1.MaximizeBox = false;
+            // Set the MinimizeBox to false to remove the minimize box.
+            form1.MinimizeBox = false;
+            // Set the accept button of the form to button1.
+            form1.AcceptButton = button1;
+            // Set the cancel button of the form to button2.
+            form1.CancelButton = button2;
+            // Set the start position of the form to the center of the screen.
+            form1.StartPosition = FormStartPosition.CenterScreen;
+
+            //Add button1 to the form.
+            form1.Controls.Add(button1);
+            //Add button2 to the form.
+            form1.Controls.Add(button2);
+
+            // Display the form as a modal dialog box.
+            form1.ShowDialog();
+        }
         try
         {
             Vector3 lpos = transform.Find("Point").localPosition; // only proceed if such a point exists i.e. there is a point
@@ -254,6 +299,8 @@ public class Stylus : MonoBehaviour
             string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.stylusSaveName);
 
             path += fileName;
+
+            
 
             using (System.IO.StreamWriter file =
                 new System.IO.StreamWriter(path, false))
