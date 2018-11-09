@@ -125,16 +125,16 @@ public class SettingsMenu : MonoBehaviour
         //
         //
         fields[(int)settings.stylusSavePath] = Application.dataPath + @"/SaveData/Stylus/Saved/";
-        fields[(int)settings.stylusSaveName] = "Landmark1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+        fields[(int)settings.stylusSaveName] = "Stylus1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
 
         fields[(int)settings.stylusLoadPath] = Application.dataPath + @"/SaveData/Stylus/Load/";
-        fields[(int)settings.stylusLoadName] = "Landmark1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+        fields[(int)settings.stylusLoadName] = "Stylus1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
         //
         fields[(int)settings.scalpMeshSavePath] = Application.dataPath + @"/SaveData/ScalpMesh/Saved/";
-        fields[(int)settings.scalpMeshSaveName] = "Landmark1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+        fields[(int)settings.scalpMeshSaveName] = "ScalpMesh1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
 
         fields[(int)settings.scalpMeshLoadPath] = Application.dataPath + @"/SaveData/ScalpMesh/Load/";
-        fields[(int)settings.scalpMeshLoadName] = "Landmark1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+        fields[(int)settings.scalpMeshLoadName] = "ScalpMesh1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
         //
         fields[(int)settings.mThresh] = "0.25";
         fields[(int)settings.rThresh] = "2.5";

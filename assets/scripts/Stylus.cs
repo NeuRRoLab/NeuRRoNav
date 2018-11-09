@@ -170,7 +170,103 @@ public class Stylus : MonoBehaviour
 		//	b.interactable = true;
 		//}
 		pauseTracking = false;
+        ExportStylus();
 	}
+
+    public void setPointFromVector3(Vector3 vec)
+    {
+        pauseTracking = true;
+        if (point != null)
+        {
+            DestroyImmediate(point);
+        }
+
+        GameObject calibrationTool = GameObject.Find("CalibrationTool");
+        GameObject pivot = this.transform.FindChild("Pivot").gameObject;
+        GameObject connectorLine = pivot.transform.FindChild("ConnectorLine").gameObject;
+
+        point = new GameObject();
+        point.name = "Point";
+        //point.transform.position = calibrationTool.transform.position;
+        point.transform.parent = this.transform;
+        point.transform.localPosition = vec;
+
+        pivot.transform.LookAt(point.transform.position);
+
+
+        GameObject psphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        psphere.name = "Point Sphere";
+        psphere.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+        psphere.transform.parent = point.transform;
+        psphere.transform.localPosition = new Vector3(0, 0, 0);
+
+        connectorLine.transform.localScale = new Vector3(1, Vector3.Distance(pivot.transform.position, point.transform.position), 1);
+
+        camController.putCamOnStylus(1);
+
+        GameObject.Find("Calibrate Coil").GetComponent<Button>().interactable = true;
+        GameObject.Find("Landmarks").GetComponent<Button>().interactable = true;
+        //foreach (Button b in GameObject.Find("LandmarksList").GetComponentsInChildren<Button>()) {
+        //	b.interactable = true;
+        //}
+        pauseTracking = false;
+    }
+
+    public void ImportStylus()
+    {
+        if (initialized)
+        {
+            Debug.Log("Input stylus!!!");
+            Vector3 pos = Vector3.zero;
+            try
+            {
+                string path = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.stylusLoadPath);
+                string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.stylusLoadName);
+
+                path += fileName;
+
+                System.IO.FileStream filestream = new System.IO.FileStream(path,
+                                                     System.IO.FileMode.Open,
+                                                     System.IO.FileAccess.Read,
+                                                     System.IO.FileShare.Read);
+                System.IO.StreamReader file = new System.IO.StreamReader(filestream);
+
+                string data = file.ReadLine();
+
+                string[] dims = data.Split('\t');
+                pos = new Vector3((float)System.Convert.ToDouble(dims[0]), (float)System.Convert.ToDouble(dims[1]), (float)System.Convert.ToDouble(dims[2]));
+                file.Close();
+
+                setPointFromVector3(pos);
+            }
+            catch (Exception e) {
+                Debug.Log(e.Message);
+            }
+        }
+
+    }
+
+    public void ExportStylus() {
+        try
+        {
+            Vector3 lpos = transform.Find("Point").localPosition; // only proceed if such a point exists i.e. there is a point
+            string path = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.stylusSavePath);
+            string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.stylusSaveName);
+
+            path += fileName;
+
+            using (System.IO.StreamWriter file =
+                new System.IO.StreamWriter(path, false))
+            {
+                file.WriteLine(lpos.x + "\t" + lpos.y + "\t" + lpos.z);
+            }
+
+            GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().incrementField((int)SettingsMenu.settings.stylusSaveName);
+        }
+        catch (Exception e) {
+            Debug.Log(e.Message);
+        }
+    }
 
 
 	public void setStylusSensitiveTrackingState(bool state)
