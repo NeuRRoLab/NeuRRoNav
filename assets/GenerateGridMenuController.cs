@@ -11,6 +11,9 @@ public class GenerateGridMenuController : MonoBehaviour
     RectTransform myrect;
     public LayerMask mask;
     public Button activationkey;
+    public Text dimtext;
+    public InputField gridDim;
+    public InputField gridSpacing;
 
     // Use this for initialization
     void Start()
@@ -31,6 +34,22 @@ public class GenerateGridMenuController : MonoBehaviour
                 activationKey();
             }
         }
+        try
+        {
+            int n = System.Convert.ToInt32(gridDim.text);
+            if (n > 0)
+            {
+                n = (2 * n) + 1;
+                dimtext.text = "Grid Width(2n + 1): " + n.ToString() + "x" + n.ToString();
+            }
+            else
+            {
+                dimtext.text = "Grid Width(2n + 1): Error: Bad dim";
+            }
+        }
+        catch {
+            // Means junk input
+        }
     }
     public void generateGridofHotSpots() {
         GameObject TPoint = GameObject.Find("TargetMatching").GetComponent<TargetMatching>().tPoint.pos.gameObject;
@@ -39,8 +58,8 @@ public class GenerateGridMenuController : MonoBehaviour
         int n = 0;
         try
         {
-            n = System.Convert.ToInt32(GameObject.Find("InputFieldGridDim").GetComponent<InputField>().text);
-            gridspacing = float.Parse(GameObject.Find("InputFieldGridSpacing").GetComponent<InputField>().text);
+            n = System.Convert.ToInt32(gridDim.text);
+            gridspacing = float.Parse(gridSpacing.text);
         }
         catch {
             // if anything goes wrong with these, return

@@ -53,6 +53,8 @@ public class TargetMatching : MonoBehaviour
     FileIO logger;
     SettingsMenu settingsMenu;
 
+    public LayerMask mask;
+
     public void setMThresh()
     {
         float value = float.Parse(GameObject.Find("mThresh").GetComponent<InputField>().text);
@@ -218,7 +220,7 @@ public class TargetMatching : MonoBehaviour
         Ray ray = camController.cameras[camController.activeCamera].GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         //int result;
-        if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray,out hit,100000,mask))
         {
             GameObject hitObj = hit.collider.gameObject.transform.parent.gameObject;
             TargetPoint newTPoint = null;
@@ -1344,7 +1346,7 @@ public class TargetMatching : MonoBehaviour
             System.Windows.Forms.Button buttondefault = new System.Windows.Forms.Button();
             buttondefault.Location = new System.Drawing.Point(-2000, -2000);
 
-            text.Text = "Successfully added Hotspot! Do you want to save to \nentire Grid to Grid Save location?";
+            text.Text = "Successfully added Hotspot! Do you want to save the \nentire Grid to Grid Save location?";
             text.Width = 1000;
             text.Height = 50;
             text.Location
