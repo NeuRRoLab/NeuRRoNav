@@ -156,6 +156,11 @@ public class TargetMatching : MonoBehaviour
         // Yuck
         CreateScalpHotSpot(GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.position, GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.rotation);
 
+        if (AskIfToSave())
+        {
+            ExportGrid(0);
+        }
+
         setHotSpot.text = "New Hot Spot";
         calibrationInstruct.text = "";
         settingHotSpot = false;
@@ -1042,9 +1047,7 @@ public class TargetMatching : MonoBehaviour
         usingGrid = true;
 
         GameObject.Find("Save Grids").GetComponent<Button>().interactable = true;
-        if (AskIfToSave()) {
-            ExportGrid(0);
-        }
+        
     }
 
     public void ImportGrid()
@@ -1341,7 +1344,7 @@ public class TargetMatching : MonoBehaviour
             System.Windows.Forms.Button buttondefault = new System.Windows.Forms.Button();
             buttondefault.Location = new System.Drawing.Point(-2000, -2000);
 
-            text.Text = "Successfully calibrated Grid! Do you want to save to \nGrid Save location?";
+            text.Text = "Successfully added Hotspot! Do you want to save to \nentire Grid to Grid Save location?";
             text.Width = 1000;
             text.Height = 50;
             text.Location

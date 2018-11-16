@@ -112,8 +112,7 @@ public class GenerateGridMenuController : MonoBehaviour
             }
         }
 
-        //      
-        // Generate suitable hotspots
+        
     }
     public void activationKey()
     {

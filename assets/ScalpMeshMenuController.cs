@@ -58,10 +58,17 @@ public class ScalpMeshMenuController : MonoBehaviour {
                     // Debug.Log(System.Convert.ToString(xcoord) + "  " + System.Convert.ToString(ycoord));
                     int closestx = Mathf.RoundToInt(xcoord);
                     int closesty = Mathf.RoundToInt(ycoord);
-                    int index = (verticeslong * closestx) + closesty;
-                    vertices[index] = new Vector3(vertices[index].x, vertices[index].y, localpos.z);
-                    filter.mesh.vertices = vertices;
-                    filter.mesh.RecalculateNormals();
+                    try
+                    {
+                        int index = (verticeslong * closestx) + closesty;
+
+                        vertices[index] = new Vector3(vertices[index].x, vertices[index].y, localpos.z);
+                        filter.mesh.vertices = vertices;
+                        filter.mesh.RecalculateNormals();
+                    }
+                    catch {
+                        // Means minor rounding error that causes out of bounds issue 
+                    }
                 }
                 else
                 {
@@ -115,6 +122,23 @@ public class ScalpMeshMenuController : MonoBehaviour {
             myrect.localPosition = activepos;
         }
     }
+    public void ClearHeadMesh() {
+        // Clear the stuff
+        if ((filter != null) && (filter.mesh!=null))
+        {
+            filter.mesh.triangles = new int[0];
+            filter.mesh.normals = new Vector3[0];
+            filter.mesh.vertices = new Vector3[0];
+            
+            
+
+            filter.mesh.RecalculateNormals();
+            planeObj.GetComponent<MeshCollider>().sharedMesh = filter.mesh;
+        }
+        // Disable Saving
+        GameObject.Find("Save Scalp").GetComponent<Button>().interactable = false;
+    }
+
     public void loadHeadMeshFromFile() {
         // Don't save if we are currently making one
         if (STATE != "INACTIVE")
@@ -408,7 +432,9 @@ public class ScalpMeshMenuController : MonoBehaviour {
             System.Windows.Forms.Label text = new System.Windows.Forms.Label();
             System.Windows.Forms.Button button1 = new System.Windows.Forms.Button();
             System.Windows.Forms.Button button3 = new System.Windows.Forms.Button();
-            
+            System.Windows.Forms.Button buttondefault = new System.Windows.Forms.Button();
+            buttondefault.Location = new System.Drawing.Point(-2000, -2000);
+
 
             text.Text = text.Text = "A file exists at the Scalp Mesh Save location specified! \nDo you want to overwrite?\n\nIf not: Cancel, then edit the Save Scalp Mesh Field, \nthen Save Manually.";
             text.Width = 1000;
@@ -449,6 +475,7 @@ public class ScalpMeshMenuController : MonoBehaviour {
             button3.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 
             //Add button1 to the form.
+            form1.Controls.Add(buttondefault);
             form1.Controls.Add(button1);
             //Add button2 to the form.
             form1.Controls.Add(button3);
@@ -479,6 +506,8 @@ public class ScalpMeshMenuController : MonoBehaviour {
             System.Windows.Forms.Label text = new System.Windows.Forms.Label();
             System.Windows.Forms.Button button1 = new System.Windows.Forms.Button();
             System.Windows.Forms.Button button3 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button buttondefault = new System.Windows.Forms.Button();
+            buttondefault.Location = new System.Drawing.Point(-2000, -2000);
 
             text.Text = "Successfully calibrated Scalp Mesh! Do you want to\n save to Scalp Mesh Save location?";
             text.Width = 1000;
@@ -519,6 +548,7 @@ public class ScalpMeshMenuController : MonoBehaviour {
             button3.DialogResult = System.Windows.Forms.DialogResult.OK;
 
             //Add button1 to the form.
+            form1.Controls.Add(buttondefault);
             form1.Controls.Add(button1);
             //Add button2 to the form.
             form1.Controls.Add(button3);
