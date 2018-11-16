@@ -171,10 +171,11 @@ public class Stylus : MonoBehaviour
 
 		GameObject.Find("Calibrate Coil").GetComponent<UnityEngine.UI.Button>().interactable = true;
 		GameObject.Find("Landmarks").GetComponent<UnityEngine.UI.Button>().interactable = true;
-		//foreach (Button b in GameObject.Find("LandmarksList").GetComponentsInChildren<Button>()) {
-		//	b.interactable = true;
-		//}
-		pauseTracking = false;
+        GameObject.Find("Save Stylus").GetComponent<UnityEngine.UI.Button>().interactable = true;
+        //foreach (Button b in GameObject.Find("LandmarksList").GetComponentsInChildren<Button>()) {
+        //	b.interactable = true;
+        //}
+        pauseTracking = false;
         if (AskIfToSave())
         {
             ExportStylus();
@@ -214,6 +215,7 @@ public class Stylus : MonoBehaviour
 
         GameObject.Find("Calibrate Coil").GetComponent<UnityEngine.UI.Button>().interactable = true;
         GameObject.Find("Landmarks").GetComponent<UnityEngine.UI.Button>().interactable = true;
+        GameObject.Find("Save Stylus").GetComponent<UnityEngine.UI.Button>().interactable = true;
         //foreach (Button b in GameObject.Find("LandmarksList").GetComponentsInChildren<Button>()) {
         //	b.interactable = true;
         //}
@@ -269,11 +271,11 @@ public class Stylus : MonoBehaviour
                 bool val = PromptOverwrite();
                 if (val == false)
                 {
-                    Debug.Log("Quitting Save");
+                    //Debug.Log("Quitting Save");
                     return;
                 }
                 else {
-                    Debug.Log("Overwriting!!!");
+                   // Debug.Log("Overwriting!!!");
                 }
             }
             
@@ -304,10 +306,12 @@ public class Stylus : MonoBehaviour
             System.Windows.Forms.Label text = new System.Windows.Forms.Label();
             System.Windows.Forms.Button button1 = new System.Windows.Forms.Button();
             System.Windows.Forms.Button button3 = new System.Windows.Forms.Button();
-
-            text.Text = "A file exists at the Stylus Save location specified! \nDo you want to overwrite?";
+            System.Windows.Forms.Button buttondefault = new System.Windows.Forms.Button();
+            buttondefault.Location = new System.Drawing.Point(-2000, -2000);
+           
+            text.Text = "A file exists at the Stylus Save location specified! \nDo you want to overwrite?\n\nIf not: Cancel, then edit the Save Stylus Field, \nthen Save Manually.";
             text.Width = 1000;
-            text.Height = 50;
+            text.Height = 70;
             text.Location
                = new Point(10, 10);
 
@@ -344,6 +348,7 @@ public class Stylus : MonoBehaviour
             button3.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 
             //Add button1 to the form.
+            form1.Controls.Add(buttondefault);
             form1.Controls.Add(button1);
             //Add button2 to the form.
             form1.Controls.Add(button3);
@@ -373,6 +378,8 @@ public class Stylus : MonoBehaviour
             System.Windows.Forms.Label text = new System.Windows.Forms.Label();
             System.Windows.Forms.Button button1 = new System.Windows.Forms.Button();
             System.Windows.Forms.Button button3 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button buttondefault = new System.Windows.Forms.Button();
+            buttondefault.Location = new System.Drawing.Point(-2000, -2000);
 
             text.Text = "Successfully calibrated Stylus! Do you want to save to \nStylus Save location?";
             text.Width = 1000;
@@ -413,6 +420,7 @@ public class Stylus : MonoBehaviour
             button3.DialogResult = System.Windows.Forms.DialogResult.OK;
 
             //Add button1 to the form.
+            form1.Controls.Add(buttondefault);
             form1.Controls.Add(button1);
             //Add button2 to the form.
             form1.Controls.Add(button3);
