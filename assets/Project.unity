@@ -10932,7 +10932,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1509004354}
-        m_MethodName: ImportStylus
+        m_MethodName: ExportStylus
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -25214,8 +25214,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 49348608}
   m_HandleRect: {fileID: 49348607}
   m_Direction: 2
-  m_Value: 0.100173615
-  m_Size: 0.3872334
+  m_Value: 0.10017383
+  m_Size: 0.38723332
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

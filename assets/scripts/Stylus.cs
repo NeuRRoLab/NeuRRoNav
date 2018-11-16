@@ -175,7 +175,10 @@ public class Stylus : MonoBehaviour
 		//	b.interactable = true;
 		//}
 		pauseTracking = false;
-        ExportStylus();
+        if (AskIfToSave())
+        {
+            ExportStylus();
+        }
 	}
 
     public void setPointFromVector3(Vector3 vec)
@@ -251,47 +254,10 @@ public class Stylus : MonoBehaviour
 
     }
 
+    
+
     public void ExportStylus() {
-        using (var form1 = new Form())
-        {
-            System.Windows.Forms.Button button1 = new System.Windows.Forms.Button();
-            System.Windows.Forms.Button button2 = new System.Windows.Forms.Button();
-
-            // Set the text of button1 to "OK".
-            button1.Text = "OK";
-            // Set the position of the button on the form.
-            button1.Location = new Point(10, 10);
-            // Set the text of button2 to "Cancel".
-            button2.Text = "Cancel";
-            // Set the position of the button based on the location of button1.
-            button2.Location
-               = new Point(button1.Left, button1.Height + button1.Top + 10);
-            // Set the caption bar text of the form.   
-            form1.Text = "My Dialog Box";
-            // Display a help button on the form.
-            form1.HelpButton = true;
-
-            // Define the border style of the form to a dialog box.
-            form1.FormBorderStyle = FormBorderStyle.FixedDialog;
-            // Set the MaximizeBox to false to remove the maximize box.
-            form1.MaximizeBox = false;
-            // Set the MinimizeBox to false to remove the minimize box.
-            form1.MinimizeBox = false;
-            // Set the accept button of the form to button1.
-            form1.AcceptButton = button1;
-            // Set the cancel button of the form to button2.
-            form1.CancelButton = button2;
-            // Set the start position of the form to the center of the screen.
-            form1.StartPosition = FormStartPosition.CenterScreen;
-
-            //Add button1 to the form.
-            form1.Controls.Add(button1);
-            //Add button2 to the form.
-            form1.Controls.Add(button2);
-
-            // Display the form as a modal dialog box.
-            form1.ShowDialog();
-        }
+        
         try
         {
             Vector3 lpos = transform.Find("Point").localPosition; // only proceed if such a point exists i.e. there is a point
@@ -299,7 +265,17 @@ public class Stylus : MonoBehaviour
             string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.stylusSaveName);
 
             path += fileName;
-
+            if (System.IO.File.Exists(path)) {
+                bool val = PromptOverwrite();
+                if (val == false)
+                {
+                    Debug.Log("Quitting Save");
+                    return;
+                }
+                else {
+                    Debug.Log("Overwriting!!!");
+                }
+            }
             
 
             using (System.IO.StreamWriter file =
@@ -308,7 +284,7 @@ public class Stylus : MonoBehaviour
                 file.WriteLine(lpos.x + "\t" + lpos.y + "\t" + lpos.z);
             }
 
-            GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().incrementField((int)SettingsMenu.settings.stylusSaveName);
+            //GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().incrementField((int)SettingsMenu.settings.stylusSaveName);
         }
         catch (Exception e) {
             Debug.Log(e.Message);
@@ -320,5 +296,145 @@ public class Stylus : MonoBehaviour
     {
         stylusTrackingIsSensitive = state;
     }
+
+    bool PromptOverwrite()
+    {
+        using (var form1 = new Form())
+        {
+            System.Windows.Forms.Label text = new System.Windows.Forms.Label();
+            System.Windows.Forms.Button button1 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button button3 = new System.Windows.Forms.Button();
+
+            text.Text = "A file exists at the Stylus Save location specified! \nDo you want to overwrite?";
+            text.Width = 1000;
+            text.Height = 50;
+            text.Location
+               = new Point(10, 10);
+
+            // Set the text of button1 to "OK".
+            button3.Text = "Cancel Save";
+            // Set the position of the button on the form.
+            button3.Location = new Point(text.Left, text.Height + text.Top + 10);
+            button3.BackColor = System.Drawing.Color.LightGreen;
+            button3.Width = 100;
+
+            // Set the text of button1 to "OK".
+            button1.Text = "Overwrite!";
+            // Set the position of the button on the form.
+            button1.Location = new Point(button3.Left, button3.Height + button3.Top + 15);
+            button1.BackColor = System.Drawing.Color.LightYellow;
+            button1.Width = 100;
+            form1.Text = "CAUTION";
+            // Define the border style of the form to a dialog box.
+            form1.FormBorderStyle = FormBorderStyle.FixedDialog;
+            // Set the MaximizeBox to false to remove the maximize box.
+            form1.MaximizeBox = false;
+            // Set the MinimizeBox to false to remove the minimize box.
+            form1.MinimizeBox = false;
+            // Set the accept button of the form to button1.
+            form1.AcceptButton = button1;
+            form1.CancelButton = button3;
+            // Set the cancel button of the form to button2.
+            // Set the start position of the form to the center of the screen.
+            form1.StartPosition = FormStartPosition.CenterScreen;
+
+            form1.Height = 200;
+
+            button1.DialogResult = System.Windows.Forms.DialogResult.OK;
+            button3.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+
+            //Add button1 to the form.
+            form1.Controls.Add(button1);
+            //Add button2 to the form.
+            form1.Controls.Add(button3);
+
+            form1.Controls.Add(text);
+            DialogResult retval = form1.ShowDialog();
+            // Display the form as a modal dialog box.
+            if (retval == DialogResult.Cancel) {
+                //Debug.Log("Canceled save");
+                return false;
+            }
+            if (retval == DialogResult.OK)
+            {
+                //Debug.Log("accepted");
+                return true;
+            }
+
+
+        }
+        return false;
+    }
+
+    bool AskIfToSave()
+    {
+        using (var form1 = new Form())
+        {
+            System.Windows.Forms.Label text = new System.Windows.Forms.Label();
+            System.Windows.Forms.Button button1 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button button3 = new System.Windows.Forms.Button();
+
+            text.Text = "Successfully calibrated Stylus! Do you want to save to \nStylus Save location?";
+            text.Width = 1000;
+            text.Height = 50;
+            text.Location
+               = new Point(10, 10);
+
+            // Set the text of button1 to "OK".
+            button3.Text = "Yes";
+            // Set the position of the button on the form.
+            button3.Location = new Point(text.Left, text.Height + text.Top + 10);
+            button3.BackColor = System.Drawing.Color.LightGreen;
+            button3.Width = 100;
+
+            // Set the text of button1 to "OK".
+            button1.Text = "No";
+            // Set the position of the button on the form.
+            button1.Location = new Point(button3.Left, button3.Height + button3.Top + 15);
+            button1.BackColor = System.Drawing.Color.Pink;
+            button1.Width = 100;
+            form1.Text = "";
+            // Define the border style of the form to a dialog box.
+            form1.FormBorderStyle = FormBorderStyle.FixedDialog;
+            // Set the MaximizeBox to false to remove the maximize box.
+            form1.MaximizeBox = false;
+            // Set the MinimizeBox to false to remove the minimize box.
+            form1.MinimizeBox = false;
+            // Set the accept button of the form to button1.
+            form1.AcceptButton = button1;
+            form1.CancelButton = button3;
+            // Set the cancel button of the form to button2.
+            // Set the start position of the form to the center of the screen.
+            form1.StartPosition = FormStartPosition.CenterScreen;
+
+            form1.Height = 200;
+
+            button1.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            button3.DialogResult = System.Windows.Forms.DialogResult.OK;
+
+            //Add button1 to the form.
+            form1.Controls.Add(button1);
+            //Add button2 to the form.
+            form1.Controls.Add(button3);
+
+            form1.Controls.Add(text);
+            DialogResult retval = form1.ShowDialog();
+            // Display the form as a modal dialog box.
+            if (retval == DialogResult.Cancel)
+            {
+                //Debug.Log("Canceled save");
+                return false;
+            }
+            if (retval == DialogResult.OK)
+            {
+                //Debug.Log("accepted");
+                return true;
+            }
+
+
+        }
+        return false;
+    }
+
 
 }
