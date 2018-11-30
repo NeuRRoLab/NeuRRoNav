@@ -1,2 +1,0 @@
-X	Y	Z	Pitch	Yaw	Roll	TimeStamp	
-0.04	0.08	0.09	0.24	-0.16	-0.23		
