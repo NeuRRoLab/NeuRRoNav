@@ -215,6 +215,14 @@ public class ScalpGenerator : MonoBehaviour
         landmarks[index].transform.parent = head.transform;
     }
 
+    void SetLandmarkFromLocalPos(int index, Vector3 localpos) {
+        head = GameObject.Find("Head");
+        Debug.Log(landmarks[index].name);
+        landmarks[index].transform.parent = head.transform;
+        landmarks[index].transform.localPosition = localpos;
+        
+    }
+
     void setLandmark(int index)
     {
         stylusPoint = GameObject.Find("Stylus").transform.Find("Point").gameObject;
@@ -665,22 +673,22 @@ public class ScalpGenerator : MonoBehaviour
             for (int i = 0; i < 5; ++i) {
                 string line = file.ReadLine();
                 var elements = line.Split('\t');
-                Vector3 pos = head.transform.position + new Vector3(float.Parse(elements[1]), float.Parse(elements[2]), float.Parse(elements[3]));
+                Vector3 pos = new Vector3(float.Parse(elements[1]), float.Parse(elements[2]), float.Parse(elements[3]));
                 switch (i) {
                     case 0:
-                        setLandmarkFromVector((int)landmarkNames.nasion, pos);
+                        SetLandmarkFromLocalPos((int)landmarkNames.nasion, pos);
                         break;
                     case 1:
-                        setLandmarkFromVector((int)landmarkNames.rightTragus, pos);
+                        SetLandmarkFromLocalPos((int)landmarkNames.rightTragus, pos);
                         break;
                     case 2:
-                        setLandmarkFromVector((int)landmarkNames.leftTragus, pos);
+                        SetLandmarkFromLocalPos((int)landmarkNames.leftTragus, pos);
                         break;
                     case 3:
-                        setLandmarkFromVector((int)landmarkNames.aproxVertex, pos);
+                        SetLandmarkFromLocalPos((int)landmarkNames.aproxVertex, pos);
                         break;
                     case 4:
-                        setLandmarkFromVector((int)landmarkNames.inion, pos);
+                        SetLandmarkFromLocalPos((int)landmarkNames.inion, pos);
                         break;
                 }
             }
@@ -729,20 +737,45 @@ public class ScalpGenerator : MonoBehaviour
             }
         }
 
+
+        // We want position relative to head, not center!!!
+        landmarks[(int)landmarkNames.nasion].transform.parent = head.transform;
+        landmarks[(int)landmarkNames.rightTragus].transform.parent = head.transform;
+        landmarks[(int)landmarkNames.leftTragus].transform.parent = head.transform;
+        landmarks[(int)landmarkNames.aproxVertex].transform.parent = head.transform;
+        landmarks[(int)landmarkNames.inion].transform.parent = head.transform;
+
+
         using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(path, false))
         {
-            Vector3 pos = landmarks[(int)landmarkNames.nasion].transform.position - head.transform.position;
+            
+
+
+            Vector3 pos = landmarks[(int)landmarkNames.nasion].transform.localPosition;
             file.WriteLine("Nasion:\t"+pos.x.ToString()+'\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
-            pos = landmarks[(int)landmarkNames.rightTragus].transform.position - head.transform.position;
+
+            pos = landmarks[(int)landmarkNames.rightTragus].transform.localPosition;
             file.WriteLine("rTragus:\t" + pos.x.ToString() + '\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
-            pos = landmarks[(int)landmarkNames.leftTragus].transform.position - head.transform.position;
+
+            pos = landmarks[(int)landmarkNames.leftTragus].transform.localPosition;
             file.WriteLine("lTragus:\t" + pos.x.ToString() + '\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
-            pos = landmarks[(int)landmarkNames.aproxVertex].transform.position - head.transform.position;
+
+            pos = landmarks[(int)landmarkNames.aproxVertex].transform.localPosition;
             file.WriteLine("Vertex:\t" + pos.x.ToString() + '\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
-            pos = landmarks[(int)landmarkNames.inion].transform.position - head.transform.position;
+
+            pos = landmarks[(int)landmarkNames.inion].transform.localPosition;
             file.WriteLine("Inion:\t" + pos.x.ToString() + '\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
+            
+            
         }
+
+        // Gotta revert back to parenting all lmarks to center
+        landmarks[(int)landmarkNames.nasion].transform.parent = center.transform;
+        landmarks[(int)landmarkNames.rightTragus].transform.parent = center.transform;
+        landmarks[(int)landmarkNames.leftTragus].transform.parent = center.transform;
+        landmarks[(int)landmarkNames.aproxVertex].transform.parent = center.transform;
+        landmarks[(int)landmarkNames.inion].transform.parent = center.transform;
 
         //GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().incrementField((int)SettingsMenu.settings.landmarkSaveName);
     }
