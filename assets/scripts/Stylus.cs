@@ -176,9 +176,12 @@ public class Stylus : MonoBehaviour
         //	b.interactable = true;
         //}
         pauseTracking = false;
-        if (AskIfToSave())
+        if (GameObject.Find("Toggle_SavePrompts").GetComponent<Toggle>().isOn)
         {
-            ExportStylus();
+            if (AskIfToSave())
+            {
+                ExportStylus();
+            }
         }
 	}
 
@@ -310,7 +313,7 @@ public class Stylus : MonoBehaviour
             buttondefault.Location = new System.Drawing.Point(-2000, -2000);
            
             text.Text = "A file exists at the Stylus Save location specified! \nDo you want to overwrite?\n\nIf not: Cancel, then edit the Save Stylus Field, \nthen Save Manually.";
-            text.Width = 1000;
+            text.Width = 280;
             text.Height = 70;
             text.Location
                = new Point(10, 10);
@@ -343,6 +346,7 @@ public class Stylus : MonoBehaviour
             form1.StartPosition = FormStartPosition.CenterScreen;
 
             form1.Height = 200;
+            form1.Width = 300;
 
             button1.DialogResult = System.Windows.Forms.DialogResult.OK;
             button3.DialogResult = System.Windows.Forms.DialogResult.Cancel;
@@ -382,7 +386,7 @@ public class Stylus : MonoBehaviour
             buttondefault.Location = new System.Drawing.Point(-2000, -2000);
 
             text.Text = "Successfully calibrated Stylus! Do you want to save to \nStylus Save location?";
-            text.Width = 1000;
+            text.Width = 280;
             text.Height = 50;
             text.Location
                = new Point(10, 10);
@@ -415,6 +419,7 @@ public class Stylus : MonoBehaviour
             form1.StartPosition = FormStartPosition.CenterScreen;
 
             form1.Height = 200;
+            form1.Width = 300;
 
             button1.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             button3.DialogResult = System.Windows.Forms.DialogResult.OK;

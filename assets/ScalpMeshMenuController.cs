@@ -27,7 +27,7 @@ public class ScalpMeshMenuController : MonoBehaviour {
     void Start () {
         activationkey = GameObject.Find("Scalp Mesh").GetComponent<Button>();
         inactivepos = new Vector3(680,98,0);
-        activepos = new Vector3(-934,90,0);
+        activepos = GameObject.Find("CenterScreen").GetComponent<RectTransform>().position;//new Vector3(-934,90,0);
         myrect = GetComponent<RectTransform>();
 	}
 	
@@ -40,7 +40,7 @@ public class ScalpMeshMenuController : MonoBehaviour {
         }
         if (STATE == "GENHEAD")
         {
-            GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "PRESS RMB AND DRAG";
+            GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "PRESS RMB AND DRAG, then Space";
             if (Input.GetKey(KeyCode.Mouse1))
             {
                 // Get current stylus point in local coordinates
@@ -102,9 +102,13 @@ public class ScalpMeshMenuController : MonoBehaviour {
                 filter.mesh.vertices = vertices;
                 filter.mesh.RecalculateNormals();
                 planeObj.GetComponent<MeshCollider>().sharedMesh = filter.mesh;
-                
-                if (AskIfToSave()) {
-                    saveHeadMeshToFile();
+
+                if (GameObject.Find("Toggle_SavePrompts").GetComponent<Toggle>().isOn)
+                {
+                    if (AskIfToSave())
+                    {
+                        saveHeadMeshToFile();
+                    }
                 }
                 GameObject.Find("Save Scalp").GetComponent<Button>().interactable = true;
 
@@ -119,7 +123,8 @@ public class ScalpMeshMenuController : MonoBehaviour {
         }
         else {
             isactive = true;
-            myrect.localPosition = activepos;
+            activepos = GameObject.Find("CenterScreen").GetComponent<RectTransform>().position;
+            myrect.position = activepos;
         }
     }
     public void ClearHeadMesh() {
@@ -437,7 +442,7 @@ public class ScalpMeshMenuController : MonoBehaviour {
 
 
             text.Text = text.Text = "A file exists at the Scalp Mesh Save location specified! \nDo you want to overwrite?\n\nIf not: Cancel, then edit the Save Scalp Mesh Field, \nthen Save Manually.";
-            text.Width = 1000;
+            text.Width = 280;
             text.Height = 70;
             text.Location
                = new System.Drawing.Point(10, 10);
@@ -470,6 +475,7 @@ public class ScalpMeshMenuController : MonoBehaviour {
             form1.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 
             form1.Height = 200;
+            form1.Width = 300;
 
             button1.DialogResult = System.Windows.Forms.DialogResult.OK;
             button3.DialogResult = System.Windows.Forms.DialogResult.Cancel;
@@ -510,7 +516,7 @@ public class ScalpMeshMenuController : MonoBehaviour {
             buttondefault.Location = new System.Drawing.Point(-2000, -2000);
 
             text.Text = "Successfully calibrated Scalp Mesh! Do you want to\n save to Scalp Mesh Save location?";
-            text.Width = 1000;
+            text.Width = 280;
             text.Height = 50;
             text.Location
                = new System.Drawing.Point(10, 10);
@@ -543,6 +549,7 @@ public class ScalpMeshMenuController : MonoBehaviour {
             form1.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 
             form1.Height = 200;
+            form1.Width = 300;
 
             button1.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             button3.DialogResult = System.Windows.Forms.DialogResult.OK;

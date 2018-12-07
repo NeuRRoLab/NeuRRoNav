@@ -166,10 +166,13 @@ public class ScalpGenerator : MonoBehaviour
                 landmarkIndex++;
                 if (landmarkIndex == 5)
                 {
-                    // We have set all landmarks, and are done.
-                    if (AskIfToSave())
+                    if (GameObject.Find("Toggle_SavePrompts").GetComponent<Toggle>().isOn)
                     {
-                        ExportLandmarks();
+                        // We have set all landmarks, and are done.
+                        if (AskIfToSave())
+                        {
+                            ExportLandmarks();
+                        }
                     }
                     waitingToDraw = true;
                     settingLandmarks = false;
@@ -791,7 +794,7 @@ public class ScalpGenerator : MonoBehaviour
             buttondefault.Location = new System.Drawing.Point(-2000, -2000);
 
             text.Text = text.Text = "A file exists at the Landmark Save location specified! \nDo you want to overwrite?\n\nIf not: Cancel, then edit the Save Landmark Field, \nthen Save Manually.";
-            text.Width = 1000;
+            text.Width = 280;
             text.Height = 70;
             text.Location
                = new System.Drawing.Point(10, 10);
@@ -824,6 +827,7 @@ public class ScalpGenerator : MonoBehaviour
             form1.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 
             form1.Height = 200;
+            form1.Width = 300;
 
             button1.DialogResult = System.Windows.Forms.DialogResult.OK;
             button3.DialogResult = System.Windows.Forms.DialogResult.Cancel;
@@ -864,7 +868,7 @@ public class ScalpGenerator : MonoBehaviour
             buttondefault.Location = new System.Drawing.Point(-2000, -2000);
 
             text.Text = "Successfully calibrated Landmarks! Do you want to save\n to Landmark Save location?";
-            text.Width = 1000;
+            text.Width = 280;
             text.Height = 50;
             text.Location
                = new System.Drawing.Point(10, 10);
@@ -897,6 +901,7 @@ public class ScalpGenerator : MonoBehaviour
             form1.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 
             form1.Height = 200;
+            form1.Width = 300;
 
             button1.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             button3.DialogResult = System.Windows.Forms.DialogResult.OK;

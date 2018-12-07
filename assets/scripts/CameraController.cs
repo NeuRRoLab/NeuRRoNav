@@ -138,7 +138,7 @@ public class CameraController : MonoBehaviour
         GameObject cam = cameras[camera];
         coilHotSpot = coil.transform.FindChild("container").FindChild("hotspot").gameObject;
         targets[camera] = coilHotSpot;
-        cam.transform.position = Vector3.Lerp(coilHotSpot.transform.position, coil.transform.position, 0.95F);
+        cam.transform.position = coil.transform.position + Vector3.up * 0.5f;//= Vector3.Lerp(coilHotSpot.transform.position, coil.transform.position, 0.95F);
         cam.transform.LookAt(coilHotSpot.transform.position, coilHotSpot.transform.forward);
         cam.transform.parent = coil.transform;
         coilCam = true;

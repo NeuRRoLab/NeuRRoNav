@@ -239,9 +239,12 @@ public class Coil : MonoBehaviour
         calibrating = false;
         point = 0;
         calibrationInstruct.text = "";
-        if (AskIfToSave())
+        if (GameObject.Find("Toggle_SavePrompts").GetComponent<Toggle>().isOn)
         {
-            ExportCoil();
+            if (AskIfToSave())
+            {
+                ExportCoil();
+            }
         }
         GameObject.Find("Save Coil").GetComponent<UnityEngine.UI.Button>().interactable = true;
         GameObject.Find("ScalpGenerator").GetComponent<ScalpGenerator>().waitingToDraw = true;
@@ -386,7 +389,7 @@ public class Coil : MonoBehaviour
             buttondefault.Location = new System.Drawing.Point(-2000, -2000);
 
             text.Text = text.Text = "A file exists at the Coil Save location specified! \nDo you want to overwrite?\n\nIf not: Cancel, then edit the Save Coil Field, \nthen Save Manually.";
-            text.Width = 1000;
+            text.Width = 280;
             text.Height = 70;
             text.Location
                = new System.Drawing.Point(10, 10);
@@ -419,6 +422,7 @@ public class Coil : MonoBehaviour
             form1.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 
             form1.Height = 200;
+            form1.Width = 300;
 
             button1.DialogResult = System.Windows.Forms.DialogResult.OK;
             button3.DialogResult = System.Windows.Forms.DialogResult.Cancel;
@@ -459,7 +463,7 @@ public class Coil : MonoBehaviour
             buttondefault.Location = new System.Drawing.Point(-2000, -2000);
 
             text.Text = "Successfully calibrated Coil! Do you want to save to \nCoil Save location?";
-            text.Width = 1000;
+            text.Width = 280;
             text.Height = 50;
             text.Location
                = new System.Drawing.Point(10, 10);
@@ -492,6 +496,7 @@ public class Coil : MonoBehaviour
             form1.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 
             form1.Height = 200;
+            form1.Width = 300;
 
             button1.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             button3.DialogResult = System.Windows.Forms.DialogResult.OK;
