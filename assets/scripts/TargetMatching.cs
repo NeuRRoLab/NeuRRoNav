@@ -452,7 +452,7 @@ public class TargetMatching : MonoBehaviour
 
         setTargetColor(angleDif * 0.9f);
 
-        string r = setRotateInstruction("CtrCl ", "Clk ", rpy[0], rThresh);
+        string r = setRotateInstruction("Clk ", "CtrCl ", rpy[0], rThresh);
         string p = setRotateInstruction("Up ", "Dwn ", -rpy[1], rThresh);
         string y = setRotateInstruction("Lef ", "Rigt ", rpy[2], rThresh);
 

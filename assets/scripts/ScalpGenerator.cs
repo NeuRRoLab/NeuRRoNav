@@ -349,7 +349,7 @@ public class ScalpGenerator : MonoBehaviour
             // Take the scalp Mesh center object and parent that too, makes stuff easier
             planeCenter.parent = center.transform;
             planeCenter.localPosition = Vector3.zero;
-            planeCenter.rotation = center.transform.rotation;
+            //planeCenter.rotation = center.transform.rotation;
 
 			// Setup the scalp to use similair local coordinates to the center
 			scalp.transform.localScale = scalpStartScale;

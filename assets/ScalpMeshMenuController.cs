@@ -344,8 +344,8 @@ public class ScalpMeshMenuController : MonoBehaviour {
         planePoint.position = midpoint;
         planePoint.rotation = Quaternion.LookRotation(-planedir, vbacktonose);
 
-        width = Vector3.Distance(lefthead.position, midpoint) * 3f;
-        length = Vector3.Distance(nose.position, midpoint) * 3f;
+        width = Vector3.Distance(lefthead.position, midpoint) * 6f;
+        length = Vector3.Distance(nose.position, midpoint) * 6f;
 
         // Now to create our mesh
         // start from back left
