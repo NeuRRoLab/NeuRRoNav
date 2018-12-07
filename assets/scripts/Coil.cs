@@ -52,6 +52,8 @@ public class Coil : MonoBehaviour
 
     int point;
 
+    Text stylusTracking;
+
     void Start()
     {
         initialized = false;
@@ -59,6 +61,7 @@ public class Coil : MonoBehaviour
         calibrationInstruct = GameObject.Find("CalibrationInstructions").GetComponent<Text>();
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
         coilTrackStatus = GameObject.Find("CoilTrackStatus").GetComponent<Text>();
+        stylusTracking = GameObject.Find("StylusTrackStatus").GetComponent<Text>();
         FindObjectOfType<SlipStream>().PacketNotification += new PacketReceivedHandler(OnPacketReceived);
 
         coilTrackingIsSensitive = false;
@@ -166,7 +169,7 @@ public class Coil : MonoBehaviour
 
     void Update()
     {
-        if (calibrating && Utility.AnyInputDown())
+        if (calibrating && Input.anyKeyDown && stylusTracking.color.Equals(Color.green) &&(!Input.GetMouseButton(0)))
         {
             if (point == 0)
             {
@@ -236,9 +239,14 @@ public class Coil : MonoBehaviour
         calibrating = false;
         point = 0;
         calibrationInstruct.text = "";
-
-        ExportCoil();
-
+        if (GameObject.Find("Toggle_SavePrompts").GetComponent<Toggle>().isOn)
+        {
+            if (AskIfToSave())
+            {
+                ExportCoil();
+            }
+        }
+        GameObject.Find("Save Coil").GetComponent<UnityEngine.UI.Button>().interactable = true;
         GameObject.Find("ScalpGenerator").GetComponent<ScalpGenerator>().waitingToDraw = true;
 
     }
@@ -251,8 +259,22 @@ public class Coil : MonoBehaviour
 
         path += fileName;
 
+        if (System.IO.File.Exists(path))
+        {
+            bool val = PromptOverwrite();
+            if (val == false)
+            {
+                //Debug.Log("Quitting Save");
+                return;
+            }
+            else
+            {
+               // Debug.Log("Overwriting!!!");
+            }
+        }
+
         using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(path, true))
+            new System.IO.StreamWriter(path, false))
         {
             Vector3 hotspotLoc = coil.transform.InverseTransformPoint(calibrateHotSpot.transform.position);
             Vector3 rightLoc = coil.transform.InverseTransformPoint(calibrateRight.transform.position);
@@ -263,7 +285,7 @@ public class Coil : MonoBehaviour
             file.WriteLine(forwarLoc.x + "\t" + forwarLoc.y + "\t" + forwarLoc.z);
         }
 
-        GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().incrementField((int)SettingsMenu.settings.coilSaveName);
+       // GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().incrementField((int)SettingsMenu.settings.coilSaveName);
     }
 
     public void ImportCoil()
@@ -307,14 +329,47 @@ public class Coil : MonoBehaviour
                 calibrateHotSpot = points[0];
                 calibrateRight = points[1];
                 calibrateForward = points[2];
-        }
+            }
             catch (Exception e)
-        {
-            //something went wrong, warn user
-            return;
-        }
+            {
+                //something went wrong, warn user
+                return;
+            }
 
-        MatchRotation();
+            //MatchRotation();
+
+            hotspot.transform.parent = null;
+            calibrateHotSpot.transform.parent = null;
+            calibrateForward.transform.parent = null;
+            calibrateRight.transform.parent = null;
+
+            container.transform.parent = hotspot.transform;
+            hotspot.transform.position = calibrateHotSpot.transform.position;
+            container.transform.parent = null;
+
+            hotspot.transform.LookAt(forward.transform);
+            container.transform.parent = hotspot.transform;
+            hotspot.transform.LookAt(calibrateForward.transform);
+
+            container.transform.parent = null;
+            hotspot.transform.LookAt(right.transform, calibrateForward.transform.position - calibrateHotSpot.transform.position);
+            container.transform.parent = hotspot.transform;
+            hotspot.transform.LookAt(calibrateRight.transform, calibrateForward.transform.position - calibrateHotSpot.transform.position);
+
+            container.transform.parent = coil.transform;
+            hotspot.transform.rotation = container.transform.rotation;
+            hotspot.transform.parent = container.transform;
+
+            calibrateForward.transform.parent = coil.transform;
+            calibrateHotSpot.transform.parent = coil.transform;
+            calibrateRight.transform.parent = coil.transform;
+
+            calibrating = false;
+            point = 0;
+            calibrationInstruct.text = "";
+
+            GameObject.Find("ScalpGenerator").GetComponent<ScalpGenerator>().waitingToDraw = true;
+            GameObject.Find("Save Coil").GetComponent<UnityEngine.UI.Button>().interactable = true;
         }
     }
 
@@ -322,4 +377,153 @@ public class Coil : MonoBehaviour
     {
         coilTrackingIsSensitive = state;
     }
+
+    bool PromptOverwrite()
+    {
+        using (var form1 = new System.Windows.Forms.Form())
+        {
+            System.Windows.Forms.Label text = new System.Windows.Forms.Label();
+            System.Windows.Forms.Button button1 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button button3 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button buttondefault = new System.Windows.Forms.Button();
+            buttondefault.Location = new System.Drawing.Point(-2000, -2000);
+
+            text.Text = text.Text = "A file exists at the Coil Save location specified! \nDo you want to overwrite?\n\nIf not: Cancel, then edit the Save Coil Field, \nthen Save Manually.";
+            text.Width = 280;
+            text.Height = 70;
+            text.Location
+               = new System.Drawing.Point(10, 10);
+
+            // Set the text of button1 to "OK".
+            button3.Text = "Cancel Save";
+            // Set the position of the button on the form.
+            button3.Location = new System.Drawing.Point(text.Left, text.Height + text.Top + 10);
+            button3.BackColor = System.Drawing.Color.LightGreen;
+            button3.Width = 100;
+
+            // Set the text of button1 to "OK".
+            button1.Text = "Overwrite!";
+            // Set the position of the button on the form.
+            button1.Location = new System.Drawing.Point(button3.Left, button3.Height + button3.Top + 15);
+            button1.BackColor = System.Drawing.Color.LightYellow;
+            button1.Width = 100;
+            form1.Text = "CAUTION";
+            // Define the border style of the form to a dialog box.
+            form1.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            // Set the MaximizeBox to false to remove the maximize box.
+            form1.MaximizeBox = false;
+            // Set the MinimizeBox to false to remove the minimize box.
+            form1.MinimizeBox = false;
+            // Set the accept button of the form to button1.
+            form1.AcceptButton = button1;
+            form1.CancelButton = button3;
+            // Set the cancel button of the form to button2.
+            // Set the start position of the form to the center of the screen.
+            form1.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+
+            form1.Height = 200;
+            form1.Width = 300;
+
+            button1.DialogResult = System.Windows.Forms.DialogResult.OK;
+            button3.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+
+            //Add button1 to the form.
+            form1.Controls.Add(buttondefault);
+            form1.Controls.Add(button1);
+            //Add button2 to the form.
+            form1.Controls.Add(button3);
+
+            form1.Controls.Add(text);
+            System.Windows.Forms.DialogResult retval = form1.ShowDialog();
+            // Display the form as a modal dialog box.
+            if (retval == System.Windows.Forms.DialogResult.Cancel)
+            {
+                //Debug.Log("Canceled save");
+                return false;
+            }
+            if (retval == System.Windows.Forms.DialogResult.OK)
+            {
+                //Debug.Log("accepted");
+                return true;
+            }
+
+
+        }
+        return false;
+    }
+
+    bool AskIfToSave()
+    {
+        using (var form1 = new System.Windows.Forms.Form())
+        {
+            System.Windows.Forms.Label text = new System.Windows.Forms.Label();
+            System.Windows.Forms.Button button1 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button button3 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button buttondefault = new System.Windows.Forms.Button();
+            buttondefault.Location = new System.Drawing.Point(-2000, -2000);
+
+            text.Text = "Successfully calibrated Coil! Do you want to save to \nCoil Save location?";
+            text.Width = 280;
+            text.Height = 50;
+            text.Location
+               = new System.Drawing.Point(10, 10);
+
+            // Set the text of button1 to "OK".
+            button3.Text = "Yes";
+            // Set the position of the button on the form.
+            button3.Location = new System.Drawing.Point(text.Left, text.Height + text.Top + 10);
+            button3.BackColor = System.Drawing.Color.LightGreen;
+            button3.Width = 100;
+
+            // Set the text of button1 to "OK".
+            button1.Text = "No";
+            // Set the position of the button on the form.
+            button1.Location = new System.Drawing.Point(button3.Left, button3.Height + button3.Top + 15);
+            button1.BackColor = System.Drawing.Color.Pink;
+            button1.Width = 100;
+            form1.Text = "";
+            // Define the border style of the form to a dialog box.
+            form1.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            // Set the MaximizeBox to false to remove the maximize box.
+            form1.MaximizeBox = false;
+            // Set the MinimizeBox to false to remove the minimize box.
+            form1.MinimizeBox = false;
+            // Set the accept button of the form to button1.
+            form1.AcceptButton = button1;
+            form1.CancelButton = button3;
+            // Set the cancel button of the form to button2.
+            // Set the start position of the form to the center of the screen.
+            form1.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+
+            form1.Height = 200;
+            form1.Width = 300;
+
+            button1.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            button3.DialogResult = System.Windows.Forms.DialogResult.OK;
+
+            //Add button1 to the form.
+            form1.Controls.Add(buttondefault);
+            form1.Controls.Add(button1);
+            //Add button2 to the form.
+            form1.Controls.Add(button3);
+
+            form1.Controls.Add(text);
+            System.Windows.Forms.DialogResult retval = form1.ShowDialog();
+            // Display the form as a modal dialog box.
+            if (retval == System.Windows.Forms.DialogResult.Cancel)
+            {
+                //Debug.Log("Canceled save");
+                return false;
+            }
+            if (retval == System.Windows.Forms.DialogResult.OK)
+            {
+                //Debug.Log("accepted");
+                return true;
+            }
+
+
+        }
+        return false;
+    }
+
 }

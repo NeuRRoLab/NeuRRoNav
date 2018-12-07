@@ -3,10 +3,11 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 public class ScalpGenerator : MonoBehaviour
 {
-
+    public Transform planeCenter;
     CameraController camController;
     SurfaceGen surfaceGen;
 
@@ -18,6 +19,7 @@ public class ScalpGenerator : MonoBehaviour
     int splines;
     int splinePoints;
 
+   
     GameObject[] landmarks;
     enum landmarkNames { nasion = 0, leftTragus = 1, rightTragus = 2, inion = 4, aproxVertex = 3 };
     int landmarkIndex;
@@ -43,6 +45,12 @@ public class ScalpGenerator : MonoBehaviour
     GameObject vertex;
 
     Vector3 scalpStartScale;
+
+    // If this is enabled, then an average of 5 clicks for each landmark are used. 
+    bool averageMode = false;
+    int clicks_per_landmark = 1;
+    int clicks_per_landmark_placehold = 0;
+    Vector3 currentlandmark_runningaverage = Vector3.zero;
 
     void Start()
     {
@@ -124,24 +132,71 @@ public class ScalpGenerator : MonoBehaviour
         //    ExportScalpSurfaceXYZ();
         //}
     }
-
+    public void ToggleAverageMode() {
+        if (GameObject.Find("AverageLandmarksToggle").GetComponent<Toggle>().isOn)
+        {
+            averageMode = true;
+            clicks_per_landmark = System.Convert.ToInt32(GameObject.Find("NumberOfClicksField").GetComponent<InputField>().text);
+        }
+        else {
+            averageMode = false;
+            clicks_per_landmark = 1;
+        }
+    }
     void FindLandmarks()
     {
-		if (Utility.AnyInputDown() && stylusTracking.color.Equals(Color.green))
+		if (Input.anyKeyDown && stylusTracking.color.Equals(Color.green) && (!Input.GetMouseButton(0)))
         {
-            setLandmark(landmarkIndex);
-            landmarkIndex++;
-            if (landmarkIndex == 5)
+            stylusPoint = GameObject.Find("Stylus").transform.Find("Point").gameObject;
+            head = GameObject.Find("Head");
+            // Keep a running average of all points
+            currentlandmark_runningaverage += stylusPoint.transform.position;
+
+            clicks_per_landmark_placehold++;
+            
+            if (clicks_per_landmark_placehold >= clicks_per_landmark)
             {
-                waitingToDraw = true;
-                settingLandmarks = false;
-                calibrationInstruct.text = "";
-                CenterHead();
-                FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(false);
-                return;
+                // Have collected all 5 points, get their average, keep on rolling
+                setLandmarkFromVector(landmarkIndex,currentlandmark_runningaverage*((float)1/(float)clicks_per_landmark));
+
+                // reset used variables
+                currentlandmark_runningaverage = Vector3.zero;
+                clicks_per_landmark_placehold = 0;
+
+                landmarkIndex++;
+                if (landmarkIndex == 5)
+                {
+                    
+                    waitingToDraw = true;
+                    settingLandmarks = false;
+                    calibrationInstruct.text = "";
+                    CenterHead();
+                    FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(false);
+                    GameObject.Find("AverageLandmarksToggle").GetComponent<Toggle>().interactable = true;
+                    GameObject.Find("Save Landmarks").GetComponent<Button>().interactable = true;
+                    GameObject.Find("NumberOfClicksField").GetComponent<InputField>().interactable = true;
+
+                    if (GameObject.Find("Toggle_SavePrompts").GetComponent<Toggle>().isOn)
+                    {
+                        // We have set all landmarks, and are done.
+                        if (AskIfToSave())
+                        {
+                            ExportLandmarks();
+                        }
+                    }
+
+
+
+                    return;
+                }
             }
-                
-            calibrationInstruct.text = "Select " + LandmarkIndexToName(landmarkIndex);
+            if (!averageMode)
+            {
+                calibrationInstruct.text = "Select " + LandmarkIndexToName(landmarkIndex);
+            }
+            else {
+                calibrationInstruct.text = "Select " + LandmarkIndexToName(landmarkIndex) + ", Iteration: "+clicks_per_landmark_placehold.ToString();
+            }
         }
     }
 
@@ -160,6 +215,21 @@ public class ScalpGenerator : MonoBehaviour
 		}
 		return "Index Error";
 	}
+
+    void setLandmarkFromVector(int index, Vector3 pos) {
+        head = GameObject.Find("Head");
+        Debug.Log(landmarks[index].name);
+        landmarks[index].transform.position = pos;
+        landmarks[index].transform.parent = head.transform;
+    }
+
+    void SetLandmarkFromLocalPos(int index, Vector3 localpos) {
+        head = GameObject.Find("Head");
+        Debug.Log(landmarks[index].name);
+        landmarks[index].transform.parent = head.transform;
+        landmarks[index].transform.localPosition = localpos;
+        
+    }
 
     void setLandmark(int index)
     {
@@ -216,6 +286,10 @@ public class ScalpGenerator : MonoBehaviour
     void CenterHead()
     {
         head = GameObject.Find("Head");
+        // Save the coil and scalp if need be
+        ScalpMeshSerialized saveScalp = FindObjectOfType<ScalpMeshMenuController>().SerializeHeadMesh();
+        GridSerialized saveGrid = FindObjectOfType<TargetMatching>().SerializeGrid();
+
         if (scalp == null)
         {
             scalp = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -231,13 +305,27 @@ public class ScalpGenerator : MonoBehaviour
             //scalp.transform.parent = head.transform;
         }
         else {
+            // If we are recreating the center, ie it already existed, undo the existing center object. 
+            // First, do any cameras currently point here?
+            for (int i = 0; i < 3; ++i) {
+                if (camController.targets[i] == center) {
+                    camController.putCamOnStylus(i);
+                }
+            }
+            
+
 			if (center != null) {
 				Transform[] children = center.GetComponentsInChildren<Transform>();
 				foreach (Transform child in children) {
-					if (child.transform.parent == this.transform)
-						child.transform.parent = center.transform.parent;
+                    if (child.transform.parent == this.transform)
+                    {
+                        
+                        child.transform.parent = center.transform.parent;
+                    }
 				}
+                center.name = "junk";
 				Destroy(center);
+                
 			}
 
 			// Find the center of the three most important points
@@ -267,6 +355,11 @@ public class ScalpGenerator : MonoBehaviour
 				landmark.transform.parent = center.transform;
 			}
 
+            // Take the scalp Mesh center object and parent that too, makes stuff easier
+            planeCenter.parent = center.transform;
+            planeCenter.localPosition = Vector3.zero;
+            //planeCenter.rotation = center.transform.rotation;
+
 			// Setup the scalp to use similair local coordinates to the center
 			scalp.transform.localScale = scalpStartScale;
 			scalp.GetComponent<CenterScalp>().Center();
@@ -279,13 +372,15 @@ public class ScalpGenerator : MonoBehaviour
 			newScalpScale.z =
 				Mathf.Abs(landmarks[(int)landmarkNames.nasion].transform.localPosition.z - landmarks[(int)landmarkNames.inion].transform.localPosition.z) /
 				Mathf.Abs(nasion.transform.localPosition.z - inion.transform.localPosition.z);
-			//newScalpScale.y =
-			//	(Mathf.Abs(landmarks[(int)landmarkNames.nasion].transform.localPosition.y - landmarks[(int)landmarkNames.aproxVertex].transform.localPosition.x) /
-			//	Mathf.Abs(nasion.transform.localPosition.y - vertex.transform.localPosition.y)) / 2.2f;
-			newScalpScale.y = (newScalpScale.x + newScalpScale.z) / 2;
 
-			// Move the scalp under center and setup the transform properties
-			scalp.transform.parent = center.transform;
+            //newScalpScale.y = (newScalpScale.x + newScalpScale.z) / 2;
+            newScalpScale.y =
+                Mathf.Abs(landmarks[(int)landmarkNames.aproxVertex].transform.localPosition.y ) /
+                Mathf.Abs(vertex.transform.localPosition.y);
+
+
+            // Move the scalp under center and setup the transform properties
+            scalp.transform.parent = center.transform;
 			scalp.transform.localPosition = Vector3.zero;
 			scalp.transform.localRotation = Quaternion.identity;
 			scalp.transform.localScale = newScalpScale;
@@ -294,10 +389,30 @@ public class ScalpGenerator : MonoBehaviour
 			camController.centerMainOnObject(head, -center.transform.forward, 0.5F);
 
 			GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
-			GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
+			//GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
 			GameObject.Find("Load Grids").GetComponent<Button>().interactable = true;
-		}
-	}
+            GameObject.Find("Scalp Mesh").GetComponent<Button>().interactable = true;
+            foreach (Button b in GameObject.Find("LandmarksList").GetComponentsInChildren<Button>())
+            {
+                b.interactable = true;
+            }
+            // camController.putMainCam1FacingBackOfCoil(tPoint.pos);
+            //  camController.putTargetCam1OnTargetXZ(tPoint.pos);
+            // camController.putTargetCam2OnTargetZY(tPoint.pos);
+
+            
+            
+        }
+        // Now restore
+
+        if (saveGrid != null) {
+            FindObjectOfType<TargetMatching>().ImportGridFromSerialized(saveGrid);
+        }
+        if (saveScalp != null) {
+            FindObjectOfType<ScalpMeshMenuController>().LoadSerializedHeadMesh(saveScalp);
+        }
+
+    }
 
     //public void ExportScalpSurfaceXYZ()
     //{
@@ -362,13 +477,18 @@ public class ScalpGenerator : MonoBehaviour
     {
         head = GameObject.Find("Head");
         FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(true);
-        if(landmarks != null)
+        if (averageMode) {
+            clicks_per_landmark = System.Convert.ToInt32(GameObject.Find("NumberOfClicksField").GetComponent<InputField>().text);
+        }
+        GameObject.Find("AverageLandmarksToggle").GetComponent<Toggle>().interactable = false;
+        GameObject.Find("NumberOfClicksField").GetComponent<InputField>().interactable = false;
+        if (landmarks != null)
         {
             for (int i = 0; i < 5; i++)
             {
                 if (landmarks[i] != null)
                 {
-                    DestroyImmediate(landmarks[i]);
+                    Destroy(landmarks[i]);
                 }
             }
         }
@@ -399,7 +519,15 @@ public class ScalpGenerator : MonoBehaviour
         landmarkIndex = 0;
         settingLandmarks = true;
 
-        calibrationInstruct.text = "Select Nasion";
+        if (!averageMode)
+        {
+            calibrationInstruct.text = "Select Nasion";
+        }
+        else
+        {
+            calibrationInstruct.text = "Select Nasion, Iteration 0"; 
+        }
+
     }
 
     public void LandmarkButtonPress(int landmark)
@@ -488,7 +616,7 @@ public class ScalpGenerator : MonoBehaviour
     //        //        index++;
     //        //    }
     //        //}
-            
+
     //        for (j = 0; j < highestResolution; j++)
     //        {
     //            if (j < splineCage[i].Count)
@@ -514,4 +642,318 @@ public class ScalpGenerator : MonoBehaviour
     //        Destroy(s);
     //    }
     //}
+
+    public void ImportLandmarks()
+    {
+        head = GameObject.Find("Head");
+        FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(true);
+        if (averageMode)
+        {
+            clicks_per_landmark = System.Convert.ToInt32(GameObject.Find("NumberOfClicksField").GetComponent<InputField>().text);
+        }
+        
+        if (landmarks != null)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                if (landmarks[i] != null)
+                {
+                    Destroy(landmarks[i]);
+                }
+            }
+        }
+        landmarks = new GameObject[5];
+        for (int i = 0; i < 5; i++)
+        {
+            landmarks[i] = new GameObject();
+            landmarks[i].transform.position = head.transform.position;
+            landmarks[i].transform.rotation = head.transform.rotation;
+            landmarks[i].transform.parent = head.transform;
+            landmarks[i].name = LandmarkIndexToName(i);
+
+            DebugPoint debugPoint = landmarks[i].AddComponent<DebugPoint>();
+            debugPoint.p = PrimitiveType.Cube;
+            if (i == 0)
+                debugPoint.c = Color.red;
+            else if (i == 1)
+                debugPoint.c = Color.yellow;
+            else if (i == 2)
+                debugPoint.c = Color.green;
+            else if (i == 3)
+                debugPoint.c = Color.cyan;
+            else if (i == 4)
+                debugPoint.c = Color.magenta;
+
+
+        }
+
+        string path = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.landmarkLoadPath);
+        print(path);
+        string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.landmarkLoadName);
+
+        try
+        {
+            System.IO.FileStream filestream = new System.IO.FileStream(path + "/" + fileName,
+                                              System.IO.FileMode.Open,
+                                              System.IO.FileAccess.Read,
+                                              System.IO.FileShare.Read);
+            System.IO.StreamReader file = new System.IO.StreamReader(filestream);
+
+            for (int i = 0; i < 5; ++i) {
+                string line = file.ReadLine();
+                var elements = line.Split('\t');
+                Vector3 pos = new Vector3(float.Parse(elements[1]), float.Parse(elements[2]), float.Parse(elements[3]));
+                switch (i) {
+                    case 0:
+                        SetLandmarkFromLocalPos((int)landmarkNames.nasion, pos);
+                        break;
+                    case 1:
+                        SetLandmarkFromLocalPos((int)landmarkNames.rightTragus, pos);
+                        break;
+                    case 2:
+                        SetLandmarkFromLocalPos((int)landmarkNames.leftTragus, pos);
+                        break;
+                    case 3:
+                        SetLandmarkFromLocalPos((int)landmarkNames.aproxVertex, pos);
+                        break;
+                    case 4:
+                        SetLandmarkFromLocalPos((int)landmarkNames.inion, pos);
+                        break;
+                }
+            }
+
+            
+
+            file.Close();
+        }
+        catch (Exception e)
+        {
+            print(e);
+            //tell user something went wrong
+            return;
+        }
+        // We have set all landmarks, and are done.
+        waitingToDraw = true;
+        settingLandmarks = false;
+        calibrationInstruct.text = "";
+        CenterHead();
+        FindObjectOfType<Stylus>().setStylusSensitiveTrackingState(false);
+        GameObject.Find("AverageLandmarksToggle").GetComponent<Toggle>().interactable = true;
+        GameObject.Find("Save Landmarks").GetComponent<Button>().interactable = true;
+        GameObject.Find("NumberOfClicksField").GetComponent<InputField>().interactable = true;
+    }
+
+    public void ExportLandmarks()
+    {
+        head = GameObject.Find("Head");
+        GameObject center = GameObject.Find("Center");
+
+        string path = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.landmarkSavePath);
+        string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.landmarkSaveName);
+
+        path += fileName;
+        if (System.IO.File.Exists(path))
+        {
+            bool val = PromptOverwrite();
+            if (val == false)
+            {
+                //Debug.Log("Quitting Save");
+                return;
+            }
+            else
+            {
+                // Debug.Log("Overwriting!!!");
+            }
+        }
+
+
+        // We want position relative to head, not center!!!
+        landmarks[(int)landmarkNames.nasion].transform.parent = head.transform;
+        landmarks[(int)landmarkNames.rightTragus].transform.parent = head.transform;
+        landmarks[(int)landmarkNames.leftTragus].transform.parent = head.transform;
+        landmarks[(int)landmarkNames.aproxVertex].transform.parent = head.transform;
+        landmarks[(int)landmarkNames.inion].transform.parent = head.transform;
+
+
+        using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(path, false))
+        {
+            
+
+
+            Vector3 pos = landmarks[(int)landmarkNames.nasion].transform.localPosition;
+            file.WriteLine("Nasion:\t"+pos.x.ToString()+'\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
+
+            pos = landmarks[(int)landmarkNames.rightTragus].transform.localPosition;
+            file.WriteLine("rTragus:\t" + pos.x.ToString() + '\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
+
+            pos = landmarks[(int)landmarkNames.leftTragus].transform.localPosition;
+            file.WriteLine("lTragus:\t" + pos.x.ToString() + '\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
+
+            pos = landmarks[(int)landmarkNames.aproxVertex].transform.localPosition;
+            file.WriteLine("Vertex:\t" + pos.x.ToString() + '\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
+
+            pos = landmarks[(int)landmarkNames.inion].transform.localPosition;
+            file.WriteLine("Inion:\t" + pos.x.ToString() + '\t' + pos.y.ToString() + '\t' + pos.z.ToString() + '\t');
+            
+            
+        }
+
+        // Gotta revert back to parenting all lmarks to center
+        landmarks[(int)landmarkNames.nasion].transform.parent = center.transform;
+        landmarks[(int)landmarkNames.rightTragus].transform.parent = center.transform;
+        landmarks[(int)landmarkNames.leftTragus].transform.parent = center.transform;
+        landmarks[(int)landmarkNames.aproxVertex].transform.parent = center.transform;
+        landmarks[(int)landmarkNames.inion].transform.parent = center.transform;
+
+        //GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().incrementField((int)SettingsMenu.settings.landmarkSaveName);
+    }
+
+    bool PromptOverwrite()
+    {
+        using (var form1 = new System.Windows.Forms.Form())
+        {
+            System.Windows.Forms.Label text = new System.Windows.Forms.Label();
+            System.Windows.Forms.Button button1 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button button3 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button buttondefault = new System.Windows.Forms.Button();
+            buttondefault.Location = new System.Drawing.Point(-2000, -2000);
+
+            text.Text = text.Text = "A file exists at the Landmark Save location specified! \nDo you want to overwrite?\n\nIf not: Cancel, then edit the Save Landmark Field, \nthen Save Manually.";
+            text.Width = 280;
+            text.Height = 70;
+            text.Location
+               = new System.Drawing.Point(10, 10);
+
+            // Set the text of button1 to "OK".
+            button3.Text = "Cancel Save";
+            // Set the position of the button on the form.
+            button3.Location = new System.Drawing.Point(text.Left, text.Height + text.Top + 10);
+            button3.BackColor = System.Drawing.Color.LightGreen;
+            button3.Width = 100;
+
+            // Set the text of button1 to "OK".
+            button1.Text = "Overwrite!";
+            // Set the position of the button on the form.
+            button1.Location = new System.Drawing.Point(button3.Left, button3.Height + button3.Top + 15);
+            button1.BackColor = System.Drawing.Color.LightYellow;
+            button1.Width = 100;
+            form1.Text = "CAUTION";
+            // Define the border style of the form to a dialog box.
+            form1.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            // Set the MaximizeBox to false to remove the maximize box.
+            form1.MaximizeBox = false;
+            // Set the MinimizeBox to false to remove the minimize box.
+            form1.MinimizeBox = false;
+            // Set the accept button of the form to button1.
+            form1.AcceptButton = button1;
+            form1.CancelButton = button3;
+            // Set the cancel button of the form to button2.
+            // Set the start position of the form to the center of the screen.
+            form1.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+
+            form1.Height = 200;
+            form1.Width = 300;
+
+            button1.DialogResult = System.Windows.Forms.DialogResult.OK;
+            button3.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+
+            //Add button1 to the form.
+            form1.Controls.Add(buttondefault);
+            form1.Controls.Add(button1);
+            //Add button2 to the form.
+            form1.Controls.Add(button3);
+
+            form1.Controls.Add(text);
+            System.Windows.Forms.DialogResult retval = form1.ShowDialog();
+            // Display the form as a modal dialog box.
+            if (retval == System.Windows.Forms.DialogResult.Cancel)
+            {
+                //Debug.Log("Canceled save");
+                return false;
+            }
+            if (retval == System.Windows.Forms.DialogResult.OK)
+            {
+                //Debug.Log("accepted");
+                return true;
+            }
+
+
+        }
+        return false;
+    }
+
+    bool AskIfToSave()
+    {
+        using (var form1 = new System.Windows.Forms.Form())
+        {
+            System.Windows.Forms.Label text = new System.Windows.Forms.Label();
+            System.Windows.Forms.Button button1 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button button3 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button buttondefault = new System.Windows.Forms.Button();
+            buttondefault.Location = new System.Drawing.Point(-2000, -2000);
+
+            text.Text = "Successfully calibrated Landmarks! Do you want to save\n to Landmark Save location?";
+            text.Width = 280;
+            text.Height = 50;
+            text.Location
+               = new System.Drawing.Point(10, 10);
+
+            // Set the text of button1 to "OK".
+            button3.Text = "Yes";
+            // Set the position of the button on the form.
+            button3.Location = new System.Drawing.Point(text.Left, text.Height + text.Top + 10);
+            button3.BackColor = System.Drawing.Color.LightGreen;
+            button3.Width = 100;
+
+            // Set the text of button1 to "OK".
+            button1.Text = "No";
+            // Set the position of the button on the form.
+            button1.Location = new System.Drawing.Point(button3.Left, button3.Height + button3.Top + 15);
+            button1.BackColor = System.Drawing.Color.Pink;
+            button1.Width = 100;
+            form1.Text = "";
+            // Define the border style of the form to a dialog box.
+            form1.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            // Set the MaximizeBox to false to remove the maximize box.
+            form1.MaximizeBox = false;
+            // Set the MinimizeBox to false to remove the minimize box.
+            form1.MinimizeBox = false;
+            // Set the accept button of the form to button1.
+            form1.AcceptButton = button1;
+            form1.CancelButton = button3;
+            // Set the cancel button of the form to button2.
+            // Set the start position of the form to the center of the screen.
+            form1.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+
+            form1.Height = 200;
+            form1.Width = 300;
+
+            button1.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            button3.DialogResult = System.Windows.Forms.DialogResult.OK;
+
+            //Add button1 to the form.
+            form1.Controls.Add(buttondefault);
+            form1.Controls.Add(button1);
+            //Add button2 to the form.
+            form1.Controls.Add(button3);
+
+            form1.Controls.Add(text);
+            System.Windows.Forms.DialogResult retval = form1.ShowDialog();
+            // Display the form as a modal dialog box.
+            if (retval == System.Windows.Forms.DialogResult.Cancel)
+            {
+                //Debug.Log("Canceled save");
+                return false;
+            }
+            if (retval == System.Windows.Forms.DialogResult.OK)
+            {
+                //Debug.Log("accepted");
+                return true;
+            }
+
+
+        }
+        return false;
+    }
 }

@@ -8,6 +8,8 @@ using System.Diagnostics;
 
 public class TargetMatching : MonoBehaviour
 {
+    Text calibrationInstruct;
+
     Stopwatch watch;
     GameObject coil;
     GameObject tCoil;
@@ -44,12 +46,14 @@ public class TargetMatching : MonoBehaviour
     bool logging;
     bool initalized = false;
 
-    public float mThresh = 0.1F;
-    public float rThresh = 1F;
+    public float mThresh = 0.25F;
+    public float rThresh = 2.5F;
 
 
     FileIO logger;
     SettingsMenu settingsMenu;
+
+    public LayerMask mask;
 
     public void setMThresh()
     {
@@ -70,6 +74,7 @@ public class TargetMatching : MonoBehaviour
     {
         coilTracker = GameObject.Find("CoilTracker").GetComponent<Coil>();
         camController = GameObject.Find("Camera Controller").GetComponent<CameraController>();
+        calibrationInstruct = GameObject.Find("CalibrationInstructions").GetComponent<Text>();
         settingsMenu = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>();
         matching = false;
         usingGrid = false;
@@ -112,15 +117,15 @@ public class TargetMatching : MonoBehaviour
     {
         coilTracker.setStylusSensitiveTrackingState(matching);
         
-        if (settingGrid && (Utility.AnyInputDown()))
-        {
-            currentGrid.gridPoints.Add(CreateGridPoint());
-        }
+        //if (settingGrid && (Utility.AnyInputDown()))
+       // {
+        //    currentGrid.gridPoints.Add(CreateGridPoint());
+       // }
         if (usingGrid && Input.GetKeyDown(KeyCode.Mouse1) && !matching)
         {
-            MouseSelectGridPoint();
+            MouseSelectHotSpot();
         }
-        if (settingHotSpot && (Input.GetKeyDown(KeyCode.Space)))
+        if (settingHotSpot && (Input.anyKeyDown) &&(!Input.GetMouseButton(0)))
         {
             prepareHotSpot();
         }
@@ -150,9 +155,18 @@ public class TargetMatching : MonoBehaviour
         GameObject hs = new GameObject();
         hs.transform.position = GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.position;
         hs.transform.rotation = GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.rotation;
+        // Yuck
         CreateScalpHotSpot(GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.position, GameObject.Find(coilTracker.coilName).transform.FindChild("container").FindChild("hotspot").transform.rotation);
+        if (GameObject.Find("Toggle_SavePrompts").GetComponent<Toggle>().isOn)
+        {
+            if (AskIfToSave())
+            {
+                ExportGrid(0);
+            }
+        }
 
         setHotSpot.text = "New Hot Spot";
+        calibrationInstruct.text = "";
         settingHotSpot = false;
     }
 
@@ -186,7 +200,7 @@ public class TargetMatching : MonoBehaviour
         logger.setColumn(6, watch.ElapsedMilliseconds.ToString());
         logger.Log();
     }
-
+    /*
     public void SetPointOrientation()
     {
         tPoint.rot.transform.rotation = coilHotSpot.transform.rotation;
@@ -201,30 +215,33 @@ public class TargetMatching : MonoBehaviour
         DestroyImmediate(tPoint.pos.transform.FindChild("point").gameObject);
         InstantiateTargetCoil();
         VisualizePoint(tPoint.pos, tPoint.rot);
-    }
+    }*/
 
-    private void MouseSelectGridPoint()
+    private void MouseSelectHotSpot()
     {
         Ray ray = camController.cameras[camController.activeCamera].GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         //int result;
-        if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray,out hit,100000,mask))
         {
             GameObject hitObj = hit.collider.gameObject.transform.parent.gameObject;
             TargetPoint newTPoint = null;
-            UnityEngine.Debug.Log(hitObj.name.ToString());
+            // UnityEngine.Debug.Log("Hit an object:");
+            // UnityEngine.Debug.Log(hitObj.name.ToString());
+            /*
             foreach (TargetPoint t in currentGrid.gridPoints)
-            {
-                if(t.pos.Equals(hitObj))
+            {  
+                if (t.pos.Equals(hitObj))
                 {
                     newTPoint = t;
                     break;
                 }
-            }
+            }*/
             if(newTPoint==null)
             {
                 foreach (TargetPoint t in currentGrid.hotSpots)
                 {
+                    
                     if (t.pos.Equals(hitObj))
                     {
                         newTPoint = t;
@@ -234,6 +251,7 @@ public class TargetMatching : MonoBehaviour
             }
             if(newTPoint!=null && newTPoint.fired == false)
             {
+               // UnityEngine.Debug.Log("Case 3");
                 tPoint = newTPoint;
                 target();
             }
@@ -243,7 +261,7 @@ public class TargetMatching : MonoBehaviour
             }
         }
     }
-
+    /*
     private TargetPoint CreateGridPoint()
     {
         TargetPoint point = new TargetPoint(false, currentGrid.gridPoints);
@@ -258,7 +276,7 @@ public class TargetMatching : MonoBehaviour
         VisualizePoint(pos);
 
         return point;
-    }
+    }*/
 
     private static void VisualizePoint(GameObject pos)
     {
@@ -322,7 +340,7 @@ public class TargetMatching : MonoBehaviour
         float deltY = p.y - t.y;
         float deltZ = p.z - t.z;
 
-        if (distance > 0.05)
+        if (distance > 0.5) // 0.05 is what this should be
         {
             distance = 1;
             deltX *= 100;
@@ -356,9 +374,9 @@ public class TargetMatching : MonoBehaviour
             deltZ *= 100;
 
             //Calculate needed corrections
-            string rl = setMoveInstruction("Right ", "Left ", deltX, mThresh);
-            string ud = setMoveInstruction("Up ", "Down ", deltY, mThresh);
-            string fb = setMoveInstruction("Back ", "Forward ", deltZ, mThresh);
+            string rl = setMoveInstruction("Right ", "Left ", -deltX, mThresh);
+            string ud = setMoveInstruction("Up ", "Down ", -deltY, mThresh);
+            string fb = setMoveInstruction("Back ", "Fward ", deltZ, mThresh);
 
             //Update the status of each dimension
             xStatus[0].text = xStatus[1].text = "X: " + rl + deltX.ToString("0.0");
@@ -386,11 +404,13 @@ public class TargetMatching : MonoBehaviour
 
     private Quaternion quaternionDifference(Quaternion fromRotation, Quaternion toRotation)
     {
-        return fromRotation * Quaternion.Inverse(toRotation);
+        //return fromRotation * Quaternion.Inverse(toRotation);
+        return Quaternion.Inverse(fromRotation) * toRotation;
     }
 
     private float[] AngleDecomposition(Quaternion angle)//Returns Roll Pitch Yaw
     {
+        // 
         float w = angle.w;
         float y = angle.y;
         float z = angle.z;
@@ -410,6 +430,8 @@ public class TargetMatching : MonoBehaviour
         //float pitch = coilHotSpot.transform.rotation.eulerAngles.x - tPoint.rot.transform.rotation.eulerAngles.x;
         //float yaw = coilHotSpot.transform.rotation.eulerAngles.y - tPoint.rot.transform.rotation.eulerAngles.y;
         //float roll = coilHotSpot.transform.rotation.eulerAngles.z - tPoint.rot.transform.rotation.eulerAngles.z;
+
+        // This gives the angle that when applied to coilHotSpot, will result in tPoint.rotation
         Quaternion angle =  quaternionDifference(coilHotSpot.transform.rotation, tPoint.rot.transform.rotation);
 
         float[] rpy = AngleDecomposition(angle);
@@ -430,13 +452,13 @@ public class TargetMatching : MonoBehaviour
 
         setTargetColor(angleDif * 0.9f);
 
-        string r = setRotateInstruction("Cntr Clockwise ", "Clockwise ", rpy[0], rThresh);
-        string p = setRotateInstruction("Pitch Up ", "Pitch Down ", rpy[1], rThresh);
-        string y = setRotateInstruction("Yaw Left ", "Yaw Right ", rpy[2], rThresh);
+        string r = setRotateInstruction("Clk ", "CtrCl ", rpy[0], rThresh);
+        string p = setRotateInstruction("Up ", "Dwn ", -rpy[1], rThresh);
+        string y = setRotateInstruction("Lef ", "Rigt ", rpy[2], rThresh);
 
-        pitchStatus[0].text = pitchStatus[1].text = "Pitch: " + p + rpy[1].ToString("0.00");
-        yawStatus[0].text = yawStatus[1].text = "Yaw: " + y + rpy[2].ToString("0.00");
-        rollStatus[0].text = rollStatus[1].text = "Roll: " + r + rpy[0].ToString("0.00");
+        pitchStatus[0].text = pitchStatus[1].text = "P: " + p + rpy[1].ToString("0.00");
+        yawStatus[0].text = yawStatus[1].text = "Y: " + y + rpy[2].ToString("0.00");
+        rollStatus[0].text = rollStatus[1].text = "R: " + r + rpy[0].ToString("0.00");
 
         //loggingString[3] = "Pitch: " + rpy[1].ToString("0.00");
         //loggingString[4] = "Yaw: " + rpy[2].ToString("0.00");
@@ -491,13 +513,13 @@ public class TargetMatching : MonoBehaviour
 
     public class Grid
     {
-        public IList<TargetPoint> gridPoints;
-        public IList<TargetPoint> hotSpots;
+        //public IList<TargetPoint> gridPoints;
+        public IList<TargetPoint> hotSpots; 
         public string name;
 
-        public Grid(string name, IList<TargetPoint> points, IList<TargetPoint> hotSpots)
+        public Grid(string name, /*IList<TargetPoint> points,*/ IList<TargetPoint> hotSpots)
         {
-            this.gridPoints = points;
+            //this.gridPoints = points;
             this.hotSpots = hotSpots;
             this.name = name;
         }
@@ -505,6 +527,22 @@ public class TargetMatching : MonoBehaviour
 
     public void AddPoints()
     {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Old stuff I don't get, ignore for now
+        /*
         if (!settingGrid)
         {
             if(currentGrid == null)
@@ -535,9 +573,9 @@ public class TargetMatching : MonoBehaviour
             GameObject.Find("ScalpGenerator").GetComponent<ScalpGenerator>().waitingToDraw = true;
             GameObject.Find("Save Grids").GetComponent<Button>().interactable = true;
 
-        }
+        }*/
     }
-
+    /*
     private void CalculateEstimatedTangentsForGridPoints()
     {
         foreach (TargetPoint point in currentGrid.gridPoints)
@@ -663,18 +701,21 @@ public class TargetMatching : MonoBehaviour
 
             point.pos.transform.FindChild("point").transform.rotation = point.rot.transform.rotation;
         }
-    }
+    }*/
 
     public void setScalpHotspotButton(GameObject button)
     {
         if (settingHotSpot == false)
         {
+            calibrationInstruct.text = "Press Space";
+
             settingHotSpot = true;
             setHotSpot = button.GetComponentInChildren<Text>();
             setHotSpot.text = "Cancel";
         }
         else
         {
+            calibrationInstruct.text = "";
             settingHotSpot = false;
             setHotSpot.text = "New Hot Spot";
         }
@@ -690,7 +731,7 @@ public class TargetMatching : MonoBehaviour
 
     public void newGrid()
     {
-        DestroyCurrentGrid();
+        DestroyAllHotSpots();
         CreateNewGrid();
     }
 
@@ -698,9 +739,9 @@ public class TargetMatching : MonoBehaviour
     {
         numPoints = 0;
         int numg = ++numGrids;
-        IList<TargetPoint> gp = new List<TargetPoint>();
+        //IList<TargetPoint> gp = new List<TargetPoint>();
         IList<TargetPoint> hs = new List<TargetPoint>();
-        currentGrid = new Grid(gridName, gp, hs);
+        currentGrid = new Grid(gridName, /*gp,*/ hs);
         GameObject.Find("Set Grid").GetComponent<Button>().interactable = true;
         //GameObject.Find("ScalpGenerator").GetComponent<ScalpGenerator>().waitingToDraw = false;
     }
@@ -734,18 +775,23 @@ public class TargetMatching : MonoBehaviour
         }
     }
 
-    private void DestroyCurrentGrid()
+    private void DestroyAllHotSpots()
     {
-        if (currentGrid.gridPoints.Count > 0)
+        // New behavior: Put all three cameras on head, with similar orientation as when points are being lined up.
+        camController.putMainCam1FacingBackOfHead();
+        camController.putTargetCam1OnHeadXZ();
+        camController.putTargetCam2OnHeadZY();
+
+        if (currentGrid.hotSpots.Count > 0)
         {
-            foreach (TargetPoint point in currentGrid.gridPoints)
+            foreach (TargetPoint point in currentGrid.hotSpots)
             {
                 Destroy(point.pos.transform.FindChild("point").gameObject);
                 Destroy(point.pos.gameObject);
                 Destroy(point.rot.gameObject);
 
             }
-            currentGrid.gridPoints = null;
+            currentGrid.hotSpots = null;
         }
         GameObject.Find("Set Grid").GetComponent<Button>().interactable = false;
     }
@@ -754,6 +800,7 @@ public class TargetMatching : MonoBehaviour
     {
         if (matching)
         {
+            /* OLD BUGGY BEHAVIOR: would put both bottom cameras on stylus, and break the top one
             int i = 0;
             foreach(GameObject t in camController.targets)
             {
@@ -762,10 +809,17 @@ public class TargetMatching : MonoBehaviour
                     camController.putCamOnStylus(i);
                 }
                 i++;
-            }
-            DestroyImmediate(tPoint.pos.transform.FindChild("point").gameObject);
-            DestroyImmediate(tPoint.pos.gameObject);
-            DestroyImmediate(tPoint.rot.gameObject);
+            }*/
+
+            // New behavior: Put all three cameras on head, with similar orientation as when points are being lined up.
+            camController.putMainCam1FacingBackOfHead();
+            camController.putTargetCam1OnHeadXZ();
+            camController.putTargetCam2OnHeadZY();
+
+
+            Destroy(tPoint.pos.transform.FindChild("point").gameObject);
+            Destroy(tPoint.pos.gameObject);
+            Destroy(tPoint.rot.gameObject);
             tPoint.containedIn.Remove(tPoint);
 
             if (tCoil != null)
@@ -778,10 +832,13 @@ public class TargetMatching : MonoBehaviour
             }
 
             GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "";
+            GameObject.Find("Set Grid").GetComponent<Button>().interactable = true;
             GameObject.Find("Delete Point").GetComponent<Button>().interactable = false;
-            GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
+            //GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
             GameObject.Find("Logging").GetComponent<Button>().interactable = false;
-
+            GameObject.Find("Generate Grid").GetComponent<Button>().interactable = false;
+            GameObject.Find("Scalp Mesh").GetComponent<Button>().interactable = true;
+            GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
             matching = false;
 
         }
@@ -832,18 +889,31 @@ public class TargetMatching : MonoBehaviour
         coilHotSpot = coil.transform.FindChild("container").FindChild("hotspot").gameObject;
 
         InstantiateTargetCoil();
+        // Disable adding new points during target mode
+        
 
+        // LEGACY
+        /*
         camController.putMainCamOnTargetXY(tPoint.pos);
+        camController.putTargetCam1OnTargetXZ(tPoint.pos);
+        camController.putTargetCam2OnTargetZY(tPoint.pos);
+        */
+
+        //camController.putMainCamOnTargetXY(coil);
+        camController.putMainCam1FacingBackOfCoil(tPoint.pos);
         camController.putTargetCam1OnTargetXZ(tPoint.pos);
         camController.putTargetCam2OnTargetZY(tPoint.pos);
 
         //tCoil.transform.FindChild("model").transform.localScale = Vector3.Scale(tCoil.transform.FindChild("model").transform.localScale, new Vector3(1.1F,1.1F,1.1F)); position/stretch problems
 
         matching = true;
+        GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = false;
         GameObject.Find("Delete Point").GetComponent<Button>().interactable = true;
-        GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = true;
+        //GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = true;
+        GameObject.Find("Generate Grid").GetComponent<Button>().interactable = true;
         GameObject.Find("Logging").GetComponent<Button>().interactable = true;
         GameObject.Find("Set Grid").GetComponent<Button>().interactable = false;
+        GameObject.Find("Scalp Mesh").GetComponent<Button>().interactable = false;
         //GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "Match";
     }
 
@@ -899,14 +969,28 @@ public class TargetMatching : MonoBehaviour
         string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.gridSaveName);
 
         path += fileName;
+        if (System.IO.File.Exists(path))
+        {
+            bool val = PromptOverwrite();
+            if (val == false)
+            {
+                //Debug.Log("Quitting Save");
+                return;
+            }
+            else
+            {
+                // Debug.Log("Overwriting!!!");
+            }
+        }
 
         using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(path, true))
+            new System.IO.StreamWriter(path, false))
         {
             Grid grid = currentGrid;
             file.WriteLine(grid.name);
-            file.WriteLine(grid.gridPoints.Count.ToString());
+            //file.WriteLine(grid.gridPoints.Count.ToString());
             file.WriteLine(grid.hotSpots.Count.ToString());
+            /*
             foreach (TargetPoint point in grid.gridPoints)
             {
                 //Vector3 p = center.transform.InverseTransformPoint(GameObject.Find("Head").transform.TransformPoint(point.pos.transform.position));
@@ -920,7 +1004,7 @@ public class TargetMatching : MonoBehaviour
                 {
                     file.WriteLine("1" + "\t" + p.x + "\t" + p.y + "\t" + p.z);
                 }
-            }
+            }*/
             //if (scalpHotSpots.pos != null)
             foreach (TargetPoint point in grid.hotSpots)
             {
@@ -930,10 +1014,38 @@ public class TargetMatching : MonoBehaviour
                 //CreateScalpHotSpot(p, r);
             }
 
-            GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().incrementField((int)SettingsMenu.settings.gridSaveName);
+            //GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().incrementField((int)SettingsMenu.settings.gridSaveName);
         }
     }
 
+    public GridSerialized SerializeGrid()
+    {
+        GameObject center = GameObject.Find("Center");
+        GridSerialized to_return = new GridSerialized();
+        string path = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.gridSavePath);
+        string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.gridSaveName);
+
+        path += fileName;
+        
+        Grid grid = currentGrid;
+
+        if ((grid!=null)&&(grid.hotSpots!=null)&&(grid.hotSpots.Count > 0))
+        {
+            foreach (TargetPoint point in grid.hotSpots)
+            {
+                Vector3 p = center.transform.InverseTransformPoint(point.pos.transform.position);
+                Quaternion r = Quaternion.Inverse(center.transform.rotation) * point.rot.transform.rotation;
+                to_return.localPositions.Add(p);
+                to_return.localRotations.Add(r);
+                //file.WriteLine("0" + "\t" + p.x + "\t" + p.y + "\t" + p.z + "\t" + r.x + "\t" + r.y + "\t" + r.z + "\t" + r.w);
+                //CreateScalpHotSpot(p, r);
+            }
+            return to_return;
+        }
+        else {
+            return null;
+        }
+    }
     public void CreateScalpHotSpot(Vector3 p, Quaternion r)
     {
         //if (scalpHotSpot.pos != null && scalpHotSpot.pos.transform.FindChild("point") != null)
@@ -967,6 +1079,7 @@ public class TargetMatching : MonoBehaviour
         usingGrid = true;
 
         GameObject.Find("Save Grids").GetComponent<Button>().interactable = true;
+        
     }
 
     public void ImportGrid()
@@ -975,14 +1088,7 @@ public class TargetMatching : MonoBehaviour
         print(path);
         string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.gridLoadName);
 
-        //string[] fileNames = System.IO.Directory.GetFiles(path);
-
-
-        //System.IO.FileStream filestream = new System.IO.FileStream(fileNames[0],
-        //                                  System.IO.FileMode.Open,
-        //                                  System.IO.FileAccess.Read,
-        //                                  System.IO.FileShare.Read);
-        //System.IO.StreamReader file = new System.IO.StreamReader(filestream);
+       
 
         try {
             System.IO.FileStream filestream = new System.IO.FileStream(path + "/" + fileName,
@@ -993,13 +1099,13 @@ public class TargetMatching : MonoBehaviour
 
             if (currentGrid != null)
             {
-                DestroyCurrentGrid();
+                DestroyAllHotSpots();
             }
 
-            currentGrid = new Grid(file.ReadLine(), new List<TargetPoint>(), new List<TargetPoint>());
-            int points = System.Convert.ToInt32(file.ReadLine());
+            currentGrid = new Grid(file.ReadLine(), /*new List<TargetPoint>(),*/ new List<TargetPoint>());
+            //int points = System.Convert.ToInt32(file.ReadLine());
             int hotSpots = System.Convert.ToInt32(file.ReadLine());
-
+            /*
             for (int i = 0; i < points; i++)
             {
                 TargetPoint t = new TargetPoint(false, currentGrid.gridPoints);
@@ -1021,7 +1127,7 @@ public class TargetMatching : MonoBehaviour
                 }
                 currentGrid.gridPoints.Add(t);
                 t.index = currentGrid.gridPoints.IndexOf(t);
-            }
+            }*/
             for (int i = 0; i < hotSpots; i++)
             {
                 string datahs = file.ReadLine();
@@ -1043,7 +1149,7 @@ public class TargetMatching : MonoBehaviour
             //tell user something went wrong
             return;
         }
-
+        /*
         foreach (TargetPoint point in currentGrid.gridPoints)
         {
             point.pos.transform.parent = GameObject.Find("Head").transform;
@@ -1057,31 +1163,67 @@ public class TargetMatching : MonoBehaviour
             //pshere.transform.parent = point.pos.transform;
 
             VisualizePoint(point.pos, point.rot);
-        }
+        }*/
 
-        GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
+        //GameObject.Find("Add Points").GetComponent<Button>().interactable = true;
+        // Re-enables adding new points during target mode
+        GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
+        GameObject.Find("Set Grid").GetComponent<Button>().interactable = true;
+        GameObject.Find("Reset Grid").GetComponent<Button>().interactable = true;
         settingGrid = false;
         usingGrid = true;
         matching = false;
+    }
+
+    public void ImportGridFromSerialized(GridSerialized newgrid)
+    {
+        try
+        {
+            if (currentGrid != null)
+            {
+                DestroyAllHotSpots();
+            }
+
+            currentGrid = new Grid("name", /*new List<TargetPoint>(),*/ new List<TargetPoint>());
+
+            int hotSpots = newgrid.localPositions.Count;
+           
+            for (int i = 0; i < hotSpots; i++)
+            {
+                CreateScalpHotSpot(GameObject.Find("Center").transform.TransformPoint(newgrid.localPositions[i]), GameObject.Find("Center").transform.rotation * newgrid.localRotations[i]);
+            }
+
+        }
+        catch (Exception e)
+        {
+            print(e);
+            //tell user something went wrong
+            return;
+        }
     }
 
     public void resetGrid()
     {
         Material pmat = GameObject.Find("Arrow").GetComponent<Renderer>().material;
         Material hmat = GameObject.Find("HotSpot Arrow").GetComponent<Renderer>().material;
+        /*
         for (int i = 0; i < currentGrid.gridPoints.Count; i++)
         {
             TargetPoint t = currentGrid.gridPoints[i];
             t.fired = false;
             Renderer renderer = t.pos.GetComponentInChildren<Renderer>();
             renderer.material = pmat;
+            CapsuleCollider collider = t.pos.GetComponentInChildren<CapsuleCollider>();
+            collider.enabled = true;
             currentGrid.gridPoints[i] = t;
-        }
+        }*/
         for (int i = 0; i < currentGrid.hotSpots.Count; i++)
         {
             TargetPoint t = currentGrid.hotSpots[i];
             t.fired = false;
             Renderer renderer = t.pos.GetComponentInChildren<Renderer>();
+            CapsuleCollider collider = t.pos.GetComponentInChildren<CapsuleCollider>();
+            collider.enabled = true;
             renderer.material = hmat;
             currentGrid.hotSpots[i] = t;
         }
@@ -1089,6 +1231,7 @@ public class TargetMatching : MonoBehaviour
 
     void tmsFire()
     {
+        
         if (tPoint.rot == null)
         {
             UnityEngine.Debug.Log("rotation set on fire");
@@ -1098,6 +1241,18 @@ public class TargetMatching : MonoBehaviour
             DestroyImmediate(tPoint.pos.transform.FindChild("point"));
             VisualizePoint(tPoint.pos, tPoint.rot);
         }
+        /*
+        // New mode: destroy tPoint after firing, need to realign cameras too
+        EDIT: Nevermind!
+        camController.putMainCam1FacingBackOfHead();
+        camController.putTargetCam1OnHeadXZ();
+        camController.putTargetCam2OnHeadZY();
+
+        DestroyImmediate(tPoint.pos.transform.FindChild("point").gameObject);
+        DestroyImmediate(tPoint.pos.gameObject);
+        DestroyImmediate(tPoint.rot.gameObject);
+        tPoint.containedIn.Remove(tPoint);
+        */
         if (tCoil != null)
         {
             Destroy(tCoil);
@@ -1106,12 +1261,12 @@ public class TargetMatching : MonoBehaviour
         {
             Destroy(tHotSpot);
         }
-
-        //output firing error
-
+        
         tPoint.fired = true;
         matching = false;
         Renderer renderer = tPoint.pos.GetComponentInChildren<Renderer>();
+        CapsuleCollider collider = tPoint.pos.GetComponentInChildren<CapsuleCollider>();
+        collider.enabled = false;
         Material transMat = renderer.material;
         Color transColor = Color.red;
         transColor.a = 0.2F;
@@ -1125,19 +1280,22 @@ public class TargetMatching : MonoBehaviour
         transMat.EnableKeyword("_ALPHAPREMULTIPLY_ON");
         transMat.renderQueue = 3000;
         renderer.material = transMat;
-
         tPoint.containedIn[tPoint.containedIn.IndexOf(tPoint)] = tPoint;
 
+        GameObject.Find("Set Hot Spot").GetComponent<Button>().interactable = true;
         GameObject.Find("Reset Grid").GetComponent<Button>().interactable = true;
-        GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
+        //GameObject.Find("Set Point Orientation").GetComponent<Button>().interactable = false;
         GameObject.Find("Delete Point").GetComponent<Button>().interactable = false;
         GameObject.Find("Set Grid").GetComponent<Button>().interactable = true;
+        GameObject.Find("Generate Grid").GetComponent<Button>().interactable = false;
         GameObject.Find("CalibrationInstructions").GetComponent<Text>().text = "";
+        GameObject.Find("Scalp Mesh").GetComponent<Button>().interactable = true;
 
-        if(logging)
+        if (logging)
         {
             LogToggle();
         }
+        matching = false;
     }
 
     public void setGridName(string name)
@@ -1161,4 +1319,157 @@ public class TargetMatching : MonoBehaviour
         if (initalized)
         logger.SetFileName(name);
     }
+
+    bool PromptOverwrite()
+    {
+        using (var form1 = new System.Windows.Forms.Form())
+        {
+            System.Windows.Forms.Label text = new System.Windows.Forms.Label();
+            System.Windows.Forms.Button button1 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button button3 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button buttondefault = new System.Windows.Forms.Button();
+            buttondefault.Location = new System.Drawing.Point(-2000, -2000);
+
+            text.Text = text.Text = "A file exists at the Grid Save location specified! \nDo you want to overwrite?\n\nIf not: Cancel, then edit the Save Grid Field, \nthen Save Manually.";
+            text.Width = 280;
+            text.Height = 70;
+            text.Location
+               = new System.Drawing.Point(10, 10);
+
+            // Set the text of button1 to "OK".
+            button3.Text = "Cancel Save";
+            // Set the position of the button on the form.
+            button3.Location = new System.Drawing.Point(text.Left, text.Height + text.Top + 10);
+            button3.BackColor = System.Drawing.Color.LightGreen;
+            button3.Width = 100;
+
+            // Set the text of button1 to "OK".
+            button1.Text = "Overwrite!";
+            // Set the position of the button on the form.
+            button1.Location = new System.Drawing.Point(button3.Left, button3.Height + button3.Top + 15);
+            button1.BackColor = System.Drawing.Color.LightYellow;
+            button1.Width = 100;
+            form1.Text = "CAUTION";
+            // Define the border style of the form to a dialog box.
+            form1.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            // Set the MaximizeBox to false to remove the maximize box.
+            form1.MaximizeBox = false;
+            // Set the MinimizeBox to false to remove the minimize box.
+            form1.MinimizeBox = false;
+            // Set the accept button of the form to button1.
+            form1.AcceptButton = button1;
+            form1.CancelButton = button3;
+            // Set the cancel button of the form to button2.
+            // Set the start position of the form to the center of the screen.
+            form1.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+
+            form1.Height = 200;
+            form1.Width = 300;
+
+            button1.DialogResult = System.Windows.Forms.DialogResult.OK;
+            button3.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+
+            //Add button1 to the form.
+            form1.Controls.Add(buttondefault);
+            form1.Controls.Add(button1);
+            //Add button2 to the form.
+            form1.Controls.Add(button3);
+
+            form1.Controls.Add(text);
+            System.Windows.Forms.DialogResult retval = form1.ShowDialog();
+            // Display the form as a modal dialog box.
+            if (retval == System.Windows.Forms.DialogResult.Cancel)
+            {
+                //Debug.Log("Canceled save");
+                return false;
+            }
+            if (retval == System.Windows.Forms.DialogResult.OK)
+            {
+                //Debug.Log("accepted");
+                return true;
+            }
+
+
+        }
+        return false;
+    }
+
+    bool AskIfToSave()
+    {
+        using (var form1 = new System.Windows.Forms.Form())
+        {
+            System.Windows.Forms.Label text = new System.Windows.Forms.Label();
+            System.Windows.Forms.Button button1 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button button3 = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button buttondefault = new System.Windows.Forms.Button();
+            buttondefault.Location = new System.Drawing.Point(-2000, -2000);
+
+            text.Text = "Successfully added Hotspot! Do you want to save the \nentire Grid to Grid Save location?";
+            text.Width = 280;
+            text.Height = 50;
+            text.Location
+               = new System.Drawing.Point(10, 10);
+
+            // Set the text of button1 to "OK".
+            button3.Text = "Yes";
+            // Set the position of the button on the form.
+            button3.Location = new System.Drawing.Point(text.Left, text.Height + text.Top + 10);
+            button3.BackColor = System.Drawing.Color.LightGreen;
+            button3.Width = 100;
+
+            // Set the text of button1 to "OK".
+            button1.Text = "No";
+            // Set the position of the button on the form.
+            button1.Location = new System.Drawing.Point(button3.Left, button3.Height + button3.Top + 15);
+            button1.BackColor = System.Drawing.Color.Pink;
+            button1.Width = 100;
+            form1.Text = "";
+            // Define the border style of the form to a dialog box.
+            form1.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            // Set the MaximizeBox to false to remove the maximize box.
+            form1.MaximizeBox = false;
+            // Set the MinimizeBox to false to remove the minimize box.
+            form1.MinimizeBox = false;
+            // Set the accept button of the form to button1.
+            form1.AcceptButton = button1;
+            form1.CancelButton = button3;
+            // Set the cancel button of the form to button2.
+            // Set the start position of the form to the center of the screen.
+            form1.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+
+            form1.Height = 200;
+            form1.Width = 300;
+
+            button1.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            button3.DialogResult = System.Windows.Forms.DialogResult.OK;
+
+            //Add button1 to the form.
+            form1.Controls.Add(buttondefault);
+            form1.Controls.Add(button1);
+            //Add button2 to the form.
+            form1.Controls.Add(button3);
+
+            form1.Controls.Add(text);
+            System.Windows.Forms.DialogResult retval = form1.ShowDialog();
+            // Display the form as a modal dialog box.
+            if (retval == System.Windows.Forms.DialogResult.Cancel)
+            {
+                //Debug.Log("Canceled save");
+                return false;
+            }
+            if (retval == System.Windows.Forms.DialogResult.OK)
+            {
+                //Debug.Log("accepted");
+                return true;
+            }
+
+
+        }
+        return false;
+    }
+}
+
+public class GridSerialized {
+    public List<Vector3> localPositions = new List<Vector3>();
+    public List<Quaternion> localRotations = new List<Quaternion>();
 }

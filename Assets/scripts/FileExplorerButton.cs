@@ -19,29 +19,42 @@ public class FileExplorerButton : MonoBehaviour {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
 		// Folder
 		if ((int)field % 2 == 0) {
-			FolderBrowserDialog fbd = new FolderBrowserDialog();
-			string startPath = settingsMenu.getField((int)field);
-			fbd.RootFolder = System.Environment.SpecialFolder.DesktopDirectory;
-			fbd.SelectedPath = startPath;
-			if (fbd.ShowDialog() == DialogResult.OK) {
-				string correctedPath = fbd.SelectedPath.Replace('\\', '/');
-				correctedPath += '/';
-				settingsMenu.setField((int)field, correctedPath);
-			}
-		}
+            string startPath = settingsMenu.getField((int)field );
+            using (var dialog = new FolderBrowserDialog())
+            {
+                dialog.SelectedPath = startPath;
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    settingsMenu.setField((int)field, dialog.SelectedPath+"\\");
+                }
+            }
+        }
 		// File
 		else {
+            string startPath = settingsMenu.getField(((int)field)-1);
+            using (var dialog = new OpenFileDialog())
+            {
+                dialog.InitialDirectory = startPath;
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    string path = System.IO.Path.GetDirectoryName(dialog.FileName)+"\\";
+                    string fileName = System.IO.Path.GetFileName(dialog.FileName);
+                    settingsMenu.setField((int)field - 1, path);
+                    settingsMenu.setField((int)field, fileName);
+                }
+            }
+            /*
 			OpenFileDialog ofd = new OpenFileDialog();
 			string startPath = settingsMenu.getField((int)field - 1);
-			ofd.InitialDirectory = startPath + "/../";
+			//ofd.InitialDirectory = startPath;
 			if (ofd.ShowDialog() == DialogResult.OK) {
-				string path = System.IO.Path.GetDirectoryName(ofd.FileName) + '/';
+				string path = System.IO.Path.GetDirectoryName(ofd.FileName);
 				string fileName = System.IO.Path.GetFileName(ofd.FileName);
 				settingsMenu.setField((int)field - 1, path);
 				settingsMenu.setField((int)field, fileName);
 
-			}
-		}
+			}*/
+        }
 #endif
 	}
 }

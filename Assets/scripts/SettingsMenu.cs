@@ -12,12 +12,20 @@ public class SettingsMenu : MonoBehaviour
 
     string[] fields;
     InputField[] inputs;
-    public enum settings { loggingPath, loggingName, coilSavePath, coilSaveName, coilLoadPath, coilLoadName, gridSavePath, gridSaveName, gridLoadPath, gridLoadName, mThresh, rThresh };
+    public enum settings { loggingPath=0, loggingName=1, coilSavePath=2,
+                           coilSaveName=3, coilLoadPath=4, coilLoadName = 5,
+                           gridSavePath = 6, gridSaveName = 7, gridLoadPath = 8,
+                           gridLoadName = 9, landmarkSavePath = 10, landmarkSaveName = 11,
+                           landmarkLoadPath = 12 ,landmarkLoadName = 13,
+                           stylusSavePath = 14, stylusSaveName = 15, stylusLoadPath = 16, stylusLoadName = 17,
+                           scalpMeshSavePath = 18, scalpMeshSaveName = 19, scalpMeshLoadPath = 20, scalpMeshLoadName = 21,
+                           mThresh = 22, rThresh = 23};
 
     // Use for initialization
     void Awake()
     {
-        fields = new string[12];
+
+        fields = new string[24];
         inputs = GameObject.Find("Panels").GetComponentsInChildren<InputField>();
 
         menu = GameObject.Find("SettingMenu");
@@ -94,23 +102,42 @@ public class SettingsMenu : MonoBehaviour
 
     private void Initialize()
     {
-        fields[(int)settings.loggingPath] = Application.dataPath + @"/Logs/";
-        fields[(int)settings.loggingName] = "Grid1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+        fields[(int)settings.loggingPath] = Application.dataPath + @"/SaveData/Logs/";
+        fields[(int)settings.loggingName] = "Log1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
 
-        fields[(int)settings.coilSavePath] = Application.dataPath + @"/Coils/Saved/";
+        fields[(int)settings.coilSavePath] = Application.dataPath + @"/SaveData/Coils/Saved/";
         fields[(int)settings.coilSaveName] = "Coil1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
 
-        fields[(int)settings.coilLoadPath] = Application.dataPath + @"/Coils/Load/";
-        fields[(int)settings.coilLoadName] = fields[(int)settings.coilSaveName];
+        fields[(int)settings.coilLoadPath] = Application.dataPath + @"/SaveData/Coils/Load/";
+        fields[(int)settings.coilLoadName] = "Coil1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
 
-        fields[(int)settings.gridSavePath] = Application.dataPath + @"/Grids/Saved/";
-        fields[(int)settings.gridSaveName] = fields[(int)settings.loggingName];
+        fields[(int)settings.gridSavePath] = Application.dataPath + @"/SaveData/Grids/Saved/";
+        fields[(int)settings.gridSaveName] = "Grid1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
 
-        fields[(int)settings.gridLoadPath] = Application.dataPath + @"/Grids/Load/";
-        fields[(int)settings.gridLoadName] = fields[(int)settings.loggingName];
+        fields[(int)settings.gridLoadPath] = Application.dataPath + @"/SaveData/Grids/Load/";
+        fields[(int)settings.gridLoadName] = "Grid1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+        //
+        fields[(int)settings.landmarkSavePath] = Application.dataPath + @"/SaveData/Landmarks/Saved/";
+        fields[(int)settings.landmarkSaveName] = "Landmark1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
 
-        fields[(int)settings.mThresh] = "0.1";
-        fields[(int)settings.rThresh] = "1";
+        fields[(int)settings.landmarkLoadPath] = Application.dataPath + @"/SaveData/Landmarks/Load/";
+        fields[(int)settings.landmarkLoadName] = "Landmark1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+        //
+        //
+        fields[(int)settings.stylusSavePath] = Application.dataPath + @"/SaveData/Stylus/Saved/";
+        fields[(int)settings.stylusSaveName] = "Stylus1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+
+        fields[(int)settings.stylusLoadPath] = Application.dataPath + @"/SaveData/Stylus/Load/";
+        fields[(int)settings.stylusLoadName] = "Stylus1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+        //
+        fields[(int)settings.scalpMeshSavePath] = Application.dataPath + @"/SaveData/ScalpMesh/Saved/";
+        fields[(int)settings.scalpMeshSaveName] = "ScalpMesh1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+
+        fields[(int)settings.scalpMeshLoadPath] = Application.dataPath + @"/SaveData/ScalpMesh/Load/";
+        fields[(int)settings.scalpMeshLoadName] = "ScalpMesh1_" + string.Format("session-{0:yyyy-MM-dd_hh-mm-ss-tt}", System.DateTime.Now) + ".txt";
+        //
+        fields[(int)settings.mThresh] = "0.25";
+        fields[(int)settings.rThresh] = "2.5";
 
         int i = 0;
         foreach (InputField input in GameObject.Find("Panels").GetComponentsInChildren<InputField>())
