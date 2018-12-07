@@ -286,6 +286,10 @@ public class ScalpGenerator : MonoBehaviour
     void CenterHead()
     {
         head = GameObject.Find("Head");
+        // Save the coil and scalp if need be
+        ScalpMeshSerialized saveScalp = FindObjectOfType<ScalpMeshMenuController>().SerializeHeadMesh();
+        GridSerialized saveGrid = FindObjectOfType<TargetMatching>().SerializeGrid();
+
         if (scalp == null)
         {
             scalp = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -308,11 +312,16 @@ public class ScalpGenerator : MonoBehaviour
                     camController.putCamOnStylus(i);
                 }
             }
+            
+
 			if (center != null) {
 				Transform[] children = center.GetComponentsInChildren<Transform>();
 				foreach (Transform child in children) {
-					if (child.transform.parent == this.transform)
-						child.transform.parent = center.transform.parent;
+                    if (child.transform.parent == this.transform)
+                    {
+                        
+                        child.transform.parent = center.transform.parent;
+                    }
 				}
                 center.name = "junk";
 				Destroy(center);
@@ -390,7 +399,19 @@ public class ScalpGenerator : MonoBehaviour
             // camController.putMainCam1FacingBackOfCoil(tPoint.pos);
             //  camController.putTargetCam1OnTargetXZ(tPoint.pos);
             // camController.putTargetCam2OnTargetZY(tPoint.pos);
+
+            
+            
         }
+        // Now restore
+
+        if (saveGrid != null) {
+            FindObjectOfType<TargetMatching>().ImportGridFromSerialized(saveGrid);
+        }
+        if (saveScalp != null) {
+            FindObjectOfType<ScalpMeshMenuController>().LoadSerializedHeadMesh(saveScalp);
+        }
+
     }
 
     //public void ExportScalpSurfaceXYZ()

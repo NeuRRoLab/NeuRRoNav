@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 using System;
 
@@ -260,6 +261,111 @@ public class ScalpMeshMenuController : MonoBehaviour {
         GameObject.Find("Save Scalp").GetComponent<Button>().interactable = true;
 
     }
+
+    public void LoadSerializedHeadMesh(ScalpMeshSerialized newScalp)
+    {
+        Vector3[] vertices = new Vector3[0];
+        List<Vector3> loadedvertices = new List<Vector3>();
+        int totalverts;
+        try
+        {
+
+            // Load planePoint pos/rot
+            //string data = file.ReadLine();
+            
+            // planepoint pos
+            //string[] dims = data.Split('\t');
+            planePoint.localPosition = newScalp.planePointLocalPos; //new Vector3((float)System.Convert.ToDouble(dims[0]), (float)System.Convert.ToDouble(dims[1]), (float)System.Convert.ToDouble(dims[2]));
+            // planepoint rot
+            //data = file.ReadLine();
+            //dims = data.Split('\t');
+            planePoint.localRotation = newScalp.planePointLocalRot; //new Quaternion((float)System.Convert.ToDouble(dims[1]), (float)System.Convert.ToDouble(dims[2]), (float)System.Convert.ToDouble(dims[3]), (float)System.Convert.ToDouble(dims[0]));
+
+            // Width and length
+            width = newScalp.width;// (float)System.Convert.ToDouble(file.ReadLine());
+            length = newScalp.length;// (float)System.Convert.ToDouble(file.ReadLine());
+
+            // Generate verts
+            verticeswide = System.Convert.ToInt32(width / gridspacing);
+            verticeslong = System.Convert.ToInt32(length / gridspacing);
+            totalverts = verticeslong * verticeswide;
+            vertices = new Vector3[totalverts];
+            loadedvertices = new List<Vector3>(totalverts);
+
+            for (int i = 0; i < totalverts; ++i)
+            {
+                //data = file.ReadLine();
+                //dims = data.Split('\t');
+                loadedvertices[i] = newScalp.vertices[i];//new Vector3((float)System.Convert.ToDouble(dims[0]), (float)System.Convert.ToDouble(dims[1]), (float)System.Convert.ToDouble(dims[2]));
+
+            }
+
+            //file.Close();
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e.Message);
+            return;
+        }
+        // Now initialize as before
+        // Now to create our mesh
+        // start from back left
+        filter = planeObj.GetComponent<MeshFilter>();
+        filter.mesh.Clear();
+
+
+
+        float base_x = -width / 2;
+        float base_y = -length / 2;
+        for (int x = 0; x < verticeswide; x += 1)
+        {
+            for (int y = 0; y < verticeslong; y += 1)
+            {
+                vertices[(verticeslong * x) + y] = new Vector3(base_y + y * gridspacing, base_x + x * gridspacing, 0);
+            }
+        }
+
+        filter.mesh.vertices = vertices;
+
+        // Now tris
+        int[] tri = new int[(2 * (verticeswide - 1) * (verticeslong - 1)) * 3];
+        ulong cur_tri_index = 0;
+        for (int x = 0; x < verticeswide - 1; x += 1)
+        {
+            for (int y = 0; y < verticeslong - 1; y += 1)
+            {
+                //  Lower left triangle.
+                tri[cur_tri_index] = (verticeslong * x) + y;
+                tri[cur_tri_index + 1] = (verticeslong * (x + 1)) + y + 1;
+                tri[cur_tri_index + 2] = (verticeslong * x) + y + 1;
+                //  Upper right triangle.   
+                tri[cur_tri_index + 3] = (verticeslong * x) + y;
+                tri[cur_tri_index + 4] = (verticeslong * (x + 1)) + y;
+                tri[cur_tri_index + 5] = (verticeslong * (x + 1)) + y + 1;
+                //vertices[(verticeslong * x) + y]
+                cur_tri_index += 6;
+            }
+        }
+
+        filter.mesh.triangles = tri;
+
+        // Now normals
+        Vector3[] normals = new Vector3[totalverts];
+        for (int i = 0; i < totalverts; ++i)
+        {
+            normals[i] = -Vector3.forward;
+        }
+
+        filter.mesh.normals = normals;
+
+        filter.mesh.vertices = loadedvertices.ToArray();
+        filter.mesh.RecalculateNormals();
+        planeObj.GetComponent<MeshCollider>().sharedMesh = filter.mesh;
+        GameObject.Find("Save Scalp").GetComponent<Button>().interactable = true;
+
+    }
+
+
     public void saveHeadMeshToFile(){
 
 
@@ -315,6 +421,39 @@ public class ScalpMeshMenuController : MonoBehaviour {
             Debug.Log(e.Message);
         }
     }
+
+    public ScalpMeshSerialized SerializeHeadMesh()
+    {
+        ScalpMeshSerialized to_return = new ScalpMeshSerialized();
+        // Don't save if there is no mesh, or if we are currently making one
+        if ((!activeMesh))
+        {
+            return null;
+        }
+       
+        // Write planePoint position,rotation in subsequent lines
+        to_return.planePointLocalPos = planePoint.localPosition;
+        to_return.planePointLocalRot = planePoint.localRotation;
+        // Then write width and height
+        
+        to_return.width = width;
+        to_return.length = length;
+
+        // Now store the vertices vector
+        filter = planeObj.GetComponent<MeshFilter>();
+
+        Vector3[] vertices = filter.mesh.vertices;
+        for (int i = 0; i < vertices.Length; ++i)
+        {
+            //file.WriteLine(vertices[i].x + "\t" + vertices[i].y + "\t" + vertices[i].z);
+            to_return.vertices.Add(vertices[i]);
+        }
+        return to_return;
+        
+    }
+
+
+
     Vector3 midpoint_calc(Vector3 josh, Vector3 mark)
     {
         Vector3 newvec;
@@ -415,6 +554,7 @@ public class ScalpMeshMenuController : MonoBehaviour {
         
         STATE = "GENHEAD";
     }
+
     public void HeadVisibilityToggle() {
         if (GameObject.Find("headTest"))
         {
@@ -579,4 +719,12 @@ public class ScalpMeshMenuController : MonoBehaviour {
         return false;
     }
 
+}
+
+public class ScalpMeshSerialized {
+    public Vector3 planePointLocalPos;
+    public Quaternion planePointLocalRot;
+    public float width;
+    public float length;
+    public List<Vector3> vertices = new List<Vector3>();
 }

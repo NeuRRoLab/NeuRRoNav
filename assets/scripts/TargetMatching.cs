@@ -1018,6 +1018,34 @@ public class TargetMatching : MonoBehaviour
         }
     }
 
+    public GridSerialized SerializeGrid()
+    {
+        GameObject center = GameObject.Find("Center");
+        GridSerialized to_return = new GridSerialized();
+        string path = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.gridSavePath);
+        string fileName = GameObject.Find("SettingMenu").GetComponent<SettingsMenu>().getField((int)SettingsMenu.settings.gridSaveName);
+
+        path += fileName;
+        
+        Grid grid = currentGrid;
+
+        if ((grid!=null)&&(grid.hotSpots!=null)&&(grid.hotSpots.Count > 0))
+        {
+            foreach (TargetPoint point in grid.hotSpots)
+            {
+                Vector3 p = center.transform.InverseTransformPoint(point.pos.transform.position);
+                Quaternion r = Quaternion.Inverse(center.transform.rotation) * point.rot.transform.rotation;
+                to_return.localPositions.Add(p);
+                to_return.localRotations.Add(r);
+                //file.WriteLine("0" + "\t" + p.x + "\t" + p.y + "\t" + p.z + "\t" + r.x + "\t" + r.y + "\t" + r.z + "\t" + r.w);
+                //CreateScalpHotSpot(p, r);
+            }
+            return to_return;
+        }
+        else {
+            return null;
+        }
+    }
     public void CreateScalpHotSpot(Vector3 p, Quaternion r)
     {
         //if (scalpHotSpot.pos != null && scalpHotSpot.pos.transform.FindChild("point") != null)
@@ -1145,6 +1173,33 @@ public class TargetMatching : MonoBehaviour
         settingGrid = false;
         usingGrid = true;
         matching = false;
+    }
+
+    public void ImportGridFromSerialized(GridSerialized newgrid)
+    {
+        try
+        {
+            if (currentGrid != null)
+            {
+                DestroyAllHotSpots();
+            }
+
+            currentGrid = new Grid("name", /*new List<TargetPoint>(),*/ new List<TargetPoint>());
+
+            int hotSpots = newgrid.localPositions.Count;
+           
+            for (int i = 0; i < hotSpots; i++)
+            {
+                CreateScalpHotSpot(GameObject.Find("Center").transform.TransformPoint(newgrid.localPositions[i]), GameObject.Find("Center").transform.rotation * newgrid.localRotations[i]);
+            }
+
+        }
+        catch (Exception e)
+        {
+            print(e);
+            //tell user something went wrong
+            return;
+        }
     }
 
     public void resetGrid()
@@ -1412,4 +1467,9 @@ public class TargetMatching : MonoBehaviour
         }
         return false;
     }
+}
+
+public class GridSerialized {
+    public List<Vector3> localPositions = new List<Vector3>();
+    public List<Quaternion> localRotations = new List<Quaternion>();
 }
