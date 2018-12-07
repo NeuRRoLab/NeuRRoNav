@@ -166,14 +166,7 @@ public class ScalpGenerator : MonoBehaviour
                 landmarkIndex++;
                 if (landmarkIndex == 5)
                 {
-                    if (GameObject.Find("Toggle_SavePrompts").GetComponent<Toggle>().isOn)
-                    {
-                        // We have set all landmarks, and are done.
-                        if (AskIfToSave())
-                        {
-                            ExportLandmarks();
-                        }
-                    }
+                    
                     waitingToDraw = true;
                     settingLandmarks = false;
                     calibrationInstruct.text = "";
@@ -182,6 +175,18 @@ public class ScalpGenerator : MonoBehaviour
                     GameObject.Find("AverageLandmarksToggle").GetComponent<Toggle>().interactable = true;
                     GameObject.Find("Save Landmarks").GetComponent<Button>().interactable = true;
                     GameObject.Find("NumberOfClicksField").GetComponent<InputField>().interactable = true;
+
+                    if (GameObject.Find("Toggle_SavePrompts").GetComponent<Toggle>().isOn)
+                    {
+                        // We have set all landmarks, and are done.
+                        if (AskIfToSave())
+                        {
+                            ExportLandmarks();
+                        }
+                    }
+
+
+
                     return;
                 }
             }
