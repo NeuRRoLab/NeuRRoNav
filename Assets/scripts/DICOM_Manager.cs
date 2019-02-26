@@ -16,7 +16,11 @@ public class DICOM_Manager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
+		/*string thispath = "C:/Users/Daniel/Downloads/MR_Head_DICOM/ScalarVolume_10/";
+		DirectoryInfo d = new DirectoryInfo(thispath);//Assuming Test is your Folder
+		FileInfo[] Files = d.GetFiles(); //Getting Text files
+
+		image = new DicomImage(thispath + Files[0].Name);*/
 	}
 	
 	// Update is called once per frame
@@ -25,32 +29,29 @@ public class DICOM_Manager : MonoBehaviour {
 	}
 
 	public void LoadDICOMFromFolder(){
-		/*
 		string dirname = folderloc.text;
+		if (dirname[dirname.Length - 1] != '/') {
+			dirname = dirname + "/";
+		}
+
 		if (!Directory.Exists (dirname)) {
 			Debug.LogError ("Could not find directory at specified location");
 			return;
-		}
-
-		if (dirname[dirname.Length - 1] != '/') {
-			dirname = dirname + "/";
 		}
 
 		DirectoryInfo d = new DirectoryInfo(dirname);
 		FileInfo[] Files = d.GetFiles();
 
 		Debug.Log(dirname+Files[0].Name);
-		image = new DicomImage(dirname+Files[0].Name);*/
+		image = new DicomImage(dirname+Files[0].Name);
 
-		//var PatientName= image.Dataset.Get<string>(Dicom.DicomTag.PatientName);
+		string PatientName= image.Dataset.Get<string>(Dicom.DicomTag.PatientName);
+		string[] imagepospatient = image.Dataset.Get<string[]>(Dicom.DicomTag.ImagePositionPatient);
+		string[] imageorientationpatient = image.Dataset.Get<string[]> (Dicom.DicomTag.ImageOrientationPatient);
 
-		//Debug.Log(PatientName);
-		      
-		string thispath = "C:/Users/Daniel/Downloads/MR_Head_DICOM/ScalarVolume_10/";
-		DirectoryInfo d = new DirectoryInfo(thispath);//Assuming Test is your Folder
-		FileInfo[] Files = d.GetFiles(); //Getting Text files
 
-		image = new DicomImage(thispath + Files[0].Name);
-
+		foreach (var cur in imageorientationpatient) {
+			Debug.Log (cur);
+		}
 	}
 }
