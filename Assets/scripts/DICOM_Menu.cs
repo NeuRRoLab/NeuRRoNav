@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class DICOM_Menu : MonoBehaviour {
-	bool hidden;
+	public bool hidden;
 	Vector3 defaultPos;
 	GameObject menu;
 	CameraController camController;
