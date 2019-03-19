@@ -17,6 +17,15 @@ public class DICOM_Manager : MonoBehaviour {
 	Texture2D texttex;
 	Texture2D newtex;
 
+	public DICOMImageScr fronttoback;
+	public DICOMImageScr righttoleft;
+	public DICOMImageScr bottomtotop;
+
+	public UnityEngine.UI.Slider sliderfrontback;
+	public UnityEngine.UI.Slider sliderrightleft;
+	public UnityEngine.UI.Slider sliderbottomtop;
+
+
 	// Use this for initialization
 	void Start () {
 		
@@ -24,73 +33,62 @@ public class DICOM_Manager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if ((imgspecs != null) && (imgspecs.initialized)) {
+			// Pass the correct textures to the three DicomImageScrs.
+			float frontsliderval = sliderfrontback.value;
+			float rightsliderval = sliderrightleft.value;
+			float bottomsliderval = sliderbottomtop.value;
 
-		// Pass the correct textures to the three DicomImageScrs.
+			var newtexfront = new Texture2D(imgspecs.dicomspace_voxeldim.x, imgspecs.dicomspace_voxeldim.z);
+			var newtexright = new Texture2D(imgspecs.dicomspace_voxeldim.y, imgspecs.dicomspace_voxeldim.z);
+			var newtexbottom = new Texture2D(imgspecs.dicomspace_voxeldim.x, imgspecs.dicomspace_voxeldim.y);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		if ((imgspecs!=null)&&(imgspecs.initialized)) {
-			newtex = new Texture2D(imgspecs.dicomspace_voxeldim.x, imgspecs.dicomspace_voxeldim.z);
-
+			int xcoord = Mathf.FloorToInt (rightsliderval * imgspecs.dicomspace_voxeldim.x);
+			int ycoord = Mathf.FloorToInt (frontsliderval * imgspecs.dicomspace_voxeldim.y);
+			int zcoord = Mathf.FloorToInt (bottomsliderval * imgspecs.dicomspace_voxeldim.z);
+				
+			// frontback
 			for(int z=0;z<imgspecs.dicomspace_voxeldim.z;z++){
 				for(int x=0;x<imgspecs.dicomspace_voxeldim.x;x++){
-					Vector3Int coord = new Vector3Int (x, Mathf.FloorToInt(Time.time*40)%imgspecs.dicomspace_voxeldim.y, z);
+					Vector3Int coord = new Vector3Int (x, ycoord, z);
 					float pixlval = imgspecs.dicomspacevoxelarr[(imgspecs.dicomspace_voxeldim.x * imgspecs.dicomspace_voxeldim.y) * coord.z + (coord.y * imgspecs.dicomspace_voxeldim.x) + coord.x]/imgspecs.maxval;
-					newtex.SetPixel (x, z, new Color (1, 0, 0, pixlval));
+					newtexfront.SetPixel (newtexfront.width-1-x, z, new Color (pixlval, pixlval, pixlval, 1));
 				}
 			}
-			newtex.Apply();
-		}
+			newtexfront.Apply();
+			fronttoback.img.texture = newtexfront;
 
-		/*if ((imgspecs!=null)&&(imgspecs.initialized)) {
-			newtex = new Texture2D(imgspecs.dicomspace_voxeldim.y, imgspecs.dicomspace_voxeldim.z);
+			// rightleft
+			for(int z=0;z<imgspecs.dicomspace_voxeldim.z;z++){
+				for(int y=0;y<imgspecs.dicomspace_voxeldim.y;y++){
+					Vector3Int coord = new Vector3Int (xcoord, y, z);
+					float pixlval = imgspecs.dicomspacevoxelarr[(imgspecs.dicomspace_voxeldim.x * imgspecs.dicomspace_voxeldim.y) * coord.z + (coord.y * imgspecs.dicomspace_voxeldim.x) + coord.x]/imgspecs.maxval;
+					newtexright.SetPixel (newtexright.width-1-y, z, new Color (pixlval, pixlval, pixlval, 1));
+				}
+			}
+			newtexright.Apply();
+			righttoleft.img.texture = newtexright;
 
+			// bottomtop
 			for(int y=0;y<imgspecs.dicomspace_voxeldim.y;y++){
-				for(int z=0;z<imgspecs.dicomspace_voxeldim.z;z++){
-					Vector3Int coord = new Vector3Int (Mathf.FloorToInt(Time.time*20)%imgspecs.dicomspace_voxeldim.x, y, z);
+				for(int x=0;x<imgspecs.dicomspace_voxeldim.x;x++){
+					Vector3Int coord = new Vector3Int (x, y, zcoord);
 					float pixlval = imgspecs.dicomspacevoxelarr[(imgspecs.dicomspace_voxeldim.x * imgspecs.dicomspace_voxeldim.y) * coord.z + (coord.y * imgspecs.dicomspace_voxeldim.x) + coord.x]/imgspecs.maxval;
-					newtex.SetPixel (y, z, new Color (1, 0, 0, pixlval));
+					newtexbottom.SetPixel (newtexfront.width-1-x, y, new Color (pixlval, pixlval, pixlval, 1));
 				}
 			}
-			newtex.Apply();
-		}*/
-
+			newtexbottom.Apply();
+			bottomtotop.img.texture = newtexbottom;
+		}
 	}
 
 	public void LoadDICOMFromFolder(){
 		imgspecs = new DICOMImgSpecs ();
 		imgspecs.InitFromDir(folderloc.text);
-	}
-
-	void OnGUI() {
-		if ((imgspecs!=null)&&(imgspecs.initialized)) {
-			GUI.DrawTexture (new Rect (0, 0, Mathf.FloorToInt(Mathf.Abs(imgspecs.dicomspace_dims.x)), Mathf.FloorToInt(Mathf.Abs(imgspecs.dicomspace_dims.z))), newtex);
+		if ((imgspecs != null) && (imgspecs.initialized)) {
+			fronttoback.widthscaler = Mathf.Abs (imgspecs.dicomspace_dims.x / imgspecs.dicomspace_dims.z);
+			righttoleft.widthscaler = Mathf.Abs (imgspecs.dicomspace_dims.y / imgspecs.dicomspace_dims.z);
+			bottomtotop.widthscaler = Mathf.Abs (imgspecs.dicomspace_dims.x / imgspecs.dicomspace_dims.y);
 		}
 	}
 }
@@ -133,7 +131,8 @@ class DICOMImgSpecs{
 
 	public Vector3 dicomspace_bottombackleft;
 	public Vector3 dicomspace_frontforwardright;
-	public Vector3Int dicomvoxelspace_bottombackleft;
+	public Vector3Int dicomvoxelspace_bottombackleft = new Vector3Int(0,0,0);
+	public Vector3Int dicomvoxelspace_frontforwardright = new Vector3Int(0,0,0);
 
 	public float[] voxelarr;
 	public int rows;
@@ -251,6 +250,8 @@ class DICOMImgSpecs{
 		printSpecs ();
 		initialized = true;
 
+
+
 		Debug.Log("Transform: "+affinetransformer.TransformPoint (new Vector3Int(0,0,0)).ToString());
 	
 	}
@@ -284,6 +285,7 @@ class DICOMImgSpecs{
 		// max x
 		if (dicomspace_dims.x > 0) {
 			dicomspace_frontforwardright.x = originpos.x + dicomspace_dims.x;
+			dicomvoxelspace_frontforwardright.x = (dicomspace_voxeldim.x-1) * (Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.x)));
 		} else {
 			dicomspace_frontforwardright.x = originpos.x;
 		}
@@ -291,6 +293,7 @@ class DICOMImgSpecs{
 		// max y
 		if (dicomspace_dims.y > 0) {
 			dicomspace_frontforwardright.y = originpos.y + dicomspace_dims.y;
+			dicomvoxelspace_frontforwardright.y = (dicomspace_voxeldim.y-1) * (Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.y)));
 		} else {
 			dicomspace_frontforwardright.y = originpos.y;
 		}
@@ -298,6 +301,7 @@ class DICOMImgSpecs{
 		// max z
 		if (dicomspace_dims.z > 0) {
 			dicomspace_frontforwardright.z = originpos.z + dicomspace_dims.z;
+			dicomvoxelspace_frontforwardright.z = (dicomspace_voxeldim.z-1) * (Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.z)));
 		} else {
 			dicomspace_frontforwardright.z = originpos.z;
 		}
