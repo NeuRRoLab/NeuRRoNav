@@ -24,7 +24,37 @@ public class DICOM_Manager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+
+		// Pass the correct textures to the three DicomImageScrs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		if ((imgspecs!=null)&&(imgspecs.initialized)) {
 			newtex = new Texture2D(imgspecs.dicomspace_voxeldim.x, imgspecs.dicomspace_voxeldim.z);
 
@@ -37,8 +67,8 @@ public class DICOM_Manager : MonoBehaviour {
 			}
 			newtex.Apply();
 		}
-		/*
-		if ((imgspecs!=null)&&(imgspecs.initialized)) {
+
+		/*if ((imgspecs!=null)&&(imgspecs.initialized)) {
 			newtex = new Texture2D(imgspecs.dicomspace_voxeldim.y, imgspecs.dicomspace_voxeldim.z);
 
 			for(int y=0;y<imgspecs.dicomspace_voxeldim.y;y++){
@@ -49,8 +79,8 @@ public class DICOM_Manager : MonoBehaviour {
 				}
 			}
 			newtex.Apply();
-		}
-		*/
+		}*/
+
 	}
 
 	public void LoadDICOMFromFolder(){
@@ -60,7 +90,7 @@ public class DICOM_Manager : MonoBehaviour {
 
 	void OnGUI() {
 		if ((imgspecs!=null)&&(imgspecs.initialized)) {
-			GUI.DrawTexture (new Rect (0, 0, 2*Mathf.FloorToInt(Mathf.Abs(imgspecs.dicomspace_dims.x)), 2*Mathf.FloorToInt(Mathf.Abs(imgspecs.dicomspace_dims.z))), newtex);
+			GUI.DrawTexture (new Rect (0, 0, Mathf.FloorToInt(Mathf.Abs(imgspecs.dicomspace_dims.x)), Mathf.FloorToInt(Mathf.Abs(imgspecs.dicomspace_dims.z))), newtex);
 		}
 	}
 }
@@ -221,7 +251,7 @@ class DICOMImgSpecs{
 		printSpecs ();
 		initialized = true;
 
-		//Debug.Log("Transform: "+affinetransformer.TransformPoint (new Vector3Int(129,3,149)).ToString());
+		Debug.Log("Transform: "+affinetransformer.TransformPoint (new Vector3Int(0,0,0)).ToString());
 	
 	}
 
@@ -320,33 +350,12 @@ class DICOMImgSpecs{
 					// Which point of the dicomspace arr should be written to?
 					Vector3Int transformedpoint = affinetransformer.TransformPoint(cur_img_coord);
 
-					//Debug.Log ("transformed point to:" + transformedpoint.ToString ());
-
-					//if (!CheckInBounds (transformedpoint)) {
-					//	Debug.LogError ("Hey! Affine Transform is not working correctly for some reason! Failed to create Dicomspace voxelarr");
-					//	return;
-					//}
-
 					Vector3Int dicomspacecoord = new Vector3Int(
 						transformedpoint.x - dicomvoxelspace_bottombackleft.x,
 						transformedpoint.y - dicomvoxelspace_bottombackleft.y,
 						transformedpoint.z - dicomvoxelspace_bottombackleft.z
 					);
-
-					//dicomspacecoord = new Vector3 (dicomspacecoord.x/dimensionscaling.x,
-					//	dicomspacecoord.y/dimensionscaling.y,
-					//	dicomspacecoord.z/dimensionscaling.z);
-
-					//Debug.Log ("dicomspacecoord:");
-					//Debug.Log (dicomspacecoord);
-
-					//var dicomspacecoord = new Vector3(pos_rel_to_back);
-
-					//dicomspacecoord.x = (dicomspace_voxeldim.x*(transformedpoint.x - dicomspace_bottombackleft.x)/(dicomspace_frontforwardright.x - dicomspace_bottombackleft.x));
-					//dicomspacecoord.y = (dicomspace_voxeldim.y*(transformedpoint.y - dicomspace_bottombackleft.y)/(dicomspace_frontforwardright.y - dicomspace_bottombackleft.y));
-					//dicomspacecoord.z = (dicomspace_voxeldim.z*(transformedpoint.z - dicomspace_bottombackleft.z)/(dicomspace_frontforwardright.z - dicomspace_bottombackleft.z));
-
-					//Debug.Log("Try: "+dicomspacecoord.x.ToString() + "," + dicomspacecoord.y.ToString() + "," + dicomspacecoord.z.ToString());
+						
 					try{
 						var dicomfloored = dicomspacecoord;
 						dicomspacevoxelarr [(dicomspace_voxeldim.x * dicomspace_voxeldim.y) * dicomfloored.z + (dicomfloored.y * dicomspace_voxeldim.x) + dicomfloored.x] = cur_img_value;
@@ -354,19 +363,16 @@ class DICOMImgSpecs{
 					}
 					catch{
 						failures++;
-						//Debug.LogError("Out of bounds!!!: "+((dicomspace_voxeldim.x * dicomspace_voxeldim.y) * dicomspacecoord.z + (dicomspacecoord.y * dicomspace_voxeldim.x) + dicomspacecoord.x).ToString());
 
-						//Debug.LogError ("Cur img coord:"+cur_img_coord.ToString());
-						//Debug.LogError ("Mapped to:"+dicomspacecoord.ToString());
 						return;
 					}
 
 				}
 			}
 		}
-		//if (failures > 0) {
-		Debug.LogError ("Failures: "+failures.ToString());
-		//}
+		if (failures > 0) {
+			Debug.LogError ("Hey!!! This many points got mapped out of bounds: "+failures.ToString());
+		}
 	}
 
 	public bool CheckInBounds(Vector3 transformedpoint){
@@ -414,6 +420,7 @@ class DICOMImgSpecs{
 }
 
 class AffineTransformer{
+	// This is more general purpose than AffineTransformer_IndexOnly. Beware of floating point errors though
 	// Source for affine transformation matrix: https://nipy.org/nibabel/dicom/dicom_orientation.html
 	float[,] affinematrix; 
 
@@ -454,7 +461,7 @@ class AffineTransformer{
 
 class AffineTransformer_IndexOnly{
 	// Source for affine transformation matrix: https://nipy.org/nibabel/dicom/dicom_orientation.html
-	// This should only be used when transforming voxels into different arrangements.
+	// This should only be used when transforming voxels into different arrangements. Has no concept of scale, only directionality
 	int[,] affinematrix; 
 
 	public AffineTransformer_IndexOnly(Vector3Int rowdircos, Vector3Int coldircos, Vector3Int slicedircos){
@@ -464,7 +471,7 @@ class AffineTransformer_IndexOnly{
 
 		affinematrix = new int[,] { 	{ f1r.x, f2c.x, slicedircos.x, 0},
 										{ f1r.y, f2c.y, slicedircos.y, 0}, 
-										{ f1r.z, f2c.z, slicedircos.y, 0},
+										{ f1r.z, f2c.z, slicedircos.z, 0},
 										{ 0, 0, 0, 1 } };;
 	}
 
