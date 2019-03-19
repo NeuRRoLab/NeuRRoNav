@@ -30,7 +30,7 @@ public class DICOM_Manager : MonoBehaviour {
 
 			for(int z=0;z<imgspecs.dicomspace_voxeldim.z;z++){
 				for(int x=0;x<imgspecs.dicomspace_voxeldim.x;x++){
-					Vector3Int coord = new Vector3Int (x, Mathf.FloorToInt(Time.time*20)%imgspecs.dicomspace_voxeldim.y, z);
+					Vector3Int coord = new Vector3Int (x, Mathf.FloorToInt(Time.time*40)%imgspecs.dicomspace_voxeldim.y, z);
 					float pixlval = imgspecs.dicomspacevoxelarr[(imgspecs.dicomspace_voxeldim.x * imgspecs.dicomspace_voxeldim.y) * coord.z + (coord.y * imgspecs.dicomspace_voxeldim.x) + coord.x]/imgspecs.maxval;
 					newtex.SetPixel (x, z, new Color (1, 0, 0, pixlval));
 				}
@@ -60,7 +60,7 @@ public class DICOM_Manager : MonoBehaviour {
 
 	void OnGUI() {
 		if ((imgspecs!=null)&&(imgspecs.initialized)) {
-			GUI.DrawTexture (new Rect (0, 0, Mathf.FloorToInt(Mathf.Abs(imgspecs.dicomspace_dims.x)), Mathf.FloorToInt(Mathf.Abs(imgspecs.dicomspace_dims.z))), newtex);
+			GUI.DrawTexture (new Rect (0, 0, 2*Mathf.FloorToInt(Mathf.Abs(imgspecs.dicomspace_dims.x)), 2*Mathf.FloorToInt(Mathf.Abs(imgspecs.dicomspace_dims.z))), newtex);
 		}
 	}
 }
@@ -103,6 +103,7 @@ class DICOMImgSpecs{
 
 	public Vector3 dicomspace_bottombackleft;
 	public Vector3 dicomspace_frontforwardright;
+	public Vector3Int dicomvoxelspace_bottombackleft;
 
 	public float[] voxelarr;
 	public int rows;
@@ -123,7 +124,7 @@ class DICOMImgSpecs{
 
 	FileInfo[] dicom_files;
 
-	AffineTransformer affinetransformer;
+	AffineTransformer_IndexOnly affinetransformer;
 
 	public void InitFromDir(string dirname){
 
@@ -209,8 +210,9 @@ class DICOMImgSpecs{
 		InitDelimiterVectors ();
 
 		// bottom back left is important so we have consistent reference frame later.
-		affinetransformer = new AffineTransformer(row_dir_cosine, col_dir_cosine, originpos, 
-			lastpos, deltar, deltac, dicom_files.Length);
+		affinetransformer = new AffineTransformer_IndexOnly(new Vector3Int(row_dir_cosine.normalized),
+			new Vector3Int(col_dir_cosine.normalized),
+			new Vector3Int(slice_dir_cosine.normalized));
 		
 		LoadInPixelData ();
 
@@ -225,6 +227,7 @@ class DICOMImgSpecs{
 		// min x
 		if (dicomspace_dims.x < 0) {
 			dicomspace_bottombackleft.x = originpos.x + dicomspace_dims.x;
+			dicomvoxelspace_bottombackleft.x = dicomspace_voxeldim.x * Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.x));
 		} else {
 			dicomspace_bottombackleft.x = originpos.x;
 		}
@@ -232,6 +235,7 @@ class DICOMImgSpecs{
 		// min y
 		if (dicomspace_dims.y < 0) {
 			dicomspace_bottombackleft.y = originpos.y + dicomspace_dims.y;
+			dicomvoxelspace_bottombackleft.y = dicomspace_voxeldim.y * Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.y));
 		} else {
 			dicomspace_bottombackleft.y = originpos.y;
 		}
@@ -239,6 +243,7 @@ class DICOMImgSpecs{
 		// min z
 		if (dicomspace_dims.z < 0) {
 			dicomspace_bottombackleft.z = originpos.z + dicomspace_dims.z;
+			dicomvoxelspace_bottombackleft.z = dicomspace_voxeldim.z * Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.z));
 		} else {
 			dicomspace_bottombackleft.z = originpos.z;
 		}
@@ -264,6 +269,7 @@ class DICOMImgSpecs{
 		} else {
 			dicomspace_frontforwardright.z = originpos.z;
 		}
+		Debug.Log ("Dicom back:" + dicomvoxelspace_bottombackleft.ToString ());
 	}
 
 	void LoadInPixelData(){
@@ -310,20 +316,24 @@ class DICOMImgSpecs{
 					float cur_img_value = voxelarr [(rows * cols) * z + (y * rows) + x];
 
 					// Which point of the dicomspace arr should be written to?
-					Vector3 transformedpoint = affinetransformer.TransformPoint(cur_img_coord);
+					Vector3Int transformedpoint = affinetransformer.TransformPoint(cur_img_coord);
 
 					//Debug.Log ("transformed point to:" + transformedpoint.ToString ());
 
-					if (!CheckInBounds (transformedpoint)) {
-						Debug.LogError ("Hey! Affine Transform is not working correctly for some reason! Failed to create Dicomspace voxelarr");
-						return;
-					}
+					//if (!CheckInBounds (transformedpoint)) {
+					//	Debug.LogError ("Hey! Affine Transform is not working correctly for some reason! Failed to create Dicomspace voxelarr");
+					//	return;
+					//}
 
-					Vector3 dicomspacecoord = transformedpoint - dicomspace_bottombackleft;
+					Vector3Int dicomspacecoord = new Vector3Int(
+						transformedpoint.x - dicomvoxelspace_bottombackleft.x,
+						transformedpoint.y - dicomvoxelspace_bottombackleft.y,
+						transformedpoint.z - dicomvoxelspace_bottombackleft.z
+					);
 
-					dicomspacecoord = new Vector3 (dicomspacecoord.x/dimensionscaling.x,
-						dicomspacecoord.y/dimensionscaling.y,
-						dicomspacecoord.z/dimensionscaling.z);
+					//dicomspacecoord = new Vector3 (dicomspacecoord.x/dimensionscaling.x,
+					//	dicomspacecoord.y/dimensionscaling.y,
+					//	dicomspacecoord.z/dimensionscaling.z);
 
 					//Debug.Log ("dicomspacecoord:");
 					//Debug.Log (dicomspacecoord);
@@ -336,7 +346,7 @@ class DICOMImgSpecs{
 
 					//Debug.Log("Try: "+dicomspacecoord.x.ToString() + "," + dicomspacecoord.y.ToString() + "," + dicomspacecoord.z.ToString());
 					try{
-						var dicomfloored = new Vector3Int(dicomspacecoord);
+						var dicomfloored = dicomspacecoord;
 						dicomspacevoxelarr [(dicomspace_voxeldim.x * dicomspace_voxeldim.y) * dicomfloored.z + (dicomfloored.y * dicomspace_voxeldim.x) + dicomfloored.x] = cur_img_value;
 						
 					}
@@ -350,9 +360,9 @@ class DICOMImgSpecs{
 				}
 			}
 		}
-		if (failures > 0) {
-			Debug.LogError ("Failures: "+failures.ToString());
-		}
+		//if (failures > 0) {
+		Debug.LogError ("Failures: "+failures.ToString());
+		//}
 	}
 
 	public bool CheckInBounds(Vector3 transformedpoint){
@@ -435,5 +445,39 @@ class AffineTransformer{
 		}
 
 		return new Vector3(outputmatrix[0,0],outputmatrix[1,0],outputmatrix[2,0]);
+	}
+}
+
+class AffineTransformer_IndexOnly{
+	// Source for affine transformation matrix: https://nipy.org/nibabel/dicom/dicom_orientation.html
+	// This should only be used when transforming voxels into different arrangements.
+	int[,] affinematrix; 
+
+	public AffineTransformer_IndexOnly(Vector3Int rowdircos, Vector3Int coldircos, Vector3Int slicedircos){
+		// Init the transformer matrix
+		Vector3Int f1r = rowdircos;//delta_r * coldircos;
+		Vector3Int f2c = coldircos;//delta_c * rowdircos;
+
+		affinematrix = new int[,] { 	{ f1r.x, f2c.x, slicedircos.x, 0},
+										{ f1r.y, f2c.y, slicedircos.y, 0}, 
+										{ f1r.z, f2c.z, slicedircos.y, 0},
+										{ 0, 0, 0, 1 } };;
+	}
+
+	public Vector3Int TransformPoint(Vector3Int imgcoord){
+		// Takes an imgcoord and spits out coord in space of 
+		int[,] coordmatrix = new int[,] {{imgcoord.x},{imgcoord.y},{imgcoord.z},{1}};
+		int[,] outputmatrix = new int[,] {{0},{0},{0},{0}};
+
+		// foreach row of matrix
+		for (int i = 0; i < 4; ++i) {
+			int cur_sum = 0;
+			for (int j = 0; j < 4; ++j) {
+				cur_sum += affinematrix [i, j] * coordmatrix [j, 0];
+			}
+			outputmatrix [i,0] = cur_sum;
+		}
+
+		return new Vector3Int(outputmatrix[0,0],outputmatrix[1,0],outputmatrix[2,0]);
 	}
 }
