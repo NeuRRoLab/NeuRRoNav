@@ -220,6 +220,8 @@ class DICOMImgSpecs{
 
 		printSpecs ();
 		initialized = true;
+
+		//Debug.Log("Transform: "+affinetransformer.TransformPoint (new Vector3Int(129,3,149)).ToString());
 	
 	}
 
@@ -227,7 +229,7 @@ class DICOMImgSpecs{
 		// min x
 		if (dicomspace_dims.x < 0) {
 			dicomspace_bottombackleft.x = originpos.x + dicomspace_dims.x;
-			dicomvoxelspace_bottombackleft.x = dicomspace_voxeldim.x * Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.x));
+			dicomvoxelspace_bottombackleft.x = (dicomspace_voxeldim.x-1) * (Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.x)));
 		} else {
 			dicomspace_bottombackleft.x = originpos.x;
 		}
@@ -235,7 +237,7 @@ class DICOMImgSpecs{
 		// min y
 		if (dicomspace_dims.y < 0) {
 			dicomspace_bottombackleft.y = originpos.y + dicomspace_dims.y;
-			dicomvoxelspace_bottombackleft.y = dicomspace_voxeldim.y * Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.y));
+			dicomvoxelspace_bottombackleft.y = (dicomspace_voxeldim.y-1) * (Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.y)));
 		} else {
 			dicomspace_bottombackleft.y = originpos.y;
 		}
@@ -243,7 +245,7 @@ class DICOMImgSpecs{
 		// min z
 		if (dicomspace_dims.z < 0) {
 			dicomspace_bottombackleft.z = originpos.z + dicomspace_dims.z;
-			dicomvoxelspace_bottombackleft.z = dicomspace_voxeldim.z * Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.z));
+			dicomvoxelspace_bottombackleft.z = (dicomspace_voxeldim.z-1) * (Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.z)));
 		} else {
 			dicomspace_bottombackleft.z = originpos.z;
 		}
@@ -353,8 +355,10 @@ class DICOMImgSpecs{
 					catch{
 						failures++;
 						//Debug.LogError("Out of bounds!!!: "+((dicomspace_voxeldim.x * dicomspace_voxeldim.y) * dicomspacecoord.z + (dicomspacecoord.y * dicomspace_voxeldim.x) + dicomspacecoord.x).ToString());
-						//Debug.LogError (dicomspacecoord.x.ToString() + "," + dicomspacecoord.y.ToString() + "," + dicomspacecoord.z.ToString());
-						//return;
+
+						//Debug.LogError ("Cur img coord:"+cur_img_coord.ToString());
+						//Debug.LogError ("Mapped to:"+dicomspacecoord.ToString());
+						return;
 					}
 
 				}
