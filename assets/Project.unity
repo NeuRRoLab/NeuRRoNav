@@ -303,7 +303,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: C:/Users/Dani
+  m_Text: C:/Users/Daniel
 --- !u!222 &8711294
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2931,7 +2931,7 @@ GameObject:
   - 222: {fileID: 154971848}
   - 114: {fileID: 154971847}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text_TopRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2950,10 +2950,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 948422798}
   m_RootOrder: 2
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 184.3, y: -171.92}
-  m_SizeDelta: {x: 141, y: 26.831}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -67, y: 16}
+  m_SizeDelta: {x: 141, y: 26.830994}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &154971847
 MonoBehaviour:
@@ -2987,7 +2987,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: 0.0mm
 --- !u!222 &154971848
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3201,6 +3201,9 @@ MonoBehaviour:
   fronttoback: {fileID: 181391448}
   righttoleft: {fileID: 250114267}
   bottomtotop: {fileID: 1094128487}
+  fronttext: {fileID: 987176967}
+  righttext: {fileID: 154971847}
+  bottomtext: {fileID: 2038761711}
   sliderfrontback: {fileID: 1220644974}
   sliderrightleft: {fileID: 1940196610}
   sliderbottomtop: {fileID: 1560035083}
@@ -18038,7 +18041,7 @@ GameObject:
   - 222: {fileID: 987176968}
   - 114: {fileID: 987176967}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text_TopLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18057,10 +18060,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1065529969}
   m_RootOrder: 2
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 184.3, y: -171.92}
-  m_SizeDelta: {x: 141, y: 26.831}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -67, y: 16}
+  m_SizeDelta: {x: 141, y: 26.830994}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &987176967
 MonoBehaviour:
@@ -18094,7 +18097,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: 0.0mm
 --- !u!222 &987176968
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -36951,7 +36954,7 @@ GameObject:
   - 222: {fileID: 2038761712}
   - 114: {fileID: 2038761711}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text_BottomLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36970,10 +36973,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2115412530}
   m_RootOrder: 2
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 184.3, y: -171.92}
-  m_SizeDelta: {x: 141, y: 26.831}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -66, y: 16}
+  m_SizeDelta: {x: 141, y: 26.830994}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2038761711
 MonoBehaviour:
@@ -37007,7 +37010,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: 0.0mm
 --- !u!222 &2038761712
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -21,10 +21,21 @@ public class DICOM_Manager : MonoBehaviour {
 	public DICOMImageScr righttoleft;
 	public DICOMImageScr bottomtotop;
 
+	public Text fronttext;
+	public Text righttext;
+	public Text bottomtext;
+
 	public UnityEngine.UI.Slider sliderfrontback;
 	public UnityEngine.UI.Slider sliderrightleft;
 	public UnityEngine.UI.Slider sliderbottomtop;
 
+	float prevfronval = -100;
+	float prevrightval = -100;
+	float prevbottomval = -100;
+
+	Texture2D newtexfront;
+	Texture2D newtexright;
+	Texture2D newtexbottom;
 
 	// Use this for initialization
 	void Start () {
@@ -39,46 +50,54 @@ public class DICOM_Manager : MonoBehaviour {
 			float rightsliderval = sliderrightleft.value;
 			float bottomsliderval = sliderbottomtop.value;
 
-			var newtexfront = new Texture2D(imgspecs.dicomspace_voxeldim.x, imgspecs.dicomspace_voxeldim.z);
-			var newtexright = new Texture2D(imgspecs.dicomspace_voxeldim.y, imgspecs.dicomspace_voxeldim.z);
-			var newtexbottom = new Texture2D(imgspecs.dicomspace_voxeldim.x, imgspecs.dicomspace_voxeldim.y);
-
 			int xcoord = Mathf.FloorToInt (rightsliderval * imgspecs.dicomspace_voxeldim.x);
 			int ycoord = Mathf.FloorToInt (frontsliderval * imgspecs.dicomspace_voxeldim.y);
 			int zcoord = Mathf.FloorToInt (bottomsliderval * imgspecs.dicomspace_voxeldim.z);
 				
 			// frontback
-			for(int z=0;z<imgspecs.dicomspace_voxeldim.z;z++){
-				for(int x=0;x<imgspecs.dicomspace_voxeldim.x;x++){
-					Vector3Int coord = new Vector3Int (x, ycoord, z);
-					float pixlval = imgspecs.dicomspacevoxelarr[(imgspecs.dicomspace_voxeldim.x * imgspecs.dicomspace_voxeldim.y) * coord.z + (coord.y * imgspecs.dicomspace_voxeldim.x) + coord.x]/imgspecs.maxval;
-					newtexfront.SetPixel (newtexfront.width-1-x, z, new Color (pixlval, pixlval, pixlval, 1));
+			if (frontsliderval != prevfronval) {
+				for (int z = 0; z < imgspecs.dicomspace_voxeldim.z; z++) {
+					for (int x = 0; x < imgspecs.dicomspace_voxeldim.x; x++) {
+						Vector3Int coord = new Vector3Int (x, ycoord, z);
+						float pixlval = imgspecs.dicomspacevoxelarr [(imgspecs.dicomspace_voxeldim.x * imgspecs.dicomspace_voxeldim.y) * coord.z + (coord.y * imgspecs.dicomspace_voxeldim.x) + coord.x] / imgspecs.maxval;
+						newtexfront.SetPixel (newtexfront.width - 1 - x, z, new Color (pixlval, pixlval, pixlval, 1));
+					}
 				}
+				newtexfront.Apply ();
+				fronttext.text = imgspecs.dicomspace_bottombackleft.y + Mathf.Abs(imgspecs.dicomspace_dims.y)*frontsliderval+"mm";
 			}
-			newtexfront.Apply();
-			fronttoback.img.texture = newtexfront;
+
 
 			// rightleft
-			for(int z=0;z<imgspecs.dicomspace_voxeldim.z;z++){
-				for(int y=0;y<imgspecs.dicomspace_voxeldim.y;y++){
-					Vector3Int coord = new Vector3Int (xcoord, y, z);
-					float pixlval = imgspecs.dicomspacevoxelarr[(imgspecs.dicomspace_voxeldim.x * imgspecs.dicomspace_voxeldim.y) * coord.z + (coord.y * imgspecs.dicomspace_voxeldim.x) + coord.x]/imgspecs.maxval;
-					newtexright.SetPixel (newtexright.width-1-y, z, new Color (pixlval, pixlval, pixlval, 1));
+			if (rightsliderval != prevrightval) {
+				for (int z = 0; z < imgspecs.dicomspace_voxeldim.z; z++) {
+					for (int y = 0; y < imgspecs.dicomspace_voxeldim.y; y++) {
+						Vector3Int coord = new Vector3Int (xcoord, y, z);
+						float pixlval = imgspecs.dicomspacevoxelarr [(imgspecs.dicomspace_voxeldim.x * imgspecs.dicomspace_voxeldim.y) * coord.z + (coord.y * imgspecs.dicomspace_voxeldim.x) + coord.x] / imgspecs.maxval;
+						newtexright.SetPixel (newtexright.width - 1 - y, z, new Color (pixlval, pixlval, pixlval, 1));
+					}
 				}
+				newtexright.Apply ();
+				righttext.text = imgspecs.dicomspace_bottombackleft.x + Mathf.Abs(imgspecs.dicomspace_dims.x)*rightsliderval+"mm";
 			}
-			newtexright.Apply();
-			righttoleft.img.texture = newtexright;
+
 
 			// bottomtop
-			for(int y=0;y<imgspecs.dicomspace_voxeldim.y;y++){
-				for(int x=0;x<imgspecs.dicomspace_voxeldim.x;x++){
-					Vector3Int coord = new Vector3Int (x, y, zcoord);
-					float pixlval = imgspecs.dicomspacevoxelarr[(imgspecs.dicomspace_voxeldim.x * imgspecs.dicomspace_voxeldim.y) * coord.z + (coord.y * imgspecs.dicomspace_voxeldim.x) + coord.x]/imgspecs.maxval;
-					newtexbottom.SetPixel (newtexfront.width-1-x, y, new Color (pixlval, pixlval, pixlval, 1));
+			if (bottomsliderval != prevbottomval) {
+				for (int y = 0; y < imgspecs.dicomspace_voxeldim.y; y++) {
+					for (int x = 0; x < imgspecs.dicomspace_voxeldim.x; x++) {
+						Vector3Int coord = new Vector3Int (x, y, zcoord);
+						float pixlval = imgspecs.dicomspacevoxelarr [(imgspecs.dicomspace_voxeldim.x * imgspecs.dicomspace_voxeldim.y) * coord.z + (coord.y * imgspecs.dicomspace_voxeldim.x) + coord.x] / imgspecs.maxval;
+						newtexbottom.SetPixel (newtexfront.width - 1 - x, y, new Color (pixlval, pixlval, pixlval, 1));
+					}
 				}
+				newtexbottom.Apply ();
+				bottomtext.text = imgspecs.dicomspace_bottombackleft.z + Mathf.Abs(imgspecs.dicomspace_dims.z)*bottomsliderval+"mm";
 			}
-			newtexbottom.Apply();
-			bottomtotop.img.texture = newtexbottom;
+
+			prevfronval = frontsliderval;
+			prevrightval = rightsliderval;
+			prevbottomval = bottomsliderval;
 		}
 	}
 
@@ -89,6 +108,18 @@ public class DICOM_Manager : MonoBehaviour {
 			fronttoback.widthscaler = Mathf.Abs (imgspecs.dicomspace_dims.x / imgspecs.dicomspace_dims.z);
 			righttoleft.widthscaler = Mathf.Abs (imgspecs.dicomspace_dims.y / imgspecs.dicomspace_dims.z);
 			bottomtotop.widthscaler = Mathf.Abs (imgspecs.dicomspace_dims.x / imgspecs.dicomspace_dims.y);
+
+			newtexfront = new Texture2D(imgspecs.dicomspace_voxeldim.x, imgspecs.dicomspace_voxeldim.z);
+			newtexright = new Texture2D(imgspecs.dicomspace_voxeldim.y, imgspecs.dicomspace_voxeldim.z);
+			newtexbottom = new Texture2D(imgspecs.dicomspace_voxeldim.x, imgspecs.dicomspace_voxeldim.y);
+
+			fronttoback.img.texture = newtexfront;
+			righttoleft.img.texture = newtexright;
+			bottomtotop.img.texture = newtexbottom;
+
+			prevbottomval = -100;
+			prevfronval = -100;
+			prevrightval = -100;
 		}
 	}
 }
@@ -249,10 +280,6 @@ class DICOMImgSpecs{
 
 		printSpecs ();
 		initialized = true;
-
-
-
-		Debug.Log("Transform: "+affinetransformer.TransformPoint (new Vector3Int(0,0,0)).ToString());
 	
 	}
 
@@ -367,8 +394,6 @@ class DICOMImgSpecs{
 					}
 					catch{
 						failures++;
-
-						return;
 					}
 
 				}
