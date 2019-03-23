@@ -52,9 +52,9 @@ public class DICOM_Manager : MonoBehaviour {
 			float rightsliderval = sliderrightleft.value;
 			float bottomsliderval = sliderbottomtop.value;
 
-			float xcoord = imgspecs.dicomspace_bottombackleft.x + rightsliderval * (imgspecs.dicomspace_frontforwardright.x - imgspecs.dicomspace_bottombackleft.x);
-			float ycoord = imgspecs.dicomspace_bottombackleft.y + frontsliderval * (imgspecs.dicomspace_frontforwardright.y - imgspecs.dicomspace_bottombackleft.y);
-			float zcoord = imgspecs.dicomspace_bottombackleft.z + bottomsliderval * (imgspecs.dicomspace_frontforwardright.z - imgspecs.dicomspace_bottombackleft.z);
+			float xcoord = imgspecs.dicomspace_bottombackleft.x + rightsliderval * imgspecs.dicomspace_dims.x;
+			float ycoord = imgspecs.dicomspace_bottombackleft.y + frontsliderval * imgspecs.dicomspace_dims.y;
+			float zcoord = imgspecs.dicomspace_bottombackleft.z + bottomsliderval * imgspecs.dicomspace_dims.z;
 				
 			// frontback
 			if (frontsliderval != prevfronval) {
@@ -70,52 +70,60 @@ public class DICOM_Manager : MonoBehaviour {
 						Vector3Int imgcoord = imgspecs.affinetransformer.TransformPointDICOMToImg (dicomspacecoord);
 						float pixlval = imgspecs.GetValAtImgCoord(imgcoord);
 
-						newtexfront.SetPixel (newtexfront.width - 1 - x, z, new Color (pixlval, pixlval, pixlval, 1));
+						newtexfront.SetPixel (x, z, new Color (pixlval, pixlval, pixlval, 1));
 					}
 				}
-					
-
-				/*
-				for (int z = 0; z < imgspecs.dicomspace_voxeldim.z; z++) {
-					for (int x = 0; x < imgspecs.dicomspace_voxeldim.x; x++) {
-						Vector3Int coord = new Vector3Int (x, ycoord, z);
-						float pixlval = imgspecs.dicomspacevoxelarr [(imgspecs.dicomspace_voxeldim.x * imgspecs.dicomspace_voxeldim.y) * coord.z + (coord.y * imgspecs.dicomspace_voxeldim.x) + coord.x] / imgspecs.maxval;
-						newtexfront.SetPixel (newtexfront.width - 1 - x, z, new Color (pixlval, pixlval, pixlval, 1));
-					}
-				}*/
-
-
+			
 				newtexfront.Apply ();
-				fronttext.text = xcoord.ToString()+"mm";
+				fronttext.text = ycoord.ToString()+"mm";
 			}
-
-			/*
+				
 			// rightleft
 			if (rightsliderval != prevrightval) {
-				for (int z = 0; z < imgspecs.dicomspace_voxeldim.z; z++) {
-					for (int y = 0; y < imgspecs.dicomspace_voxeldim.y; y++) {
-						Vector3Int coord = new Vector3Int (xcoord, y, z);
-						float pixlval = imgspecs.dicomspacevoxelarr [(imgspecs.dicomspace_voxeldim.x * imgspecs.dicomspace_voxeldim.y) * coord.z + (coord.y * imgspecs.dicomspace_voxeldim.x) + coord.x] / imgspecs.maxval;
-						newtexright.SetPixel (newtexright.width - 1 - y, z, new Color (pixlval, pixlval, pixlval, 1));
+
+				for (int z = 0; z < imagedim; ++z) {
+					for (int y = 0; y < imagedim; ++y) {
+						float yfrac = (float)y / imagedim; 
+						float zfrac = (float)z / imagedim; 
+						Vector3 dicomspacecoord = new Vector3 (
+							xcoord,
+							imgspecs.dicomspace_bottombackleft.y + yfrac * imgspecs.dicomspace_dims.y,
+							imgspecs.dicomspace_bottombackleft.z + zfrac * imgspecs.dicomspace_dims.z);
+
+						Vector3Int imgcoord = imgspecs.affinetransformer.TransformPointDICOMToImg (dicomspacecoord);
+						float pixlval = imgspecs.GetValAtImgCoord(imgcoord);
+
+						newtexright.SetPixel (y, z, new Color (pixlval, pixlval, pixlval, 1));
 					}
 				}
+	
 				newtexright.Apply ();
-				righttext.text = imgspecs.dicomspace_bottombackleft.x + Mathf.Abs(imgspecs.dicomspace_dims.x)*rightsliderval+"mm";
+				righttext.text = xcoord.ToString()+"mm";
 			}
 
 
 			// bottomtop
 			if (bottomsliderval != prevbottomval) {
-				for (int y = 0; y < imgspecs.dicomspace_voxeldim.y; y++) {
-					for (int x = 0; x < imgspecs.dicomspace_voxeldim.x; x++) {
-						Vector3Int coord = new Vector3Int (x, y, zcoord);
-						float pixlval = imgspecs.dicomspacevoxelarr [(imgspecs.dicomspace_voxeldim.x * imgspecs.dicomspace_voxeldim.y) * coord.z + (coord.y * imgspecs.dicomspace_voxeldim.x) + coord.x] / imgspecs.maxval;
-						newtexbottom.SetPixel (newtexfront.width - 1 - x, y, new Color (pixlval, pixlval, pixlval, 1));
+				for (int x = 0; x < imagedim; ++x) {
+					for (int y = 0; y < imagedim; ++y) {
+						float yfrac = (float)y / imagedim; 
+						float xfrac = (float)x / imagedim; 
+						Vector3 dicomspacecoord = new Vector3 (
+							imgspecs.dicomspace_bottombackleft.x + xfrac * imgspecs.dicomspace_dims.x,
+							imgspecs.dicomspace_bottombackleft.y + yfrac * imgspecs.dicomspace_dims.y,
+							zcoord);
+
+						Vector3Int imgcoord = imgspecs.affinetransformer.TransformPointDICOMToImg (dicomspacecoord);
+						float pixlval = imgspecs.GetValAtImgCoord(imgcoord);
+
+						newtexbottom.SetPixel (x,y, new Color (pixlval, pixlval, pixlval, 1));
 					}
 				}
+
+
 				newtexbottom.Apply ();
-				bottomtext.text = imgspecs.dicomspace_bottombackleft.z + Mathf.Abs(imgspecs.dicomspace_dims.z)*bottomsliderval+"mm";
-			}*/
+				bottomtext.text = zcoord.ToString()+"mm";
+			}
 
 			prevfronval = frontsliderval;
 			prevrightval = rightsliderval;
@@ -272,11 +280,12 @@ class DICOMImgSpecs{
 		cols = image.Dataset.Get<int>(Dicom.DicomTag.Columns);
 		slices = dicom_files.Length;
 
-		InitDelimiterVectors ();
 
 		// bottom back left is important so we have consistent reference frame later.
 		affinetransformer = new AffineTransformer(row_dir_cosine, col_dir_cosine, originpos, 
 			lastpos, deltar, deltac, slices);
+
+		InitDelimiterVectors ();
 		
 		LoadInPixelData ();
 
@@ -288,10 +297,10 @@ class DICOMImgSpecs{
 	public float GetValAtImgCoord(Vector3Int imgcoord){
 		//  Check if in bounds
 		bool inbounds = true;
-		if((imgcoord.x<0)||(imgcoord.x>=rows)){
+		if((imgcoord.x<0)||(imgcoord.x>=cols)){
 			inbounds = false;
 		}
-		if((imgcoord.y<0)||(imgcoord.y>=cols)){
+		if((imgcoord.y<0)||(imgcoord.y>=rows)){
 			inbounds = false;
 		}
 		if((imgcoord.z<0)||(imgcoord.z>=slices)){
@@ -301,7 +310,7 @@ class DICOMImgSpecs{
 		if (!inbounds) {
 			return 1;
 		} else {
-			return voxelarr [(rows * cols) * imgcoord.z + (imgcoord.y * rows) + imgcoord.x]/maxval;
+			return voxelarr [(rows * cols) * imgcoord.z + (imgcoord.y * cols) + imgcoord.x]/maxval;
 		}
 
 	}
@@ -312,20 +321,20 @@ class DICOMImgSpecs{
 		dicomspace_frontforwardright = originpos;
 
 		Vector3 slicevec = slice_dir_cosine * slices;
-		Vector3 rowvec = row_dir_cosine * rows;
-		Vector3 colvec = col_dir_cosine * cols;
+		Vector3 rowvec = row_dir_cosine * cols;
+		Vector3 colvec = col_dir_cosine * rows;
 
 		List<Vector3> extremitypoints = new List<Vector3> ();
 
-		extremitypoints.Add (originpos);
-		extremitypoints.Add (originpos + rowvec);
-		extremitypoints.Add (originpos + colvec);
-		extremitypoints.Add (originpos + rowvec + colvec);
+		extremitypoints.Add (affinetransformer.TransformPointImgToDICOM(new Vector3Int(0,0,0)));
+		extremitypoints.Add (affinetransformer.TransformPointImgToDICOM(new Vector3Int(cols,0,0)));
+		extremitypoints.Add (affinetransformer.TransformPointImgToDICOM(new Vector3Int(0,rows,0)));
+		extremitypoints.Add (affinetransformer.TransformPointImgToDICOM(new Vector3Int(cols,rows,0)));
 
-		extremitypoints.Add (originpos + slicevec);
-		extremitypoints.Add (originpos + slicevec + rowvec);
-		extremitypoints.Add (originpos + slicevec + colvec);
-		extremitypoints.Add (originpos + slicevec + rowvec + colvec);
+		extremitypoints.Add (affinetransformer.TransformPointImgToDICOM(new Vector3Int(0,0,slices)));
+		extremitypoints.Add (affinetransformer.TransformPointImgToDICOM(new Vector3Int(cols,0,slices)));
+		extremitypoints.Add (affinetransformer.TransformPointImgToDICOM(new Vector3Int(0,rows,slices)));
+		extremitypoints.Add (affinetransformer.TransformPointImgToDICOM(new Vector3Int(cols,rows,slices)));
 
 		// Now find max x and y and z in each.
 		foreach (Vector3 vec in extremitypoints){
@@ -363,17 +372,17 @@ class DICOMImgSpecs{
 		int fileindex = 0;
 		foreach (FileInfo file in dicom_files)
 		{
-			Texture2D newtex = new Texture2D(rows, cols);
+			Texture2D newtex = new Texture2D(cols, rows);
 
 			var image = new DicomImage(file.FullName);
 			pixelData = PixelDataFactory.Create(image.PixelData, 0);
 
-			for (int y = 0; y < cols; ++y)
+			for (int y = 0; y < rows; ++y)
 			{
-				for (int x = 0; x < rows; ++x)
+				for (int x = 0; x < cols; ++x)
 				{
 					float cur_pixel = (float)pixelData.GetPixel(x, y);
-					voxelarr [(rows * cols) * fileindex + (y * rows) + x] = cur_pixel;
+					voxelarr [(rows * cols) * fileindex + (y * cols) + x] = cur_pixel;
 					if (cur_pixel > maxval) {
 						maxval = cur_pixel;
 					}
@@ -409,8 +418,8 @@ class AffineTransformer{
 	public AffineTransformer(Vector3 rowdircos, Vector3 coldircos, Vector3 firstpos, 
 							 Vector3 lastpos, float delta_r, float delta_c, int slices){
 		// Init the transformer matrix
-		Vector3 f1r = delta_r * rowdircos;//delta_r * coldircos;
-		Vector3 f2c = delta_c * coldircos;//delta_c * rowdircos;
+		Vector3 f1r = delta_r * coldircos;
+		Vector3 f2c = delta_c * rowdircos;
 		Vector3 t1 = firstpos;
 		Vector3 tn = lastpos;
 		float n = slices;
