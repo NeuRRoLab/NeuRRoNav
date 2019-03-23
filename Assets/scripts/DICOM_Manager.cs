@@ -10,6 +10,8 @@ using System.Collections.Generic;
 public class DICOM_Manager : MonoBehaviour {
 	// Handles the loading and representation of DICOM files.
 
+	public int imagedim = 0;
+
 	public InputField folderloc;
 
 	DICOMImgSpecs imgspecs;
@@ -45,29 +47,49 @@ public class DICOM_Manager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if ((imgspecs != null) && (imgspecs.initialized)) {
-			// Pass the correct textures to the three DicomImageScrs.
+			// Pass the correct textures to the three DicomImageScrs
 			float frontsliderval = sliderfrontback.value;
 			float rightsliderval = sliderrightleft.value;
 			float bottomsliderval = sliderbottomtop.value;
 
-			int xcoord = Mathf.FloorToInt (rightsliderval * imgspecs.dicomspace_voxeldim.x);
-			int ycoord = Mathf.FloorToInt (frontsliderval * imgspecs.dicomspace_voxeldim.y);
-			int zcoord = Mathf.FloorToInt (bottomsliderval * imgspecs.dicomspace_voxeldim.z);
+			float xcoord = imgspecs.dicomspace_bottombackleft.x + rightsliderval * (imgspecs.dicomspace_frontforwardright.x - imgspecs.dicomspace_bottombackleft.x);
+			float ycoord = imgspecs.dicomspace_bottombackleft.y + frontsliderval * (imgspecs.dicomspace_frontforwardright.y - imgspecs.dicomspace_bottombackleft.y);
+			float zcoord = imgspecs.dicomspace_bottombackleft.z + bottomsliderval * (imgspecs.dicomspace_frontforwardright.z - imgspecs.dicomspace_bottombackleft.z);
 				
 			// frontback
 			if (frontsliderval != prevfronval) {
+				for (int z = 0; z < imagedim; ++z) {
+					for (int x = 0; x < imagedim; ++x) {
+						float xfrac = (float)x / imagedim; 
+						float zfrac = (float)z / imagedim; 
+						Vector3 dicomspacecoord = new Vector3 (
+							                          imgspecs.dicomspace_bottombackleft.x + xfrac * imgspecs.dicomspace_dims.x,
+							                          ycoord,
+							                          imgspecs.dicomspace_bottombackleft.z + zfrac * imgspecs.dicomspace_dims.z);
+
+						Vector3Int imgcoord = imgspecs.affinetransformer.TransformPointDICOMToImg (dicomspacecoord);
+						float pixlval = imgspecs.GetValAtImgCoord(imgcoord);
+
+						newtexfront.SetPixel (newtexfront.width - 1 - x, z, new Color (pixlval, pixlval, pixlval, 1));
+					}
+				}
+					
+
+				/*
 				for (int z = 0; z < imgspecs.dicomspace_voxeldim.z; z++) {
 					for (int x = 0; x < imgspecs.dicomspace_voxeldim.x; x++) {
 						Vector3Int coord = new Vector3Int (x, ycoord, z);
 						float pixlval = imgspecs.dicomspacevoxelarr [(imgspecs.dicomspace_voxeldim.x * imgspecs.dicomspace_voxeldim.y) * coord.z + (coord.y * imgspecs.dicomspace_voxeldim.x) + coord.x] / imgspecs.maxval;
 						newtexfront.SetPixel (newtexfront.width - 1 - x, z, new Color (pixlval, pixlval, pixlval, 1));
 					}
-				}
+				}*/
+
+
 				newtexfront.Apply ();
-				fronttext.text = imgspecs.dicomspace_bottombackleft.y + Mathf.Abs(imgspecs.dicomspace_dims.y)*frontsliderval+"mm";
+				fronttext.text = xcoord.ToString()+"mm";
 			}
 
-
+			/*
 			// rightleft
 			if (rightsliderval != prevrightval) {
 				for (int z = 0; z < imgspecs.dicomspace_voxeldim.z; z++) {
@@ -93,7 +115,7 @@ public class DICOM_Manager : MonoBehaviour {
 				}
 				newtexbottom.Apply ();
 				bottomtext.text = imgspecs.dicomspace_bottombackleft.z + Mathf.Abs(imgspecs.dicomspace_dims.z)*bottomsliderval+"mm";
-			}
+			}*/
 
 			prevfronval = frontsliderval;
 			prevrightval = rightsliderval;
@@ -105,13 +127,16 @@ public class DICOM_Manager : MonoBehaviour {
 		imgspecs = new DICOMImgSpecs ();
 		imgspecs.InitFromDir(folderloc.text);
 		if ((imgspecs != null) && (imgspecs.initialized)) {
+			imagedim = Mathf.CeilToInt(Vector3.Magnitude (new Vector3(imgspecs.rows,imgspecs.cols, imgspecs.slices)));
+
+
 			fronttoback.widthscaler = Mathf.Abs (imgspecs.dicomspace_dims.x / imgspecs.dicomspace_dims.z);
 			righttoleft.widthscaler = Mathf.Abs (imgspecs.dicomspace_dims.y / imgspecs.dicomspace_dims.z);
 			bottomtotop.widthscaler = Mathf.Abs (imgspecs.dicomspace_dims.x / imgspecs.dicomspace_dims.y);
 
-			newtexfront = new Texture2D(imgspecs.dicomspace_voxeldim.x, imgspecs.dicomspace_voxeldim.z);
-			newtexright = new Texture2D(imgspecs.dicomspace_voxeldim.y, imgspecs.dicomspace_voxeldim.z);
-			newtexbottom = new Texture2D(imgspecs.dicomspace_voxeldim.x, imgspecs.dicomspace_voxeldim.y);
+			newtexfront = new Texture2D(imagedim, imagedim);
+			newtexright = new Texture2D(imagedim, imagedim);
+			newtexbottom = new Texture2D(imagedim, imagedim);
 
 			fronttoback.img.texture = newtexfront;
 			righttoleft.img.texture = newtexright;
@@ -158,7 +183,7 @@ class DICOMImgSpecs{
 	public Vector3 slice_dir_cosine;
 
 	public Vector3 dicomspace_dims; // Length width height in millimeters, essentially the 
-									// rectangular prism the thing occupies.\
+									// rectangular prism the thing occupies.
 
 	public Vector3 dicomspace_bottombackleft;
 	public Vector3 dicomspace_frontforwardright;
@@ -170,8 +195,8 @@ class DICOMImgSpecs{
 	public int cols;
 	public int slices;
 
-	public float[] dicomspacevoxelarr;
-	public Vector3Int dicomspace_voxeldim;
+	//public float[] dicomspacevoxelarr;
+	//public Vector3Int dicomspace_voxeldim;
 
 	public float[] worldspacevoxelarr;
 	public int worldspace_xvoxels;
@@ -184,7 +209,7 @@ class DICOMImgSpecs{
 
 	FileInfo[] dicom_files;
 
-	AffineTransformer_IndexOnly affinetransformer;
+	public AffineTransformer affinetransformer;
 
 	public void InitFromDir(string dirname){
 
@@ -247,92 +272,87 @@ class DICOMImgSpecs{
 		cols = image.Dataset.Get<int>(Dicom.DicomTag.Columns);
 		slices = dicom_files.Length;
 
-		dicomspace_dims = (
-			row_dir_cosine * rows+
-			col_dir_cosine * cols+
-			slice_dir_cosine * slices);	
-
-		Vector3 voxeldim = row_dir_cosine.normalized * rows +
-		                   col_dir_cosine.normalized * cols +
-		                   slice_dir_cosine.normalized * slices;
-		
-		voxeldim = new Vector3 (Mathf.Abs(Mathf.Round (voxeldim [0])), 
-			Mathf.Abs(Mathf.Round (voxeldim [1])),
-			Mathf.Abs(Mathf.Round (voxeldim [2])));
-
-		dimensionscaling = 
-			new Vector3 (Mathf.Abs(dicomspace_dims.x/voxeldim.x),
-				Mathf.Abs(dicomspace_dims.y/voxeldim.y),
-				Mathf.Abs(dicomspace_dims.z/voxeldim.z));
-
-		dicomspace_voxeldim = new Vector3Int (voxeldim);
-
 		InitDelimiterVectors ();
 
 		// bottom back left is important so we have consistent reference frame later.
-		affinetransformer = new AffineTransformer_IndexOnly(new Vector3Int(row_dir_cosine.normalized),
-			new Vector3Int(col_dir_cosine.normalized),
-			new Vector3Int(slice_dir_cosine.normalized));
+		affinetransformer = new AffineTransformer(row_dir_cosine, col_dir_cosine, originpos, 
+			lastpos, deltar, deltac, slices);
 		
 		LoadInPixelData ();
-
-		CreateDicomSpaceVoxelArr ();
 
 		printSpecs ();
 		initialized = true;
 	
 	}
 
+	public float GetValAtImgCoord(Vector3Int imgcoord){
+		//  Check if in bounds
+		bool inbounds = true;
+		if((imgcoord.x<0)||(imgcoord.x>=rows)){
+			inbounds = false;
+		}
+		if((imgcoord.y<0)||(imgcoord.y>=cols)){
+			inbounds = false;
+		}
+		if((imgcoord.z<0)||(imgcoord.z>=slices)){
+			inbounds = false;
+		}
+			
+		if (!inbounds) {
+			return 1;
+		} else {
+			return voxelarr [(rows * cols) * imgcoord.z + (imgcoord.y * rows) + imgcoord.x]/maxval;
+		}
+
+	}
+
 	void InitDelimiterVectors(){
-		// min x
-		if (dicomspace_dims.x < 0) {
-			dicomspace_bottombackleft.x = originpos.x + dicomspace_dims.x;
-			dicomvoxelspace_bottombackleft.x = (dicomspace_voxeldim.x-1) * (Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.x)));
-		} else {
-			dicomspace_bottombackleft.x = originpos.x;
+
+		dicomspace_bottombackleft = originpos;
+		dicomspace_frontforwardright = originpos;
+
+		Vector3 slicevec = slice_dir_cosine * slices;
+		Vector3 rowvec = row_dir_cosine * rows;
+		Vector3 colvec = col_dir_cosine * cols;
+
+		List<Vector3> extremitypoints = new List<Vector3> ();
+
+		extremitypoints.Add (originpos);
+		extremitypoints.Add (originpos + rowvec);
+		extremitypoints.Add (originpos + colvec);
+		extremitypoints.Add (originpos + rowvec + colvec);
+
+		extremitypoints.Add (originpos + slicevec);
+		extremitypoints.Add (originpos + slicevec + rowvec);
+		extremitypoints.Add (originpos + slicevec + colvec);
+		extremitypoints.Add (originpos + slicevec + rowvec + colvec);
+
+		// Now find max x and y and z in each.
+		foreach (Vector3 vec in extremitypoints){
+			// Bottombackleft
+			if(vec.x<dicomspace_bottombackleft.x){
+				dicomspace_bottombackleft.x = vec.x;
+			}
+			if(vec.y<dicomspace_bottombackleft.y){
+				dicomspace_bottombackleft.y = vec.y;
+			}
+			if(vec.z<dicomspace_bottombackleft.z){
+				dicomspace_bottombackleft.z = vec.z;
+			}
+
+			// frontforwardright
+			if(vec.x>dicomspace_frontforwardright.x){
+				dicomspace_frontforwardright.x = vec.x;
+			}
+			if(vec.y>dicomspace_frontforwardright.y){
+				dicomspace_frontforwardright.y = vec.y;
+			}
+			if(vec.z>dicomspace_frontforwardright.z){
+				dicomspace_frontforwardright.z = vec.z;
+			}
 		}
 
-		// min y
-		if (dicomspace_dims.y < 0) {
-			dicomspace_bottombackleft.y = originpos.y + dicomspace_dims.y;
-			dicomvoxelspace_bottombackleft.y = (dicomspace_voxeldim.y-1) * (Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.y)));
-		} else {
-			dicomspace_bottombackleft.y = originpos.y;
-		}
-
-		// min z
-		if (dicomspace_dims.z < 0) {
-			dicomspace_bottombackleft.z = originpos.z + dicomspace_dims.z;
-			dicomvoxelspace_bottombackleft.z = (dicomspace_voxeldim.z-1) * (Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.z)));
-		} else {
-			dicomspace_bottombackleft.z = originpos.z;
-		}
-
-
-		// max x
-		if (dicomspace_dims.x > 0) {
-			dicomspace_frontforwardright.x = originpos.x + dicomspace_dims.x;
-			dicomvoxelspace_frontforwardright.x = (dicomspace_voxeldim.x-1) * (Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.x)));
-		} else {
-			dicomspace_frontforwardright.x = originpos.x;
-		}
-
-		// max y
-		if (dicomspace_dims.y > 0) {
-			dicomspace_frontforwardright.y = originpos.y + dicomspace_dims.y;
-			dicomvoxelspace_frontforwardright.y = (dicomspace_voxeldim.y-1) * (Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.y)));
-		} else {
-			dicomspace_frontforwardright.y = originpos.y;
-		}
-
-		// max z
-		if (dicomspace_dims.z > 0) {
-			dicomspace_frontforwardright.z = originpos.z + dicomspace_dims.z;
-			dicomvoxelspace_frontforwardright.z = (dicomspace_voxeldim.z-1) * (Mathf.FloorToInt(Mathf.Sign (dicomspace_dims.z)));
-		} else {
-			dicomspace_frontforwardright.z = originpos.z;
-		}
-		Debug.Log ("Dicom back:" + dicomvoxelspace_bottombackleft.ToString ());
+		dicomspace_dims = dicomspace_frontforwardright - dicomspace_bottombackleft;
 	}
 
 	void LoadInPixelData(){
@@ -361,78 +381,8 @@ class DICOMImgSpecs{
 				}
 			}
 			fileindex += 1;
-			//Debug.Log ("Maxval: "+maxval.ToString ());
 		}
 
-	}
-
-	public void CreateDicomSpaceVoxelArr(){
-		int failures = 0;
-		// What will dimensions of alignedvoxelarr be?
-		dicomspacevoxelarr = new float[Mathf.Abs(dicomspace_voxeldim.x * dicomspace_voxeldim.y * dicomspace_voxeldim.z)];
-
-		// Iterate through all points in voxelarr:
-		for(int x = 0; x<rows;++x){
-			for (int y = 0; y < cols; ++y) {
-				for (int z = 0; z < slices; ++z) {
-					Vector3Int cur_img_coord = new Vector3Int (x, y, z);
-					float cur_img_value = voxelarr [(rows * cols) * z + (y * rows) + x];
-
-					// Which point of the dicomspace arr should be written to?
-					Vector3Int transformedpoint = affinetransformer.TransformPoint(cur_img_coord);
-
-					Vector3Int dicomspacecoord = new Vector3Int(
-						transformedpoint.x - dicomvoxelspace_bottombackleft.x,
-						transformedpoint.y - dicomvoxelspace_bottombackleft.y,
-						transformedpoint.z - dicomvoxelspace_bottombackleft.z
-					);
-						
-					try{
-						var dicomfloored = dicomspacecoord;
-						dicomspacevoxelarr [(dicomspace_voxeldim.x * dicomspace_voxeldim.y) * dicomfloored.z + (dicomfloored.y * dicomspace_voxeldim.x) + dicomfloored.x] = cur_img_value;
-						
-					}
-					catch{
-						failures++;
-					}
-
-				}
-			}
-		}
-		if (failures > 0) {
-			Debug.LogError ("Hey!!! This many points got mapped out of bounds: "+failures.ToString());
-		}
-	}
-
-	public bool CheckInBounds(Vector3 transformedpoint){
-		// Is it in bounds?
-		bool isinbounds = true;
-
-		if (transformedpoint.x < dicomspace_bottombackleft.x) {
-			isinbounds = false;
-		}
-
-		if (transformedpoint.x > dicomspace_frontforwardright.x) {
-			isinbounds = false;
-		}
-
-		if (transformedpoint.y < dicomspace_bottombackleft.y) {
-			isinbounds = false;
-		}
-
-		if (transformedpoint.y > dicomspace_frontforwardright.y) {
-			isinbounds = false;
-		}
-
-		if (transformedpoint.z < dicomspace_bottombackleft.z) {
-			isinbounds = false;
-		}
-
-		if (transformedpoint.z > dicomspace_frontforwardright.z) {
-			isinbounds = false;
-		}
-
-		return isinbounds;
 	}
 
 	public void printSpecs(){
@@ -443,34 +393,68 @@ class DICOMImgSpecs{
 		Debug.Log ("Rows:" + rows.ToString ());
 		Debug.Log ("Cols:" + cols.ToString ());
 		Debug.Log ("Slices:" + slices.ToString ());
+		Debug.Log ("Bottombackleft" + dicomspace_bottombackleft.ToString ());
+		Debug.Log ("Frontforwardright: " + dicomspace_frontforwardright.ToString ());
 		Debug.Log ("DicomSpaceDims:" + dicomspace_dims.ToString ());
-		Debug.Log ("DicomSpaceVoxelDims:" + dicomspace_voxeldim.x.ToString() + ","+dicomspace_voxeldim.y.ToString()+","+dicomspace_voxeldim.z.ToString());
+
 	}
 }
 
 class AffineTransformer{
 	// This is more general purpose than AffineTransformer_IndexOnly. Beware of floating point errors though
 	// Source for affine transformation matrix: https://nipy.org/nibabel/dicom/dicom_orientation.html
-	float[,] affinematrix; 
+	float[,] affinematrix_todicom; 
+	float[,] affinematrix_toimg; 
 
 	public AffineTransformer(Vector3 rowdircos, Vector3 coldircos, Vector3 firstpos, 
 							 Vector3 lastpos, float delta_r, float delta_c, int slices){
 		// Init the transformer matrix
-		Vector3 f1r = delta_c * rowdircos;//delta_r * coldircos;
-		Vector3 f2c = delta_r * coldircos;//delta_c * rowdircos;
+		Vector3 f1r = delta_r * rowdircos;//delta_r * coldircos;
+		Vector3 f2c = delta_c * coldircos;//delta_c * rowdircos;
 		Vector3 t1 = firstpos;
 		Vector3 tn = lastpos;
 		float n = slices;
 		Vector3 tnscaled = (firstpos - lastpos);
 		tnscaled = tnscaled * (1.0f / (1.0f - n));
+
+
 	
-		affinematrix = new float[,] { 	{ f1r.x, f2c.x, tnscaled.x, t1.x},
-										{ f1r.y, f2c.y, tnscaled.y, t1.y}, 
-										{ f1r.z, f2c.z, tnscaled.z, t1.z},
-										{ 0, 0, 0, 1 } };;
+		affinematrix_todicom = new float[,] { 	{ f1r.x, f2c.x, tnscaled.x, t1.x},
+												{ f1r.y, f2c.y, tnscaled.y, t1.y}, 
+												{ f1r.z, f2c.z, tnscaled.z, t1.z},
+												{ 0, 0, 0, 1 } };
+
+		// Behold the horror - manually calculated inverse of affinematrix_todicom
+		var a = f1r.x;
+		var b = f2c.x;
+		var z = tnscaled.x;
+		var d = t1.x;
+		var e = f1r.y;
+		var f = f2c.y;
+		var g = tnscaled.y;
+		var h = t1.y;
+		var i = f1r.z;
+		var j = f2c.z;
+		var k = tnscaled.z;
+		var y = t1.z;
+
+		float denom = (b * g * i) - (f * z * i) - (a * g * j) + (a * f * k) - (b * e * k) + (e * j * z);
+
+		affinematrix_toimg = new float[,] { 	
+			{ ((f*k) - (g*j)), ((j*z) - (b*k)), ((b*g) - (f*z)), ((d*g*j)-(h*z*j)-(d*f*k)+(b*h*k)-(b*g*y)+(f*y*z))},
+			{ ((g*i) - (e*k)), ((a*k) - (i*z)), ((e*z) - (a*g)), ((-d*g*i)+(h*z*i)-(a*h*k)+(d*e*k)+(a*g*y)-(e*y*z))}, 
+			{ ((e*j) - (f*i)), ((b*i) - (a*j)), ((a*f) - (b*e)), ((d*f*i)-(b*h*i)+(a*h*j)-(d*e*j)-(a*f*y)+(b*e*y))},
+			{ 0, 0, 0, 1 } };;
+
+		// Need to divide by some nasty denom
+		for(int row=0;row<3;++row){
+			for (int col = 0; col < 4; ++col) {
+				affinematrix_toimg [row,col] = affinematrix_toimg [row,col] / denom;
+			}
+		}
 	}
 
-	public Vector3 TransformPoint(Vector3Int imgcoord){
+	public Vector3 TransformPointImgToDICOM(Vector3Int imgcoord){
 		// Takes an imgcoord and spits out coord in space of 
 		float[,] coordmatrix = new float[,] {{(float)imgcoord.x},{(float)imgcoord.y},{(float)imgcoord.z},{1}};
 		float[,] outputmatrix = new float[,] {{0},{0},{0},{0}};
@@ -479,45 +463,29 @@ class AffineTransformer{
 		for (int i = 0; i < 4; ++i) {
 			float cur_sum = 0;
 			for (int j = 0; j < 4; ++j) {
-				cur_sum += affinematrix [i, j] * coordmatrix [j, 0];
+				cur_sum += affinematrix_todicom [i, j] * coordmatrix [j, 0];
 			}
 			outputmatrix [i,0] = cur_sum;
 		}
 
 		return new Vector3(outputmatrix[0,0],outputmatrix[1,0],outputmatrix[2,0]);
 	}
-}
 
-class AffineTransformer_IndexOnly{
-	// Source for affine transformation matrix: https://nipy.org/nibabel/dicom/dicom_orientation.html
-	// This should only be used when transforming voxels into different arrangements. Has no concept of scale, only directionality
-	int[,] affinematrix; 
-
-	public AffineTransformer_IndexOnly(Vector3Int rowdircos, Vector3Int coldircos, Vector3Int slicedircos){
-		// Init the transformer matrix
-		Vector3Int f1r = rowdircos;//delta_r * coldircos;
-		Vector3Int f2c = coldircos;//delta_c * rowdircos;
-
-		affinematrix = new int[,] { 	{ f1r.x, f2c.x, slicedircos.x, 0},
-										{ f1r.y, f2c.y, slicedircos.y, 0}, 
-										{ f1r.z, f2c.z, slicedircos.z, 0},
-										{ 0, 0, 0, 1 } };;
-	}
-
-	public Vector3Int TransformPoint(Vector3Int imgcoord){
+	public Vector3Int TransformPointDICOMToImg(Vector3 dicomcoord){
 		// Takes an imgcoord and spits out coord in space of 
-		int[,] coordmatrix = new int[,] {{imgcoord.x},{imgcoord.y},{imgcoord.z},{1}};
-		int[,] outputmatrix = new int[,] {{0},{0},{0},{0}};
+		float[,] coordmatrix = new float[,] {{(float)dicomcoord.x},{(float)dicomcoord.y},{(float)dicomcoord.z},{1}};
+		float[,] outputmatrix = new float[,] {{0},{0},{0},{0}};
 
 		// foreach row of matrix
 		for (int i = 0; i < 4; ++i) {
-			int cur_sum = 0;
+			float cur_sum = 0;
 			for (int j = 0; j < 4; ++j) {
-				cur_sum += affinematrix [i, j] * coordmatrix [j, 0];
+				cur_sum += affinematrix_toimg [i, j] * coordmatrix [j, 0];
 			}
 			outputmatrix [i,0] = cur_sum;
 		}
 
-		return new Vector3Int(outputmatrix[0,0],outputmatrix[1,0],outputmatrix[2,0]);
+		return new Vector3Int(new Vector3(outputmatrix[0,0],outputmatrix[1,0],outputmatrix[2,0]));
 	}
 }
+

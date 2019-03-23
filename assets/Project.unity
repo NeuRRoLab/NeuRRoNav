@@ -3197,6 +3197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27e62cae635bf5c48b0dd6de38b0edab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  imagedim: 512
   folderloc: {fileID: 337857664}
   fronttoback: {fileID: 181391448}
   righttoleft: {fileID: 250114267}
@@ -21777,7 +21778,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 928820749}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 0.99
+  m_MaxValue: 0.9999
   m_WholeNumbers: 0
   m_Value: 0
   m_OnValueChanged:
@@ -28118,7 +28119,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 87460858}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 0.99
+  m_MaxValue: 0.9999
   m_WholeNumbers: 0
   m_Value: 0
   m_OnValueChanged:
@@ -35643,7 +35644,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 860947067}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 0.99
+  m_MaxValue: 0.9999
   m_WholeNumbers: 0
   m_Value: 0
   m_OnValueChanged:
