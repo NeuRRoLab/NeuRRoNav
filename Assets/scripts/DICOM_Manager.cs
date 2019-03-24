@@ -116,7 +116,7 @@ public class DICOM_Manager : MonoBehaviour {
 						Vector3Int imgcoord = imgspecs.affinetransformer.TransformPointDICOMToImg (dicomspacecoord);
 						float pixlval = imgspecs.GetValAtImgCoord(imgcoord);
 
-						newtexbottom.SetPixel (x,y, new Color (pixlval, pixlval, pixlval, 1));
+						newtexbottom.SetPixel (x,newtexbottom.height - 1 - y, new Color (pixlval, pixlval, pixlval, 1));
 					}
 				}
 
@@ -316,7 +316,7 @@ class DICOMImgSpecs{
 		}
 			
 		if (!inbounds) {
-			return 1;
+			return 0;
 		} else {
 			return voxelarr [(rows * cols) * imgcoord.z + (imgcoord.y * cols) + imgcoord.x]/maxval;
 		}
@@ -343,17 +343,6 @@ class DICOMImgSpecs{
 		extremitypoints.Add (affinetransformer.TransformPointImgToDICOM(new Vector3Int(cols,0,slices)));
 		extremitypoints.Add (affinetransformer.TransformPointImgToDICOM(new Vector3Int(0,rows,slices)));
 		extremitypoints.Add (affinetransformer.TransformPointImgToDICOM(new Vector3Int(cols,rows,slices)));
-
-		/*
-		extremitypoints.Add (originpos);
-		extremitypoints.Add (originpos + rowvec);
-		extremitypoints.Add (originpos + colvec);
-		extremitypoints.Add (originpos + rowvec + colvec);
-
-		extremitypoints.Add (originpos);
-		extremitypoints.Add (originpos + rowvec + slicevec);
-		extremitypoints.Add (originpos + colvec + slicevec);
-		extremitypoints.Add (originpos + rowvec + colvec + slicevec);*/
 
 		// Now find max x and y and z in each.
 		foreach (Vector3 vec in extremitypoints){
@@ -446,8 +435,6 @@ class AffineTransformer{
 		Vector3 tnscaled = (firstpos - lastpos);
 		tnscaled = tnscaled * (1.0f / (1.0f - n));
 
-
-	
 		affinematrix_todicom = new float[,] { 	{ f1r.x, f2c.x, tnscaled.x, t1.x},
 												{ f1r.y, f2c.y, tnscaled.y, t1.y}, 
 												{ f1r.z, f2c.z, tnscaled.z, t1.z},

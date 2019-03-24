@@ -303,7 +303,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: C:/Users/Daniel
+  m_Text: C:/Users/Daniel/
 --- !u!222 &8711294
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -26210,7 +26210,7 @@ RectTransform:
   m_AnchorMin: {x: 0.25, y: 0}
   m_AnchorMax: {x: 0.75, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 512, y: 0}
+  m_SizeDelta: {x: 824, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1462568427
 MonoBehaviour:
@@ -28270,8 +28270,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 49348608}
   m_HandleRect: {fileID: 49348607}
   m_Direction: 2
-  m_Value: 0.10017412
-  m_Size: 0.38723332
+  m_Value: 0.100174196
+  m_Size: 0.3872334
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
