@@ -211,6 +211,8 @@ class DICOMImgSpecs{
 	public int worldspace_yvoxels;
 	public int worldspace_zvoxels;
 
+	string anatomicalorientationtype;
+
 	public float maxval;
 
 	Vector3 dimensionscaling;
@@ -244,6 +246,12 @@ class DICOMImgSpecs{
 		string[] nextpospatient = nextimage.Dataset.Get<string[]>(Dicom.DicomTag.ImagePositionPatient);
 		string[] lastpospatient = lastimage.Dataset.Get<string[]>(Dicom.DicomTag.ImagePositionPatient);
 		string[] pixelspacing = nextimage.Dataset.Get<string[]>(Dicom.DicomTag.PixelSpacing);
+		try{
+			anatomicalorientationtype = nextimage.Dataset.Get<string>(Dicom.DicomTag.AnatomicalOrientationType);
+		}
+		catch{
+			anatomicalorientationtype = "UNSPECIFIED";
+		}
 
 		deltar = System.Convert.ToSingle (pixelspacing [0]);
 		deltac = System.Convert.ToSingle (pixelspacing [1]);
@@ -317,12 +325,12 @@ class DICOMImgSpecs{
 
 	void InitDelimiterVectors(){
 
-		dicomspace_bottombackleft = originpos;
-		dicomspace_frontforwardright = originpos;
+		dicomspace_bottombackleft = affinetransformer.TransformPointImgToDICOM (new Vector3Int (0, 0, 0));
+		dicomspace_frontforwardright = affinetransformer.TransformPointImgToDICOM (new Vector3Int (0, 0, 0));
 
 		Vector3 slicevec = slice_dir_cosine * slices;
-		Vector3 rowvec = row_dir_cosine * cols;
-		Vector3 colvec = col_dir_cosine * rows;
+		Vector3 rowvec = col_dir_cosine * rows;
+		Vector3 colvec = row_dir_cosine * cols;
 
 		List<Vector3> extremitypoints = new List<Vector3> ();
 
@@ -335,6 +343,17 @@ class DICOMImgSpecs{
 		extremitypoints.Add (affinetransformer.TransformPointImgToDICOM(new Vector3Int(cols,0,slices)));
 		extremitypoints.Add (affinetransformer.TransformPointImgToDICOM(new Vector3Int(0,rows,slices)));
 		extremitypoints.Add (affinetransformer.TransformPointImgToDICOM(new Vector3Int(cols,rows,slices)));
+
+		/*
+		extremitypoints.Add (originpos);
+		extremitypoints.Add (originpos + rowvec);
+		extremitypoints.Add (originpos + colvec);
+		extremitypoints.Add (originpos + rowvec + colvec);
+
+		extremitypoints.Add (originpos);
+		extremitypoints.Add (originpos + rowvec + slicevec);
+		extremitypoints.Add (originpos + colvec + slicevec);
+		extremitypoints.Add (originpos + rowvec + colvec + slicevec);*/
 
 		// Now find max x and y and z in each.
 		foreach (Vector3 vec in extremitypoints){
@@ -405,6 +424,7 @@ class DICOMImgSpecs{
 		Debug.Log ("Bottombackleft" + dicomspace_bottombackleft.ToString ());
 		Debug.Log ("Frontforwardright: " + dicomspace_frontforwardright.ToString ());
 		Debug.Log ("DicomSpaceDims:" + dicomspace_dims.ToString ());
+		Debug.Log ("AnatomicalOrientationType:" + anatomicalorientationtype);
 
 	}
 }
@@ -418,8 +438,8 @@ class AffineTransformer{
 	public AffineTransformer(Vector3 rowdircos, Vector3 coldircos, Vector3 firstpos, 
 							 Vector3 lastpos, float delta_r, float delta_c, int slices){
 		// Init the transformer matrix
-		Vector3 f1r = delta_r * coldircos;
-		Vector3 f2c = delta_c * rowdircos;
+		Vector3 f1r = delta_r * rowdircos;
+		Vector3 f2c = delta_c * coldircos;
 		Vector3 t1 = firstpos;
 		Vector3 tn = lastpos;
 		float n = slices;
@@ -461,6 +481,8 @@ class AffineTransformer{
 				affinematrix_toimg [row,col] = affinematrix_toimg [row,col] / denom;
 			}
 		}
+
+		Debug.Log (affinematrix_toimg);
 	}
 
 	public Vector3 TransformPointImgToDICOM(Vector3Int imgcoord){
