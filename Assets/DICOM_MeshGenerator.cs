@@ -6,24 +6,39 @@ public class DICOM_MeshGenerator : MonoBehaviour {
 	public Transform DICOMMeshObj;
 	public DICOM_Manager dmanager;
 
-	public int verts_per_side = 10;
+	public int faces_per_side = 10;
+	public int verts_per_side = 0;
 
 	// Use this for initialization
 	void Start () {
-		
+		verts_per_side = faces_per_side + 1;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
 	}
+	Vector3 ConvertDICOMToUnity(Vector3 dicom){
+		return new Vector3 (-dicom.x,dicom.z,-dicom.y);
+	}
 
+	Vector3 ConvertUnityToDICOM(Vector3 unity){
+		return new Vector3 (-unity.x,-unity.y,unity.z);
+	}
 
 	public void GenerateDICOMHeadMesh(){
 		filter = DICOMMeshObj.GetComponent<MeshFilter>();
 		filter.mesh.Clear();
 
 		DICOMImgSpecs imgspecs = dmanager.imgspecs;
+
+		Vector3 dims_dicom = imgspecs.dicomspace_dims/100f;
+		Vector3 dims_unity = ConvertDICOMToUnity (dims_dicom);
+		dims_unity = new Vector3 (Mathf.Abs(dims_unity.x), Mathf.Abs(dims_unity.y), Mathf.Abs(dims_unity.z));
+
+		Vector3 unityup = new Vector3 (0,dims_unity.y,0)/(faces_per_side);
+		Vector3 unityforward = new Vector3 (0, 0, dims_unity.z)/(faces_per_side);
+		Vector3 unityright = new Vector3 (dims_unity.x, 0, 0)/(faces_per_side);
 
 		int numfaces = 5;
 
@@ -36,41 +51,50 @@ public class DICOM_MeshGenerator : MonoBehaviour {
 		int index_verts = 0;
 		int index_tris = 0;
 
+		// Create the primitive shape
 		// Back face
-		FillFace(vertices, tris, norms, index_verts,index_tris,index_verts, 10, Vector3.zero, 
-			Vector3.up*0.1f, Vector3.right*0.1f, Vector3.back, false);
+		FillFace(vertices, tris, norms, index_verts,index_tris,index_verts, verts_per_side, Vector3.zero, 
+			unityup, unityright, Vector3.back, false);
 		index_verts += vertincrement;
 		index_tris += triinc;
 
 		// Left Face
-		FillFace(vertices, tris, norms, index_verts,index_tris,index_verts, 10, Vector3.zero, 
-			Vector3.forward*0.1f, Vector3.up*0.1f,-Vector3.right, false);
+		FillFace(vertices, tris, norms, index_verts,index_tris,index_verts, verts_per_side, Vector3.zero, 
+			unityforward, unityup,-Vector3.right, false);
 		index_verts += vertincrement;
 		index_tris += triinc;
 
 		// Right
-		FillFace(vertices, tris, norms, index_verts,index_tris,index_verts, 10, Vector3.right*0.9f, 
-			Vector3.forward*0.1f, Vector3.up*0.1f, Vector3.right, true);
+		FillFace(vertices, tris, norms, index_verts,index_tris,index_verts, verts_per_side, unityright*(faces_per_side), 
+			unityforward, unityup, Vector3.right, true);
 		index_verts += vertincrement;
 		index_tris += triinc;
 
 		// Forward face
-		FillFace(vertices, tris, norms, index_verts,index_tris,index_verts, 10, Vector3.forward*0.9f, 
-			Vector3.up*0.1f, Vector3.right*0.1f, Vector3.forward, true);
+		FillFace(vertices, tris, norms, index_verts,index_tris,index_verts, verts_per_side, unityforward*(faces_per_side), 
+			unityup, unityright, Vector3.forward, true);
 		index_verts += vertincrement;
 		index_tris += triinc;
 
 		// Top face
-		FillFace(vertices, tris, norms, index_verts,index_tris,index_verts, 10, Vector3.up*0.9f, 
-			Vector3.forward*0.1f, Vector3.right*0.1f, Vector3.up, false);
+		FillFace(vertices, tris, norms, index_verts,index_tris,index_verts, verts_per_side, unityup*(faces_per_side), 
+			unityforward, unityright, Vector3.up, false);
 		index_verts += vertincrement;
 		index_tris += triinc;
+
+
+		for (int i=0;i<vertices.Length;++i){
+			vertices [i] = vertices [i] + 0.06f*new Vector3 (Random.value, Random.value, Random.value);
+
+		}
 
 		filter.mesh.vertices = vertices;
 		filter.mesh.triangles = tris;
 		filter.mesh.normals = norms;
 
-		//filter.mesh.RecalculateNormals();
+
+
+		filter.mesh.RecalculateNormals();
 		//DICOMMeshObj.GetComponent<MeshCollider>().sharedMesh = filter.mesh;
 	}
 
