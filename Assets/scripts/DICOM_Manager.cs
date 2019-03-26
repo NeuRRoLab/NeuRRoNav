@@ -137,7 +137,6 @@ public class DICOM_Manager : MonoBehaviour {
 		if ((imgspecs != null) && (imgspecs.initialized)) {
 			imagedim = Mathf.CeilToInt(Vector3.Magnitude (new Vector3(imgspecs.rows,imgspecs.cols, imgspecs.slices)));
 
-
 			fronttoback.widthscaler = Mathf.Abs (imgspecs.dicomspace_dims.x / imgspecs.dicomspace_dims.z);
 			righttoleft.widthscaler = Mathf.Abs (imgspecs.dicomspace_dims.y / imgspecs.dicomspace_dims.z);
 			bottomtotop.widthscaler = Mathf.Abs (imgspecs.dicomspace_dims.x / imgspecs.dicomspace_dims.y);
@@ -394,12 +393,10 @@ class DICOMImgSpecs{
 					if (cur_pixel > maxval) {
 						maxval = cur_pixel;
 					}
-
 				}
 			}
 			fileindex += 1;
 		}
-
 	}
 
 	public void printSpecs(){

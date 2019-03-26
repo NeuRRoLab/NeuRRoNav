@@ -6,6 +6,7 @@ public class DICOM_Menu : MonoBehaviour {
 	Vector3 defaultPos;
 	GameObject menu;
 	CameraController camController;
+	public Camera meshcam;
 	// Use this for initialization
 	void Start () {
 		menu = GameObject.Find("DICOM_Menu");
@@ -28,11 +29,13 @@ public class DICOM_Menu : MonoBehaviour {
 		hidden = !hidden;
 		if (hidden)
 		{
+			meshcam.enabled = false;
 			menu.transform.localPosition = defaultPos;
 			camController.SetListenToMouse(true);
 		}
 		else
 		{
+			meshcam.enabled = true;
 			menu.transform.localPosition = Vector3.zero;
 			camController.SetListenToMouse(false);
 		}
