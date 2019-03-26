@@ -14,7 +14,7 @@ public class DICOM_Manager : MonoBehaviour {
 
 	public InputField folderloc;
 
-	DICOMImgSpecs imgspecs;
+	public DICOMImgSpecs imgspecs;
 
 	Texture2D texttex;
 	Texture2D newtex;
@@ -156,7 +156,7 @@ public class DICOM_Manager : MonoBehaviour {
 	}
 }
 
-struct Vector3Int{
+public struct Vector3Int{
 	public int x;
 	public int y;
 	public int z;
@@ -178,7 +178,7 @@ struct Vector3Int{
 	}
 }
 
-class DICOMImgSpecs{
+public class DICOMImgSpecs{
 	public bool initialized = false;
 	public Vector3 originpos;
 
@@ -315,7 +315,7 @@ class DICOMImgSpecs{
 		}
 			
 		if (!inbounds) {
-			return 0;
+			return 1;
 		} else {
 			return voxelarr [(rows * cols) * imgcoord.z + (imgcoord.y * cols) + imgcoord.x]/maxval;
 		}
@@ -415,7 +415,7 @@ class DICOMImgSpecs{
 	}
 }
 
-class AffineTransformer{
+public class AffineTransformer{
 	// This is more general purpose than AffineTransformer_IndexOnly. Beware of floating point errors though
 	// Source for affine transformation matrix: https://nipy.org/nibabel/dicom/dicom_orientation.html
 	float[,] affinematrix_todicom; 
