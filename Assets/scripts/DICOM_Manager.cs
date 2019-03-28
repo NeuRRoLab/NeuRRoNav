@@ -315,7 +315,7 @@ public class DICOMImgSpecs{
 		}
 			
 		if (!inbounds) {
-			return 1;
+			return 0;
 		} else {
 			return voxelarr [(rows * cols) * imgcoord.z + (imgcoord.y * cols) + imgcoord.x]/maxval;
 		}

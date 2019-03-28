@@ -15,6 +15,5 @@ public class DICOMImageScr : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		rt.sizeDelta = new Vector2(rt.sizeDelta.y*widthscaler, rt.sizeDelta.y);
-
 	}
 }

@@ -28,8 +28,6 @@ public class MeshCamScr : MonoBehaviour {
 		transform.LookAt (center.position);
 		transform.RotateAround (center.position, transform.right, slider2.value);
 		transform.LookAt (center.position);
-
-
 	
 		deg.text = "";//slider.value.ToString ().Substring(0,3)+","+slider2.value.ToString().Substring(0,3) + " deg";
 	}

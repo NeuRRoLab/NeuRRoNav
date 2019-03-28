@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class DICOM_MeshGenerator : MonoBehaviour {
 	MeshFilter filter;
@@ -8,6 +9,12 @@ public class DICOM_MeshGenerator : MonoBehaviour {
 
 	public int faces_per_side = 10;
 	public int verts_per_side = 0;
+	public float scalefactor = 100f;
+
+	public Slider threshslider;
+
+	public float stepdist = 0.5f;
+	//public float thresh = 0.5f;
 
 	// Use this for initialization
 	void Start () {
@@ -16,14 +23,47 @@ public class DICOM_MeshGenerator : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+
 	}
-	Vector3 ConvertDICOMToUnity(Vector3 dicom){
+	Vector3 ConvertDICOMToUnity(Vector3 dicom, Vector3 dicombottom, Vector3 dicomtop){
+		dicom = dicom - new Vector3 (dicomtop.x, dicomtop.y, dicombottom.z);
+		dicom = dicom / scalefactor;
 		return new Vector3 (-dicom.x,dicom.z,-dicom.y);
 	}
 
-	Vector3 ConvertUnityToDICOM(Vector3 unity){
-		return new Vector3 (-unity.x,-unity.y,unity.z);
+	Vector3 ConvertUnityToDICOM(Vector3 unity, Vector3 dicombottom, Vector3 dicomtop){
+		unity = unity * scalefactor;
+		unity = new Vector3 (-unity.x, -unity.z, unity.y);
+		return unity + new Vector3 (dicomtop.x, dicomtop.y, dicombottom.z);
+	}
+
+	Vector3 CastRayIntoDICOM(Vector3 startpos_unityspace, Vector3 center_dicomspace, Vector3 dicombottom, Vector3 dicomtop,
+		DICOMImgSpecs imgspecs, float thresh){
+
+		//Vector3 pos_dicomspace = ConvertUnityToDICOM (startpos_unityspace, dicombottom, dicomtop);
+		//return ConvertDICOMToUnity (pos_dicomspace, dicombottom, dicomtop);
+
+
+		
+		Vector3 pos_dicomspace = ConvertUnityToDICOM (startpos_unityspace, dicombottom, dicomtop);
+		Vector3 forward_dicomspace = (center_dicomspace - pos_dicomspace).normalized * stepdist;
+
+		int num_of_steps = Mathf.CeilToInt(Vector3.Distance (pos_dicomspace, center_dicomspace) / stepdist);
+		//print (num_of_steps);
+		for (int i = 0; i < num_of_steps; ++i) {
+			// Get value in dicomspace
+			Vector3Int imgcoord = imgspecs.affinetransformer.TransformPointDICOMToImg (pos_dicomspace);
+			//print (pos_dicomspace.ToString());
+			float pixlval = imgspecs.GetValAtImgCoord(imgcoord);
+			// Does it beat threshold
+			//print(pixlval);
+			if(pixlval>thresh){
+				return ConvertDICOMToUnity (pos_dicomspace, dicombottom, dicomtop);
+			}
+			pos_dicomspace += forward_dicomspace;
+		}
+		return ConvertDICOMToUnity (pos_dicomspace, dicombottom, dicomtop);
+
 	}
 
 	public void GenerateDICOMHeadMesh(){
@@ -31,9 +71,11 @@ public class DICOM_MeshGenerator : MonoBehaviour {
 		filter.mesh.Clear();
 
 		DICOMImgSpecs imgspecs = dmanager.imgspecs;
+		Vector3 dicombackleft = imgspecs.dicomspace_bottombackleft;
+		Vector3 dicomfrontright = imgspecs.dicomspace_frontforwardright;
 
-		Vector3 dims_dicom = imgspecs.dicomspace_dims/100f;
-		Vector3 dims_unity = ConvertDICOMToUnity (dims_dicom);
+		Vector3 dims_dicom = imgspecs.dicomspace_dims/scalefactor;
+		Vector3 dims_unity = new Vector3 (dims_dicom.x,dims_dicom.z,dims_dicom.y);
 		dims_unity = new Vector3 (Mathf.Abs(dims_unity.x), Mathf.Abs(dims_unity.y), Mathf.Abs(dims_unity.z));
 
 		Vector3 unityup = new Vector3 (0,dims_unity.y,0)/(faces_per_side);
@@ -82,19 +124,31 @@ public class DICOM_MeshGenerator : MonoBehaviour {
 		index_verts += vertincrement;
 		index_tris += triinc;
 
+		Vector3 center_dicomspace = imgspecs.dicomspace_bottombackleft + (0.5f * imgspecs.dicomspace_dims);
+		//Debug.LogError (center_dicomspace.ToString());
+
+		float thresh = threshslider.value;
 
 		for (int i=0;i<vertices.Length;++i){
-			vertices [i] = vertices [i] + 0.06f*new Vector3 (Random.value, Random.value, Random.value);
+			//Vector3 prev_vert = vertices [i];
+			//vertices [i] = vertices [i] + 0.06f*new Vector3 (Random.value, Random.value, Random.value);
+			vertices[i] = CastRayIntoDICOM(vertices[i], center_dicomspace, imgspecs.dicomspace_bottombackleft, 
+				imgspecs.dicomspace_frontforwardright,imgspecs, thresh);
 
+			//if (vertices [i] != prev_vert) {
+			//	Debug.LogError (prev_vert.ToString () + " ----> " + vertices [i].ToString ());
+			//}
+			//Debug.Log (prev_vert.ToString () + " ----> " + vertices [i].ToString ());
 		}
 
 		filter.mesh.vertices = vertices;
 		filter.mesh.triangles = tris;
 		filter.mesh.normals = norms;
 
-
-
 		filter.mesh.RecalculateNormals();
+		DICOMMeshObj.transform.localPosition = Vector3.zero;
+		DICOMMeshObj.transform.localPosition = transform.localPosition - dims_unity / 2f;
+
 		//DICOMMeshObj.GetComponent<MeshCollider>().sharedMesh = filter.mesh;
 	}
 
