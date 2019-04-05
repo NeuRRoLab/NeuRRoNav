@@ -62,9 +62,9 @@ public class DICOM_MeshGenerator : MonoBehaviour {
 		//print (num_of_steps);
 		for (int i = 0; i < num_of_steps; ++i) {
 			// Get value in dicomspace
-			Vector3Int imgcoord = imgspecs.affinetransformer.TransformPointDICOMToImg (pos_dicomspace);
+			//Vector3Int imgcoord = imgspecs.affinetransformer.TransformPointDICOMToImg (pos_dicomspace);
 			//print (pos_dicomspace.ToString());
-			float pixlval = imgspecs.GetValAtImgCoord(imgcoord);
+			float pixlval = imgspecs.GetSmoothedValAtDICOMCoord(pos_dicomspace);//imgspecs.GetValAtImgCoord(imgcoord);
 			// Does it beat threshold
 			//print(pixlval);
 			if(pixlval>thresh){

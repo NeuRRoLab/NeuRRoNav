@@ -176,6 +176,13 @@ public struct Vector3Int{
 	public string ToString(){
 		return "("+x.ToString()+","+y.ToString()+","+z.ToString()+")";
 	}
+
+	public static Vector3Int operator + (Vector3Int v1,  
+		Vector3Int v2) { 
+		return new Vector3Int (v1.x+v2.x, v1.y+v2.y, v1.z+v2.z);
+	} 
+
+
 }
 
 public class DICOMImgSpecs{
@@ -320,6 +327,23 @@ public class DICOMImgSpecs{
 			return voxelarr [(rows * cols) * imgcoord.z + (imgcoord.y * cols) + imgcoord.x]/maxval;
 		}
 
+	}
+
+	public float GetSmoothedValAtDICOMCoord(Vector3 dicomcoord){
+		var transformedpoint = affinetransformer.TransformPointDICOMToImg_Unfloored (dicomcoord);
+		//print (pos_dicomspace.ToString());
+		//transformedpoint = new Vector3(Mathf.Floor(transformedpoint.x),Mathf.Floor(transformedpoint.y),transformedpoint.z);
+
+		float frac = transformedpoint.z - Mathf.Floor (transformedpoint.z); // weight to give higher 
+
+		float invfrac = 1f - frac; // weight to give lower
+
+		Vector3Int flatvec = new Vector3Int (transformedpoint);
+
+		return invfrac * GetValAtImgCoord(flatvec) + 
+			frac*GetValAtImgCoord(flatvec + new Vector3Int(0,0,1));
+
+		//return GetValAtImgCoord (flatvec);
 	}
 
 	void InitDelimiterVectors(){
@@ -501,6 +525,26 @@ public class AffineTransformer{
 		}
 
 		return new Vector3Int(new Vector3(outputmatrix[0,0],outputmatrix[1,0],outputmatrix[2,0]));
+	}
+
+	public Vector3 TransformPointDICOMToImg_Unfloored(Vector3 dicomcoord){
+
+		// This is useful for when interpolating...
+
+		// Takes an imgcoord and spits out coord in space of 
+		float[,] coordmatrix = new float[,] {{(float)dicomcoord.x},{(float)dicomcoord.y},{(float)dicomcoord.z},{1}};
+		float[,] outputmatrix = new float[,] {{0},{0},{0},{0}};
+
+		// foreach row of matrix
+		for (int i = 0; i < 4; ++i) {
+			float cur_sum = 0;
+			for (int j = 0; j < 4; ++j) {
+				cur_sum += affinematrix_toimg [i, j] * coordmatrix [j, 0];
+			}
+			outputmatrix [i,0] = cur_sum;
+		}
+
+		return new Vector3(outputmatrix[0,0],outputmatrix[1,0],outputmatrix[2,0]);
 	}
 }
 
