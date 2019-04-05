@@ -94,7 +94,7 @@ public class DICOM_MeshGenerator : MonoBehaviour {
 		Vector3 unityforward = new Vector3 (0, 0, dims_unity.z)/(faces_per_side);
 		Vector3 unityright = new Vector3 (dims_unity.x, 0, 0)/(faces_per_side);
 
-		int numfaces = 5;
+		int numfaces = 6;
 
 		Vector3[] vertices = new Vector3[(verts_per_side*verts_per_side)*numfaces];
 		int[] tris = new int[numfaces * (2 * (verts_per_side - 1) * (verts_per_side - 1)) * 3];
@@ -135,6 +135,15 @@ public class DICOM_MeshGenerator : MonoBehaviour {
 			unityforward, unityright, Vector3.up, false);
 		index_verts += vertincrement;
 		index_tris += triinc;
+
+		// Bottom face
+		FillFace(vertices, tris, norms, index_verts,index_tris,index_verts, verts_per_side, Vector3.zero, 
+			unityforward, unityright, Vector3.up, true);
+		index_verts += vertincrement;
+		index_tris += triinc;
+
+
+
 
 		Vector3 center_dicomspace = imgspecs.dicomspace_bottombackleft + (0.5f * imgspecs.dicomspace_dims);
 		//Debug.LogError (center_dicomspace.ToString());
