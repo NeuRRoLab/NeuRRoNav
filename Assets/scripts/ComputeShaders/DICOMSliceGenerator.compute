@@ -1,0 +1,78 @@
+﻿#pragma kernel FrontBackTextureCalc
+#pragma kernel RightLeftTextureCalc
+#pragma kernel BottomTopTextureCalc
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> textureOutFrontBack;
+RWTexture2D<float4> textureOutRightLeft;
+RWTexture2D<float4> textureOutBottomTop;
+
+RWStructuredBuffer<float4> todicommatrix;
+RWStructuredBuffer<float4> toimgmatrix;
+RWStructuredBuffer<float4> voxelarr;
+
+RWStructuredBuffer<float4> frontforwardright;
+RWStructuredBuffer<float4> backbottomleft;
+
+RWStructuredBuffer<float4> dicomspace_dims;
+
+float4 xcoord;
+float4 ycoord;
+float4 zcoord;
+
+int rows;
+int cols;
+
+float4 maxval;
+
+int imgdim = 512;
+
+[numthreads(16,16,1)]
+void FrontBackTextureCalc (uint3 id : SV_DispatchThreadID) {
+	textureOutFrontBack[id.xy] = float4(0.5,0.5,0.5,1);
+/*
+	// transform my id point 
+	float4 xfrac = (id.x )/ imgdim; 
+	float4 zfrac = (id.y )/ imgdim; 
+
+	float4 dicomcoord[4];
+	float4 outputmatrix[4];
+
+	dicomcoord[0] = backbottomleft[0] + xfrac * dicomspace_dims[0];
+	dicomcoord[1] = ycoord;
+	dicomcoord[2] = backbottomleft[2] + zfrac * dicomspace_dims[2];
+	dicomcoord[3] = 1;
+
+	// now need to transform to img coords
+	//float4[,] coordmatrix = new float[,] {{(float)dicomcoord.x},{(float)dicomcoord.y},{(float)dicomcoord.z},{1}};
+	//float4[,] outputmatrix = new float[,] {{0},{0},{0},{0}};
+
+	// foreach row of matrix
+	for (int row = 0; row < 4; ++row) {
+		float4 cur_sum = 0;
+		for (int col = 0; col < 4; ++col) {
+			cur_sum += toimgmatrix [(4*row) + col] * dicomcoord[row];
+		}
+		outputmatrix [row] = cur_sum;
+	}
+
+	// now need to set relevant pixel of texture
+	int indexz = outputmatrix[2];
+	int indexy = outputmatrix[1];
+	int indexx = outputmatrix[0];
+
+	float pixlval = voxelarr [(rows * cols) * indexz + (indexy * cols) + indexx]/maxval;
+
+	textureOutFrontBack[id.xy] = float4(pixlval,pixlval,pixlval,1);*/
+}
+
+[numthreads(16,16,1)]
+void RightLeftTextureCalc (uint3 id : SV_DispatchThreadID) {
+	
+}
+
+[numthreads(16,16,1)]
+void BottomTopTextureCalc (uint3 id : SV_DispatchThreadID) {
+	
+}

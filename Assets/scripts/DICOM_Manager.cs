@@ -10,7 +10,13 @@ using System.Collections.Generic;
 public class DICOM_Manager : MonoBehaviour {
 	// Handles the loading and representation of DICOM files.
 
-	public int imagedim = 0;
+	int kernelfrontback; 
+	int kernelrightleft; 
+	int kernelbottomtop; 
+
+	public ComputeShader dicomslicecreator;
+
+	int imagedim = 512;
 
 	public InputField folderloc;
 
@@ -39,9 +45,34 @@ public class DICOM_Manager : MonoBehaviour {
 	Texture2D newtexright;
 	Texture2D newtexbottom;
 
+	public bool supportsComputeShaders;
+
+	RenderTexture fronttex;
+	RenderTexture righttex;
+	RenderTexture bottomtex;
+
 	// Use this for initialization
 	void Start () {
-		
+		supportsComputeShaders = SystemInfo.supportsComputeShaders;
+
+		fronttex = new RenderTexture(imagedim, imagedim, 32);
+		fronttex.enableRandomWrite = true;					// this is requred to work as compute shader side written texture
+		fronttex.Create();									// yes, we need to run Create() to actually create the texture
+		fronttex.filterMode = FilterMode.Point;			// not necessary, I just wanted to have clean pixels
+		fronttoback.img.texture = fronttex;
+
+		righttex = new RenderTexture(imagedim, imagedim, 32);
+		righttex.enableRandomWrite = true;					// this is requred to work as compute shader side written texture
+		righttex.Create();									// yes, we need to run Create() to actually create the texture
+		righttex.filterMode = FilterMode.Point;			// not necessary, I just wanted to have clean pixels
+		righttoleft.img.texture = righttex;
+
+		bottomtex = new RenderTexture(imagedim, imagedim, 32);
+		bottomtex.enableRandomWrite = true;					// this is requred to work as compute shader side written texture
+		bottomtex.Create();									// yes, we need to run Create() to actually create the texture
+		bottomtex.filterMode = FilterMode.Point;			// not necessary, I just wanted to have clean pixels
+		bottomtotop.img.texture = bottomtex;
+
 	}
 	
 	// Update is called once per frame
@@ -55,7 +86,27 @@ public class DICOM_Manager : MonoBehaviour {
 			float xcoord = imgspecs.dicomspace_bottombackleft.x + rightsliderval * imgspecs.dicomspace_dims.x;
 			float ycoord = imgspecs.dicomspace_bottombackleft.y + frontsliderval * imgspecs.dicomspace_dims.y;
 			float zcoord = imgspecs.dicomspace_bottombackleft.z + bottomsliderval * imgspecs.dicomspace_dims.z;
+
+			// GPU-Accelerated texture updates
+			if(frontsliderval != prevfronval){
+				// Call compute shader function
+				dicomslicecreator.SetFloat("ycoord",ycoord);
+				dicomslicecreator.Dispatch(kernelfrontback,imagedim/16,imagedim/16,1);
+			}
+
+			if (rightsliderval != prevrightval) {
+				// Call compute shader function
+				dicomslicecreator.SetFloat("xcoord",xcoord);
+				dicomslicecreator.Dispatch(kernelrightleft,imagedim/16,imagedim/16,1);
+			}
+
+			if (bottomsliderval != prevbottomval) {
+				// Call compute shader function
+				dicomslicecreator.SetFloat("zcoord",zcoord);
+				dicomslicecreator.Dispatch(kernelbottomtop,imagedim/16,imagedim/16,1);
+			}
 				
+			/*
 			// frontback
 			if (frontsliderval != prevfronval) {
 				for (int z = 0; z < imagedim; ++z) {
@@ -124,18 +175,95 @@ public class DICOM_Manager : MonoBehaviour {
 				newtexbottom.Apply ();
 				bottomtext.text = zcoord.ToString()+"mm";
 			}
-
+			*/
 			prevfronval = frontsliderval;
 			prevrightval = rightsliderval;
 			prevbottomval = bottomsliderval;
 		}
 	}
 
+	public void InitComputeShader() {
+		
+		kernelfrontback = dicomslicecreator.FindKernel("FrontBackTextureCalc");
+		kernelrightleft = dicomslicecreator.FindKernel("RightLeftTextureCalc");
+		kernelbottomtop = dicomslicecreator.FindKernel("BottomTopTextureCalc");
+
+		// Gotta transfer main float[]
+		ComputeBuffer voxelbuffer = new ComputeBuffer(imgspecs.voxelarr.Length, 4);
+		voxelbuffer.SetData(imgspecs.voxelarr);
+		dicomslicecreator.SetBuffer(kernelfrontback, "voxelarr", voxelbuffer);
+		dicomslicecreator.SetBuffer(kernelrightleft, "voxelarr", voxelbuffer);
+		dicomslicecreator.SetBuffer(kernelbottomtop, "voxelarr", voxelbuffer);
+
+		// Then both the transformation and inverse transformation matrix
+		ComputeBuffer todicombuffer = new ComputeBuffer(imgspecs.affinetransformer.todicom_flattened.Length, 4);
+		todicombuffer.SetData(imgspecs.affinetransformer.todicom_flattened);
+		dicomslicecreator.SetBuffer(kernelfrontback, "todicommatrix", todicombuffer);
+		dicomslicecreator.SetBuffer(kernelrightleft, "todicommatrix", todicombuffer);
+		dicomslicecreator.SetBuffer(kernelbottomtop, "todicommatrix", todicombuffer);
+
+		ComputeBuffer toimgbuffer = new ComputeBuffer(imgspecs.affinetransformer.toimg_flattened.Length, 4);
+		toimgbuffer.SetData(imgspecs.affinetransformer.toimg_flattened);
+		dicomslicecreator.SetBuffer(kernelfrontback, "toimgmatrix", toimgbuffer);
+		dicomslicecreator.SetBuffer(kernelrightleft, "toimgmatrix", toimgbuffer);
+		dicomslicecreator.SetBuffer(kernelbottomtop, "toimgmatrix", toimgbuffer);
+
+		// Then frontback and bottomleft
+		float[] bottombackarr = new float[3]{
+			imgspecs.dicomspace_bottombackleft.x,
+			imgspecs.dicomspace_bottombackleft.y,
+			imgspecs.dicomspace_bottombackleft.z,
+		};
+
+		ComputeBuffer bottombackbuffer = new ComputeBuffer(bottombackarr.Length,4);
+		bottombackbuffer.SetData (bottombackarr);
+		dicomslicecreator.SetBuffer(kernelfrontback, "backbottomleft", bottombackbuffer);
+		dicomslicecreator.SetBuffer(kernelrightleft, "backbottomleft", bottombackbuffer);
+		dicomslicecreator.SetBuffer(kernelbottomtop, "backbottomleft", bottombackbuffer);
+
+		float[] frontforwardarr = new float[3]{
+			imgspecs.dicomspace_frontforwardright.x,
+			imgspecs.dicomspace_frontforwardright.y,
+			imgspecs.dicomspace_frontforwardright.z,
+		};
+
+		ComputeBuffer frontforwardbuffer = new ComputeBuffer(frontforwardarr.Length,4);
+		frontforwardbuffer.SetData (frontforwardarr);
+		dicomslicecreator.SetBuffer(kernelfrontback, "frontforwardright", frontforwardbuffer);
+		dicomslicecreator.SetBuffer(kernelrightleft, "frontforwardright", frontforwardbuffer);
+		dicomslicecreator.SetBuffer(kernelbottomtop, "frontforwardright", frontforwardbuffer);
+
+		// dicomspace_dims
+		float[] dicomspacedims_arr = new float[3]{
+			imgspecs.dicomspace_dims.x,
+			imgspecs.dicomspace_dims.y,
+			imgspecs.dicomspace_dims.z,
+		};
+
+		ComputeBuffer dicomspacedims = new ComputeBuffer(dicomspacedims_arr.Length,4);
+		dicomspacedims.SetData (dicomspacedims_arr);
+		dicomslicecreator.SetBuffer(kernelfrontback, "dicomspace_dims", dicomspacedims);
+		dicomslicecreator.SetBuffer(kernelrightleft, "dicomspace_dims", dicomspacedims);
+		dicomslicecreator.SetBuffer(kernelbottomtop, "dicomspace_dims", dicomspacedims);
+
+		// Then link the texture
+		dicomslicecreator.SetTexture(kernelfrontback, "textureOutFrontBack", fronttex);
+		dicomslicecreator.SetTexture(kernelfrontback, "textureOutRightLeft", righttex);
+		dicomslicecreator.SetTexture(kernelfrontback, "textureOutBottomTop", bottomtex);
+
+		// Dim info of voxelarr
+		dicomslicecreator.SetInt("rows",imgspecs.rows);
+		dicomslicecreator.SetInt("cols",imgspecs.cols);
+		dicomslicecreator.SetFloat("maxval",imgspecs.maxval);
+
+
+	}
+
 	public void LoadDICOMFromFolder(){
 		imgspecs = new DICOMImgSpecs ();
 		imgspecs.InitFromDir(folderloc.text);
 		if ((imgspecs != null) && (imgspecs.initialized)) {
-			imagedim = Mathf.CeilToInt(Vector3.Magnitude (new Vector3(imgspecs.rows,imgspecs.cols, imgspecs.slices)));
+			//imagedim = Mathf.CeilToInt(Vector3.Magnitude (new Vector3(imgspecs.rows,imgspecs.cols, imgspecs.slices)));
 
 			fronttoback.widthscaler = Mathf.Abs (imgspecs.dicomspace_dims.x / imgspecs.dicomspace_dims.z);
 			righttoleft.widthscaler = Mathf.Abs (imgspecs.dicomspace_dims.y / imgspecs.dicomspace_dims.z);
@@ -152,6 +280,8 @@ public class DICOM_Manager : MonoBehaviour {
 			prevbottomval = -100;
 			prevfronval = -100;
 			prevrightval = -100;
+
+			InitComputeShader ();
 		}
 	}
 }
@@ -181,8 +311,6 @@ public struct Vector3Int{
 		Vector3Int v2) { 
 		return new Vector3Int (v1.x+v2.x, v1.y+v2.y, v1.z+v2.z);
 	} 
-
-
 }
 
 public class DICOMImgSpecs{
@@ -342,8 +470,6 @@ public class DICOMImgSpecs{
 
 		return invfrac * GetValAtImgCoord(flatvec) + 
 			frac*GetValAtImgCoord(flatvec + new Vector3Int(0,0,1));
-
-		//return GetValAtImgCoord (flatvec);
 	}
 
 	void InitDelimiterVectors(){
@@ -442,8 +568,11 @@ public class DICOMImgSpecs{
 public class AffineTransformer{
 	// This is more general purpose than AffineTransformer_IndexOnly.
 	// Source for affine transformation matrix: https://nipy.org/nibabel/dicom/dicom_orientation.html
-	float[,] affinematrix_todicom; 
-	float[,] affinematrix_toimg; 
+	public float[,] affinematrix_todicom; 
+	public float[,] affinematrix_toimg; 
+
+	public float[] todicom_flattened;
+	public float[] toimg_flattened;
 
 	public AffineTransformer(Vector3 rowdircos, Vector3 coldircos, Vector3 firstpos, 
 							 Vector3 lastpos, float delta_r, float delta_c, int slices){
@@ -490,7 +619,23 @@ public class AffineTransformer{
 			}
 		}
 
-		Debug.Log (affinematrix_toimg);
+		// Create flattened arr, rows are fastest
+		todicom_flattened = new float[16];
+
+		for (int row=0;row<4;++row){
+			for(int col=0;col<4;col++){
+				todicom_flattened [(4 * col) + row] = affinematrix_todicom [row, col];
+			}
+		}
+
+		// Create flattened arr, rows are fastest
+		toimg_flattened = new float[16];
+
+		for (int row=0;row<4;++row){
+			for(int col=0;col<4;col++){
+				toimg_flattened [(4 * col) + row] = affinematrix_toimg [row, col];
+			}
+		}
 	}
 
 	public Vector3 TransformPointImgToDICOM(Vector3Int imgcoord){

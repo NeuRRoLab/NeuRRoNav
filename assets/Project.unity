@@ -303,7 +303,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: C:/Users/Daniel/Do
+  m_Text: C:/Users/Daniel/Dow
 --- !u!222 &8711294
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3335,6 +3335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27e62cae635bf5c48b0dd6de38b0edab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dicomslicecreator: {fileID: 7200000, guid: 00a9e599dea340b48b3c11e46f472677, type: 3}
   imagedim: 512
   folderloc: {fileID: 337857664}
   fronttoback: {fileID: 181391448}
@@ -3346,6 +3347,7 @@ MonoBehaviour:
   sliderfrontback: {fileID: 1220644974}
   sliderrightleft: {fileID: 1940196610}
   sliderbottomtop: {fileID: 1560035083}
+  supportsComputeShaders: 0
 --- !u!114 &176299743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29588,7 +29590,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 49348608}
   m_HandleRect: {fileID: 49348607}
   m_Direction: 2
-  m_Value: 0.100174196
+  m_Value: 0.10017444
   m_Size: 0.3872334
   m_NumberOfSteps: 0
   m_OnValueChanged:
