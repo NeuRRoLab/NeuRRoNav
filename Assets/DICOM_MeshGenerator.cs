@@ -25,27 +25,37 @@ public class DICOM_MeshGenerator : MonoBehaviour {
 	void Update () {
 
 	}
-	Vector3 ConvertDICOMToUnity(Vector3 dicom, Vector3 dicombottom, Vector3 dicomtop){
+	Vector3 ConvertDICOMToUnity(Vector3 dicom, Vector3 unity_dims, Vector3 dicombottom, Vector3 dicomtop){
 		dicom = dicom - new Vector3 (dicomtop.x, dicomtop.y, dicombottom.z);
 		dicom = dicom / scalefactor;
-		return new Vector3 (-dicom.x,dicom.z,-dicom.y);
+		var res = new Vector3 (-dicom.x,dicom.z,-dicom.y);
+		return new Vector3 (unity_dims.x - res.x, res.y, res.z);
+
+
+		/*dicom = dicom - new Vector3 (dicombottom.x, dicomtop.y, dicombottom.z);
+		dicom = dicom / scalefactor;
+		return new Vector3 (-dicom.x,dicom.z,-dicom.y);*/
 	}
 
-	Vector3 ConvertUnityToDICOM(Vector3 unity, Vector3 dicombottom, Vector3 dicomtop){
-		unity = unity * scalefactor;
+	Vector3 ConvertUnityToDICOM(Vector3 unity, Vector3 unity_dims, Vector3 dicombottom, Vector3 dicomtop){
+		unity = new Vector3 (unity_dims.x - unity.x, unity.y, unity.z);
 		unity = new Vector3 (-unity.x, -unity.z, unity.y);
+		unity = unity * scalefactor;
 		return unity + new Vector3 (dicomtop.x, dicomtop.y, dicombottom.z);
+
+		/*unity = new Vector3 (-unity.x, -unity.z, unity.y);
+		unity = unity * scalefactor;
+		return unity + new Vector3 (dicombottom.x, dicomtop.y, dicombottom.z);*/
+
 	}
 
-	Vector3 CastRayIntoDICOM(Vector3 startpos_unityspace, Vector3 center_dicomspace, Vector3 dicombottom, Vector3 dicomtop,
+	Vector3 CastRayIntoDICOM(Vector3 startpos_unityspace, Vector3 unity_dims, Vector3 center_dicomspace, Vector3 dicombottom, Vector3 dicomtop,
 		DICOMImgSpecs imgspecs, float thresh){
 
 		//Vector3 pos_dicomspace = ConvertUnityToDICOM (startpos_unityspace, dicombottom, dicomtop);
 		//return ConvertDICOMToUnity (pos_dicomspace, dicombottom, dicomtop);
 
-
-		
-		Vector3 pos_dicomspace = ConvertUnityToDICOM (startpos_unityspace, dicombottom, dicomtop);
+		Vector3 pos_dicomspace = ConvertUnityToDICOM (startpos_unityspace, unity_dims, dicombottom, dicomtop);
 		Vector3 forward_dicomspace = (center_dicomspace - pos_dicomspace).normalized * stepdist;
 
 		int num_of_steps = Mathf.CeilToInt(Vector3.Distance (pos_dicomspace, center_dicomspace) / stepdist);
@@ -58,11 +68,13 @@ public class DICOM_MeshGenerator : MonoBehaviour {
 			// Does it beat threshold
 			//print(pixlval);
 			if(pixlval>thresh){
-				return ConvertDICOMToUnity (pos_dicomspace, dicombottom, dicomtop);
+				//var converted = ConvertDICOMToUnity (pos_dicomspace, dicombottom, dicomtop);
+				//return new Vector3 (unity_dims.x - converted.x, converted.y, converted.z);
+				return ConvertDICOMToUnity (pos_dicomspace,unity_dims, dicombottom, dicomtop);
 			}
 			pos_dicomspace += forward_dicomspace;
 		}
-		return ConvertDICOMToUnity (pos_dicomspace, dicombottom, dicomtop);
+		return ConvertDICOMToUnity (pos_dicomspace, unity_dims, dicombottom, dicomtop);
 
 	}
 
@@ -127,18 +139,18 @@ public class DICOM_MeshGenerator : MonoBehaviour {
 		Vector3 center_dicomspace = imgspecs.dicomspace_bottombackleft + (0.5f * imgspecs.dicomspace_dims);
 		//Debug.LogError (center_dicomspace.ToString());
 
+		//Debug.Log (ConvertDICOMToUnity (dicomfrontright,dicombackleft, dicomfrontright));
+		//Debug.Log (ConvertDICOMToUnity (new Vector3(dicomfrontright.x,dicomfrontright.y,dicombackleft.z),dicombackleft, dicomfrontright));
+		//Debug.Log (ConvertDICOMToUnity (dicombackleft,dicombackleft, dicomfrontright));
+
+
 		float thresh = threshslider.value;
 
 		for (int i=0;i<vertices.Length;++i){
-			//Vector3 prev_vert = vertices [i];
-			//vertices [i] = vertices [i] + 0.06f*new Vector3 (Random.value, Random.value, Random.value);
-			vertices[i] = CastRayIntoDICOM(vertices[i], center_dicomspace, imgspecs.dicomspace_bottombackleft, 
+			
+			vertices[i] = CastRayIntoDICOM(vertices[i], dims_unity, center_dicomspace, imgspecs.dicomspace_bottombackleft, 
 				imgspecs.dicomspace_frontforwardright,imgspecs, thresh);
-
-			//if (vertices [i] != prev_vert) {
-			//	Debug.LogError (prev_vert.ToString () + " ----> " + vertices [i].ToString ());
-			//}
-			//Debug.Log (prev_vert.ToString () + " ----> " + vertices [i].ToString ());
+			
 		}
 
 		filter.mesh.vertices = vertices;

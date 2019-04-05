@@ -416,7 +416,7 @@ public class DICOMImgSpecs{
 }
 
 public class AffineTransformer{
-	// This is more general purpose than AffineTransformer_IndexOnly. Beware of floating point errors though
+	// This is more general purpose than AffineTransformer_IndexOnly.
 	// Source for affine transformation matrix: https://nipy.org/nibabel/dicom/dicom_orientation.html
 	float[,] affinematrix_todicom; 
 	float[,] affinematrix_toimg; 
