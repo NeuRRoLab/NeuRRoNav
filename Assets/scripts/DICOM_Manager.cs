@@ -63,21 +63,21 @@ public class DICOM_Manager : MonoBehaviour {
 		supportsComputeShaders = SystemInfo.supportsComputeShaders;
 
 		fronttex = new RenderTexture(imagedim, imagedim, 32);
-		fronttex.enableRandomWrite = true;					// this is requred to work as compute shader side written texture
-		fronttex.Create();									// yes, we need to run Create() to actually create the texture
-		fronttex.filterMode = FilterMode.Point;			// not necessary, I just wanted to have clean pixels
+		fronttex.enableRandomWrite = true;					
+		fronttex.Create();								
+		fronttex.filterMode = FilterMode.Point;			
 		fronttoback.img.texture = fronttex;
 
 		righttex = new RenderTexture(imagedim, imagedim, 32);
-		righttex.enableRandomWrite = true;					// this is requred to work as compute shader side written texture
-		righttex.Create();									// yes, we need to run Create() to actually create the texture
-		righttex.filterMode = FilterMode.Point;			// not necessary, I just wanted to have clean pixels
+		righttex.enableRandomWrite = true;			
+		righttex.Create();						
+		righttex.filterMode = FilterMode.Point;		
 		righttoleft.img.texture = righttex;
 
 		bottomtex = new RenderTexture(imagedim, imagedim, 32);
-		bottomtex.enableRandomWrite = true;					// this is requred to work as compute shader side written texture
-		bottomtex.Create();									// yes, we need to run Create() to actually create the texture
-		bottomtex.filterMode = FilterMode.Point;			// not necessary, I just wanted to have clean pixels
+		bottomtex.enableRandomWrite = true;			
+		bottomtex.Create();						
+		bottomtex.filterMode = FilterMode.Point;	
 		bottomtotop.img.texture = bottomtex;
 
 	}
@@ -106,6 +106,7 @@ public class DICOM_Manager : MonoBehaviour {
 
 			if (rightsliderval != prevrightval) {
 				// Call compute shader function
+				print(xcoord);
 				dicomslicecreator.SetFloat("xcoord",xcoord);
 				dicomslicecreator.Dispatch(kernelrightleft,imagedim/16,imagedim/16,1);
 			}
@@ -258,11 +259,12 @@ public class DICOM_Manager : MonoBehaviour {
 
 		// Then link the texture
 		dicomslicecreator.SetTexture(kernelfrontback, "textureOutFrontBack", fronttex);
-		dicomslicecreator.SetTexture(kernelfrontback, "textureOutRightLeft", righttex);
-		dicomslicecreator.SetTexture(kernelfrontback, "textureOutBottomTop", bottomtex);
+		dicomslicecreator.SetTexture(kernelrightleft, "textureOutRightLeft", righttex);
+		dicomslicecreator.SetTexture(kernelbottomtop, "textureOutBottomTop", bottomtex);
 
 		// Dim info of voxelarr
 		dicomslicecreator.SetInt("rows",imgspecs.rows);
+		dicomslicecreator.SetInt("slices",imgspecs.slices);
 		dicomslicecreator.SetInt("cols",imgspecs.cols);
 		dicomslicecreator.SetFloat("maxval",imgspecs.maxval);
 	}
