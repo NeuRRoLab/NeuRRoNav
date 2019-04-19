@@ -101,6 +101,7 @@ public class DICOM_Manager : MonoBehaviour {
 				//print(ycoord);
 				dicomslicecreator.SetFloat("ycoord",ycoord);
 				dicomslicecreator.Dispatch(kernelfrontback,imagedim/16,imagedim/16,1);
+				fronttext.text = ycoord.ToString()+"mm";
 				//dicomslicecreator.SetFloat("ycoord",ycoord);
 			}
 
@@ -109,12 +110,14 @@ public class DICOM_Manager : MonoBehaviour {
 				print(xcoord);
 				dicomslicecreator.SetFloat("xcoord",xcoord);
 				dicomslicecreator.Dispatch(kernelrightleft,imagedim/16,imagedim/16,1);
+				righttext.text = xcoord.ToString()+"mm";
 			}
 
 			if (bottomsliderval != prevbottomval) {
 				// Call compute shader function
 				dicomslicecreator.SetFloat("zcoord",zcoord);
 				dicomslicecreator.Dispatch(kernelbottomtop,imagedim/16,imagedim/16,1);
+				bottomtext.text = zcoord.ToString()+"mm";
 			}
 				
 			/*

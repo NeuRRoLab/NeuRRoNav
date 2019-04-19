@@ -58,9 +58,14 @@ void FrontBackTextureCalc (uint3 id : SV_DispatchThreadID) {
 
 	// now need to set relevant pixel of texture
 	int indexz = outputmatrix[2];
+	int indexz_1 = indexz+1;
 	int indexy = outputmatrix[1];
 	int indexx = outputmatrix[0];
 
+	float frac = outputmatrix[2] - float(int(outputmatrix[2]));
+	float invfrac = 1.0 - frac; // weight to give lower
+
+	// Get bottom val
 	int inbounds = 1;
 	if((indexx<0)||(indexx>=cols)){
 		inbounds = 0;
@@ -71,10 +76,29 @@ void FrontBackTextureCalc (uint3 id : SV_DispatchThreadID) {
 	if((indexz<0)||(indexz>=slices)){
 		inbounds = 0;
 	}
-	float pixlval = 0;
+	float pixlval_bot = 0;
 	if(inbounds == 1){
-		 pixlval = (voxelarr [(rows * cols) * indexz + (indexy * cols) + indexx])/maxval;
+		 pixlval_bot = (voxelarr [(rows * cols) * indexz + (indexy * cols) + indexx])/maxval;
 	}
+
+	// Get top val
+	inbounds = 1;
+	if((indexx<0)||(indexx>=cols)){
+		inbounds = 0;
+	}
+	if((indexy<0)||(indexy>=rows)){
+		inbounds = 0;
+	}
+	if((indexz_1<0)||(indexz_1>=slices)){
+		inbounds = 0;
+	}
+	float pixlval_top = 0;
+	if(inbounds == 1){
+		 pixlval_top = (voxelarr [(rows * cols) * indexz_1 + (indexy * cols) + indexx])/maxval;
+	}
+
+	float pixlval = invfrac * pixlval_bot + 
+			frac*pixlval_top;
 
 	textureOutFrontBack[id.xy] = float4(pixlval,pixlval,pixlval,1);
 
@@ -110,9 +134,14 @@ void RightLeftTextureCalc (uint3 id : SV_DispatchThreadID) {
 
 	// now need to set relevant pixel of texture
 	int indexz = outputmatrix[2];
+	int indexz_1 = indexz+1;
 	int indexy = outputmatrix[1];
 	int indexx = outputmatrix[0];
 
+	float frac = outputmatrix[2] - float(int(outputmatrix[2]));
+	float invfrac = 1.0 - frac; // weight to give lower
+
+	// Get bottom val
 	int inbounds = 1;
 	if((indexx<0)||(indexx>=cols)){
 		inbounds = 0;
@@ -123,10 +152,29 @@ void RightLeftTextureCalc (uint3 id : SV_DispatchThreadID) {
 	if((indexz<0)||(indexz>=slices)){
 		inbounds = 0;
 	}
-	float pixlval = 0;
+	float pixlval_bot = 0;
 	if(inbounds == 1){
-		 pixlval = (voxelarr [(rows * cols) * indexz + (indexy * cols) + indexx])/maxval;
+		 pixlval_bot = (voxelarr [(rows * cols) * indexz + (indexy * cols) + indexx])/maxval;
 	}
+
+	// Get top val
+	inbounds = 1;
+	if((indexx<0)||(indexx>=cols)){
+		inbounds = 0;
+	}
+	if((indexy<0)||(indexy>=rows)){
+		inbounds = 0;
+	}
+	if((indexz_1<0)||(indexz_1>=slices)){
+		inbounds = 0;
+	}
+	float pixlval_top = 0;
+	if(inbounds == 1){
+		 pixlval_top = (voxelarr [(rows * cols) * indexz_1 + (indexy * cols) + indexx])/maxval;
+	}
+
+	float pixlval = invfrac * pixlval_bot + 
+			frac*pixlval_top;
 
 	textureOutRightLeft[id.xy] = float4(pixlval,pixlval,pixlval,1);
 }
@@ -139,7 +187,7 @@ int imgdim = 512;
 	// transform my id point 
 
 	float xfrac = float(id.x)/imgdim_float; 
-	float yfrac = float(id.y)/imgdim_float; 
+	float yfrac = 1.0-float(id.y)/imgdim_float; 
 
 	float dicomcoord[4];
 	float outputmatrix[4];
@@ -161,9 +209,14 @@ int imgdim = 512;
 
 	// now need to set relevant pixel of texture
 	int indexz = outputmatrix[2];
+	int indexz_1 = indexz+1;
 	int indexy = outputmatrix[1];
 	int indexx = outputmatrix[0];
 
+	float frac = outputmatrix[2] - float(int(outputmatrix[2]));
+	float invfrac = 1.0 - frac; // weight to give lower
+
+	// Get bottom val
 	int inbounds = 1;
 	if((indexx<0)||(indexx>=cols)){
 		inbounds = 0;
@@ -174,11 +227,29 @@ int imgdim = 512;
 	if((indexz<0)||(indexz>=slices)){
 		inbounds = 0;
 	}
-	float pixlval = 0;
+	float pixlval_bot = 0;
 	if(inbounds == 1){
-		 pixlval = (voxelarr [(rows * cols) * indexz + (indexy * cols) + indexx])/maxval;
+		 pixlval_bot = (voxelarr [(rows * cols) * indexz + (indexy * cols) + indexx])/maxval;
 	}
 
+	// Get top val
+	inbounds = 1;
+	if((indexx<0)||(indexx>=cols)){
+		inbounds = 0;
+	}
+	if((indexy<0)||(indexy>=rows)){
+		inbounds = 0;
+	}
+	if((indexz_1<0)||(indexz_1>=slices)){
+		inbounds = 0;
+	}
+	float pixlval_top = 0;
+	if(inbounds == 1){
+		 pixlval_top = (voxelarr [(rows * cols) * indexz_1 + (indexy * cols) + indexx])/maxval;
+	}
+
+	float pixlval = invfrac * pixlval_bot + 
+			frac*pixlval_top;
+
 	textureOutBottomTop[id.xy] = float4(pixlval,pixlval,pixlval,1);
-	
 }
