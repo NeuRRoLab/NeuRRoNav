@@ -7,6 +7,8 @@ using Dicom.Imaging.Render;
 using System.IO;
 using System.Collections.Generic;  
 using System.Windows.Forms;
+using System.Linq;
+using System;
 
 public class DICOM_Manager : MonoBehaviour {
 	// Handles the loading and representation of DICOM files.
@@ -440,9 +442,32 @@ public class DICOMImgSpecs{
 			return;
 		}
 			
-		// Need to get initial stuff. 
+		// Need to get initial stuff, filter out meta files...
 		DirectoryInfo d = new DirectoryInfo(dirname);
-		dicom_files = d.GetFiles("*.dcm");
+		var dicom_files_unfiltered = d.GetFiles ();
+		int totalfiles = 0;
+		foreach (var dfile in dicom_files_unfiltered ){
+			if(dfile.Name.Split('.')[dfile.Name.Split('.').Length-1] != "meta"){
+				totalfiles++;
+			}
+		}
+
+		dicom_files = new FileInfo[totalfiles];
+		int ind_file = 0;
+		foreach (var dfile in dicom_files_unfiltered ){
+			if(dfile.Name.Split('.')[dfile.Name.Split('.').Length-1] != "meta"){
+				dicom_files[ind_file] = dfile;
+				ind_file++;
+			}
+
+		}
+		//var allFiles = Directory.GetFiles(dirname);
+		//var filesToExclude = Directory.GetFiles(dirname, "*.meta");
+		//var dicom_files = allFiles.Except(filesToExclude);
+
+		/*
+		var dicom_files_1 = d.GetFiles("*.dcm");
+		var dicom_files_2 = d.GetFiles("*.dcm");*/
 
 		var image = new DicomImage(dirname+dicom_files[0].Name);
 		var nextimage = new DicomImage(dirname+dicom_files[1].Name);
