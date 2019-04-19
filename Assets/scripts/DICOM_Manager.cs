@@ -16,6 +16,13 @@ public class DICOM_Manager : MonoBehaviour {
 
 	public ComputeShader dicomslicecreator;
 
+	ComputeBuffer voxelbuffer;
+	ComputeBuffer todicombuffer;
+	ComputeBuffer toimgbuffer;
+	ComputeBuffer bottombackbuffer;
+	ComputeBuffer frontforwardbuffer;
+	ComputeBuffer dicomspacedims;
+
 	int imagedim = 512;
 
 	public InputField folderloc;
@@ -89,9 +96,12 @@ public class DICOM_Manager : MonoBehaviour {
 
 			// GPU-Accelerated texture updates
 			if(frontsliderval != prevfronval){
+		//		Debug.Log ("Changing front val");
 				// Call compute shader function
+				//print(ycoord);
 				dicomslicecreator.SetFloat("ycoord",ycoord);
 				dicomslicecreator.Dispatch(kernelfrontback,imagedim/16,imagedim/16,1);
+				//dicomslicecreator.SetFloat("ycoord",ycoord);
 			}
 
 			if (rightsliderval != prevrightval) {
@@ -174,8 +184,8 @@ public class DICOM_Manager : MonoBehaviour {
 
 				newtexbottom.Apply ();
 				bottomtext.text = zcoord.ToString()+"mm";
-			}
-			*/
+			}*/
+
 			prevfronval = frontsliderval;
 			prevrightval = rightsliderval;
 			prevbottomval = bottomsliderval;
@@ -189,20 +199,20 @@ public class DICOM_Manager : MonoBehaviour {
 		kernelbottomtop = dicomslicecreator.FindKernel("BottomTopTextureCalc");
 
 		// Gotta transfer main float[]
-		ComputeBuffer voxelbuffer = new ComputeBuffer(imgspecs.voxelarr.Length, 4);
+		/*ComputeBuffer */voxelbuffer = new ComputeBuffer(imgspecs.voxelarr.Length, 4);
 		voxelbuffer.SetData(imgspecs.voxelarr);
 		dicomslicecreator.SetBuffer(kernelfrontback, "voxelarr", voxelbuffer);
 		dicomslicecreator.SetBuffer(kernelrightleft, "voxelarr", voxelbuffer);
 		dicomslicecreator.SetBuffer(kernelbottomtop, "voxelarr", voxelbuffer);
 
 		// Then both the transformation and inverse transformation matrix
-		ComputeBuffer todicombuffer = new ComputeBuffer(imgspecs.affinetransformer.todicom_flattened.Length, 4);
+		/*ComputeBuffer */ todicombuffer = new ComputeBuffer(imgspecs.affinetransformer.todicom_flattened.Length, 4);
 		todicombuffer.SetData(imgspecs.affinetransformer.todicom_flattened);
 		dicomslicecreator.SetBuffer(kernelfrontback, "todicommatrix", todicombuffer);
 		dicomslicecreator.SetBuffer(kernelrightleft, "todicommatrix", todicombuffer);
 		dicomslicecreator.SetBuffer(kernelbottomtop, "todicommatrix", todicombuffer);
 
-		ComputeBuffer toimgbuffer = new ComputeBuffer(imgspecs.affinetransformer.toimg_flattened.Length, 4);
+		/*ComputeBuffer */ toimgbuffer = new ComputeBuffer(imgspecs.affinetransformer.toimg_flattened.Length, 4);
 		toimgbuffer.SetData(imgspecs.affinetransformer.toimg_flattened);
 		dicomslicecreator.SetBuffer(kernelfrontback, "toimgmatrix", toimgbuffer);
 		dicomslicecreator.SetBuffer(kernelrightleft, "toimgmatrix", toimgbuffer);
@@ -215,7 +225,7 @@ public class DICOM_Manager : MonoBehaviour {
 			imgspecs.dicomspace_bottombackleft.z,
 		};
 
-		ComputeBuffer bottombackbuffer = new ComputeBuffer(bottombackarr.Length,4);
+		/*ComputeBuffer */ bottombackbuffer = new ComputeBuffer(bottombackarr.Length,4);
 		bottombackbuffer.SetData (bottombackarr);
 		dicomslicecreator.SetBuffer(kernelfrontback, "backbottomleft", bottombackbuffer);
 		dicomslicecreator.SetBuffer(kernelrightleft, "backbottomleft", bottombackbuffer);
@@ -227,7 +237,7 @@ public class DICOM_Manager : MonoBehaviour {
 			imgspecs.dicomspace_frontforwardright.z,
 		};
 
-		ComputeBuffer frontforwardbuffer = new ComputeBuffer(frontforwardarr.Length,4);
+		/*ComputeBuffer */ frontforwardbuffer = new ComputeBuffer(frontforwardarr.Length,4);
 		frontforwardbuffer.SetData (frontforwardarr);
 		dicomslicecreator.SetBuffer(kernelfrontback, "frontforwardright", frontforwardbuffer);
 		dicomslicecreator.SetBuffer(kernelrightleft, "frontforwardright", frontforwardbuffer);
@@ -240,7 +250,7 @@ public class DICOM_Manager : MonoBehaviour {
 			imgspecs.dicomspace_dims.z,
 		};
 
-		ComputeBuffer dicomspacedims = new ComputeBuffer(dicomspacedims_arr.Length,4);
+		/*ComputeBuffer */ dicomspacedims = new ComputeBuffer(dicomspacedims_arr.Length,4);
 		dicomspacedims.SetData (dicomspacedims_arr);
 		dicomslicecreator.SetBuffer(kernelfrontback, "dicomspace_dims", dicomspacedims);
 		dicomslicecreator.SetBuffer(kernelrightleft, "dicomspace_dims", dicomspacedims);
@@ -255,8 +265,15 @@ public class DICOM_Manager : MonoBehaviour {
 		dicomslicecreator.SetInt("rows",imgspecs.rows);
 		dicomslicecreator.SetInt("cols",imgspecs.cols);
 		dicomslicecreator.SetFloat("maxval",imgspecs.maxval);
+	}
 
-
+	void OnDestroy(){					
+		voxelbuffer.Release();
+		todicombuffer.Release();
+		toimgbuffer.Release();
+		bottombackbuffer.Release();
+		frontforwardbuffer.Release();
+		dicomspacedims.Release();
 	}
 
 	public void LoadDICOMFromFolder(){
@@ -273,9 +290,15 @@ public class DICOM_Manager : MonoBehaviour {
 			newtexright = new Texture2D(imagedim, imagedim);
 			newtexbottom = new Texture2D(imagedim, imagedim);
 
-			fronttoback.img.texture = newtexfront;
-			righttoleft.img.texture = newtexright;
-			bottomtotop.img.texture = newtexbottom;
+			fronttoback.img.material.mainTexture = fronttex;
+			righttoleft.img.material.mainTexture = righttex;
+			bottomtotop.img.material.mainTexture = bottomtex;
+
+			//fronttoback.img.type = UnityEngine.UI.Image.Type.Simple;
+
+			//fronttoback.img.texture = newtexfront;
+			//righttoleft.img.texture = newtexright;
+			//bottomtotop.img.texture = newtexbottom;
 
 			prevbottomval = -100;
 			prevfronval = -100;
@@ -632,8 +655,8 @@ public class AffineTransformer{
 		toimg_flattened = new float[16];
 
 		for (int row=0;row<4;++row){
-			for(int col=0;col<4;col++){
-				toimg_flattened [(4 * col) + row] = affinematrix_toimg [row, col];
+			for(int col=0;col<4;++col){
+				toimg_flattened [(4 * row) + col] = affinematrix_toimg [row, col];
 			}
 		}
 	}
