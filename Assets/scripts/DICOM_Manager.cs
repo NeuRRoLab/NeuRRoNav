@@ -16,12 +16,12 @@ public class DICOM_Manager : MonoBehaviour {
 
 	public ComputeShader dicomslicecreator;
 
-	ComputeBuffer voxelbuffer;
-	ComputeBuffer todicombuffer;
-	ComputeBuffer toimgbuffer;
-	ComputeBuffer bottombackbuffer;
-	ComputeBuffer frontforwardbuffer;
-	ComputeBuffer dicomspacedims;
+	public static ComputeBuffer voxelbuffer;
+	public static ComputeBuffer todicombuffer;
+	public static ComputeBuffer toimgbuffer;
+	public static ComputeBuffer bottombackbuffer;
+	public static ComputeBuffer frontforwardbuffer;
+	public static ComputeBuffer dicomspacedims;
 
 	int imagedim = 512;
 
@@ -194,6 +194,8 @@ public class DICOM_Manager : MonoBehaviour {
 	}
 
 	public void InitComputeShader() {
+
+		ReleaseBuffers ();
 		
 		kernelfrontback = dicomslicecreator.FindKernel("FrontBackTextureCalc");
 		kernelrightleft = dicomslicecreator.FindKernel("RightLeftTextureCalc");
@@ -267,15 +269,33 @@ public class DICOM_Manager : MonoBehaviour {
 		dicomslicecreator.SetInt("slices",imgspecs.slices);
 		dicomslicecreator.SetInt("cols",imgspecs.cols);
 		dicomslicecreator.SetFloat("maxval",imgspecs.maxval);
+
+
+	}
+
+	void ReleaseBuffers(){
+		if (voxelbuffer != null) {
+			voxelbuffer.Release ();
+		}
+		if (todicombuffer != null) {
+			todicombuffer.Release ();
+		}
+		if (toimgbuffer != null) {
+			toimgbuffer.Release ();
+		}
+		if (bottombackbuffer != null) {
+			bottombackbuffer.Release ();
+		}
+		if (frontforwardbuffer != null) {
+			frontforwardbuffer.Release ();
+		}
+		if (dicomspacedims != null) {
+			dicomspacedims.Release ();
+		}
 	}
 
 	void OnDestroy(){					
-		voxelbuffer.Release();
-		todicombuffer.Release();
-		toimgbuffer.Release();
-		bottombackbuffer.Release();
-		frontforwardbuffer.Release();
-		dicomspacedims.Release();
+		ReleaseBuffers ();
 	}
 
 	public void LoadDICOMFromFolder(){
