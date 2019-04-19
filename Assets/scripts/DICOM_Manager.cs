@@ -6,9 +6,12 @@ using Dicom.Imaging;
 using Dicom.Imaging.Render;
 using System.IO;
 using System.Collections.Generic;  
+using System.Windows.Forms;
 
 public class DICOM_Manager : MonoBehaviour {
 	// Handles the loading and representation of DICOM files.
+
+	public UnityEngine.UI.Button genmeshbutton;
 
 	int kernelfrontback; 
 	int kernelrightleft; 
@@ -60,6 +63,8 @@ public class DICOM_Manager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		folderloc.text = UnityEngine.Application.dataPath + @"/Sample_DICOM/SampleImage_1";
+
 		supportsComputeShaders = SystemInfo.supportsComputeShaders;
 
 		fronttex = new RenderTexture(imagedim, imagedim, 32);
@@ -196,6 +201,18 @@ public class DICOM_Manager : MonoBehaviour {
 		}
 	}
 
+	public void SelectFolder(){
+		
+		using (var dialog = new FolderBrowserDialog())
+		{
+			dialog.SelectedPath = UnityEngine.Application.dataPath + @"/Sample_DICOM/";
+			if (dialog.ShowDialog() == DialogResult.OK)
+			{
+				folderloc.text = dialog.SelectedPath;
+			}
+		}
+	}
+
 	public void InitComputeShader() {
 		if (!supportsComputeShaders) {
 			return;
@@ -307,6 +324,7 @@ public class DICOM_Manager : MonoBehaviour {
 	}
 
 	public void LoadDICOMFromFolder(){
+		genmeshbutton.interactable = false;
 		imgspecs = new DICOMImgSpecs ();
 		imgspecs.InitFromDir(folderloc.text);
 		if ((imgspecs != null) && (imgspecs.initialized)) {
@@ -335,7 +353,9 @@ public class DICOM_Manager : MonoBehaviour {
 			prevrightval = -100;
 
 			InitComputeShader ();
+			genmeshbutton.interactable = true;
 		}
+
 	}
 }
 
@@ -422,7 +442,7 @@ public class DICOMImgSpecs{
 			
 		// Need to get initial stuff. 
 		DirectoryInfo d = new DirectoryInfo(dirname);
-		dicom_files = d.GetFiles();
+		dicom_files = d.GetFiles("*.dcm");
 
 		var image = new DicomImage(dirname+dicom_files[0].Name);
 		var nextimage = new DicomImage(dirname+dicom_files[1].Name);
