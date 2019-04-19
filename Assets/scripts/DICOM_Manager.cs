@@ -94,32 +94,32 @@ public class DICOM_Manager : MonoBehaviour {
 			float ycoord = imgspecs.dicomspace_bottombackleft.y + frontsliderval * imgspecs.dicomspace_dims.y;
 			float zcoord = imgspecs.dicomspace_bottombackleft.z + bottomsliderval * imgspecs.dicomspace_dims.z;
 
-			// GPU-Accelerated texture updates
-			if(frontsliderval != prevfronval){
-		//		Debug.Log ("Changing front val");
-				// Call compute shader function
-				//print(ycoord);
-				dicomslicecreator.SetFloat("ycoord",ycoord);
-				dicomslicecreator.Dispatch(kernelfrontback,imagedim/16,imagedim/16,1);
-				fronttext.text = ycoord.ToString()+"mm";
-				//dicomslicecreator.SetFloat("ycoord",ycoord);
+			if (supportsComputeShaders) {
+
+				// GPU-Offloaded texture updates
+				if (frontsliderval != prevfronval) {
+	
+					dicomslicecreator.SetFloat ("ycoord", ycoord);
+					dicomslicecreator.Dispatch (kernelfrontback, imagedim / 16, imagedim / 16, 1);
+					fronttext.text = ycoord.ToString () + "mm";
+				}
+
+				if (rightsliderval != prevrightval) {
+					dicomslicecreator.SetFloat ("xcoord", xcoord);
+					dicomslicecreator.Dispatch (kernelrightleft, imagedim / 16, imagedim / 16, 1);
+					righttext.text = xcoord.ToString () + "mm";
+				}
+
+				if (bottomsliderval != prevbottomval) {
+					dicomslicecreator.SetFloat ("zcoord", zcoord);
+					dicomslicecreator.Dispatch (kernelbottomtop, imagedim / 16, imagedim / 16, 1);
+					bottomtext.text = zcoord.ToString () + "mm";
+				}
 			}
 
-			if (rightsliderval != prevrightval) {
-				// Call compute shader function
-				print(xcoord);
-				dicomslicecreator.SetFloat("xcoord",xcoord);
-				dicomslicecreator.Dispatch(kernelrightleft,imagedim/16,imagedim/16,1);
-				righttext.text = xcoord.ToString()+"mm";
-			}
-
-			if (bottomsliderval != prevbottomval) {
-				// Call compute shader function
-				dicomslicecreator.SetFloat("zcoord",zcoord);
-				dicomslicecreator.Dispatch(kernelbottomtop,imagedim/16,imagedim/16,1);
-				bottomtext.text = zcoord.ToString()+"mm";
-			}
-				
+			// NOTE: Below is legacy functionality for drawing the DICOM textures,
+			// which operated on the CPU instead of the GPU, it was very slow due to
+			// the extensive matrix multiplications required (one for each pixel)
 			/*
 			// frontback
 			if (frontsliderval != prevfronval) {
@@ -197,6 +197,9 @@ public class DICOM_Manager : MonoBehaviour {
 	}
 
 	public void InitComputeShader() {
+		if (!supportsComputeShaders) {
+			return;
+		}
 
 		ReleaseBuffers ();
 		
@@ -297,8 +300,10 @@ public class DICOM_Manager : MonoBehaviour {
 		}
 	}
 
-	void OnDestroy(){					
-		ReleaseBuffers ();
+	void OnDestroy(){	
+		if (supportsComputeShaders) {
+			ReleaseBuffers ();
+		}
 	}
 
 	public void LoadDICOMFromFolder(){
