@@ -9,3 +9,5 @@ Developed using:
  - Unity 5.4.1f.1
 
  Video Tutorial: https://www.youtube.com/watch?v=NtjApbOK1T8
+ 
+ Motive Download: https://s3.amazonaws.com/naturalpoint/software/Motive/Motive_1.8.0_Final_x64.exe
