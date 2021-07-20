@@ -11,6 +11,9 @@ Developed using:
  Video Tutorials: 
   - Part 1: https://www.youtube.com/watch?v=3wf42p4cZv4&ab_channel=E.PeterWashabaugh
   - Part 2: https://www.youtube.com/watch?v=-nwMoSoVbRE&ab_channel=E.PeterWashabaugh
- 
+
+Updated Video Tutorial for NeuRRoNav
+
+ - https://www.youtube.com/watch?v=Pu5cU0hv1qs
  
  Motive Download: https://s3.amazonaws.com/naturalpoint/software/Motive/Motive_1.8.0_Final_x64.exe
